@@ -115,6 +115,7 @@ protected:
   void SO_SLDs();
   void SO_CLDs();
   void SO_CLD_Events();
+  void SO_Load_DDF();
 
   // helper routines
   const char*    GetSelectedPath();
