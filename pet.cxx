@@ -74,8 +74,8 @@ main(int argc, char *argv[])
 
   // check for single window switch
   if (argList.IsPresent("-single")){
-    mainPetWindow = new PetWindow(application, "PetWindow");
-    mainPetWindow->SetLocalPetWindowCreating(false);
+    mainPetWindow = new PetWindow(application, "petWindow");
+    mainPetWindow->SetLocalPetWindowCreating(true);
     mainPetWindow->AddEventReceiver(&controlEventReceiver);
     mainPetWindow->Show();
   }
@@ -675,7 +675,17 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 		pageWin = new SSPageWindow(this, "pageWindow");
 	      }
 	      if (type == CONTROL_PET_WINDOW || type == CONTROL_HYBRID_WINDOW){
-		petWin = new PetWindow(this, "PetWindow");
+		DirTree *tree = (DirTree*)treeTable->GetTree();
+		if(tree) {
+		  char treeRootPathAndNode[512];
+		  const StdNode* theNode = tree->GetRootNode();
+		  if (tree->GenerateFullNodePathname(theNode, treeRootPathAndNode) == 0)
+		    petWin = new PetWindow(this, "petWindow", "pet", treeRootPathAndNode);
+		  else
+		    petWin = new PetWindow(this, "petWindow");
+		}
+		else
+		  petWin = new PetWindow(this, "petWindow");
 		petWin->SetLocalPetWindowCreating(false);
 	      }
 	    }
@@ -779,7 +789,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       if (IsWindowInList((UIWindow*) object)){
 	PetWindow* petWin = (PetWindow*) object;
 	int ppmUser = petWin->GetPPMUser();
-	petWin = new PetWindow(this, "PetWindow");
+	petWin = new PetWindow(this, "petWindow");
+	petWin->SetLocalPetWindowCreating(false);
 	petWin->LoadFile(object->GetMessage(), NULL, ppmUser);
 	AddListWindow(petWin);
 	petWin->Show();
@@ -1164,7 +1175,7 @@ void SSMainWindow::LoadTable(const StdNode* node)
 
 void SSMainWindow::SS_New()
 {
-  PetWindow* petWin = new PetWindow(this, "PetWindow");
+  PetWindow* petWin = new PetWindow(this, "petWindow");
   petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
   petWin->TF_Open();
@@ -1183,13 +1194,13 @@ void SSMainWindow::SS_Open()
     if (WindowType(win) == CONTROL_PET_WINDOW)
       petWin = (PetWindow*) win;
     else{
-      petWin = new PetWindow(this, "PetWindow");
+      petWin = new PetWindow(this, "petWindow");
       petWin->SetLocalPetWindowCreating(false);
       AddListWindow(petWin);
     }
   }
   else{
-    petWin = new PetWindow(this, "PetWindow");
+    petWin = new PetWindow(this, "petWindow");
     petWin->SetLocalPetWindowCreating(false);
     AddListWindow(petWin);
   }
@@ -1280,7 +1291,7 @@ void SSMainWindow::SS_Default_PPM_User()
 void SSMainWindow::SS_Create_RHIC_Page()
 {
   SetWorkingCursor();
-  PetWindow* petWin = new PetWindow(this, "PetWindow");
+  PetWindow* petWin = new PetWindow(this, "petWindow");
   petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
   petWin->TF_Create_Pet_Page();
@@ -1292,7 +1303,7 @@ void SSMainWindow::SS_Create_RHIC_Page()
 void SSMainWindow::SS_Create_PS_RHIC_Page()
 {
   SetWorkingCursor();
-  PetWindow* petWin = new PetWindow(this, "PetWindow");
+  PetWindow* petWin = new PetWindow(this, "petWindow");
   petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
   petWin->TF_Create_PS_Pet_Page();
