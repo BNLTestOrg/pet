@@ -30,7 +30,7 @@
 
 static UIApplication*	application;
 static UIArgumentList	argList;
-static SSMainWindow*	mainWindow;
+static SSMainWindow*	mainWindow = NULL;
 static UIBoolean	singleDeviceListOnly=UIFalse;	// used for loading a single device list only
 							// no main window (tree table) is displayed
 static KnobPanel*	knobPanel = NULL;
@@ -970,7 +970,7 @@ int SSMainWindow::LoadDeviceList(SSPageWindow* win, const char* deviceList, shor
 
 void SSMainWindow::SetWindowPos(UIWindow* window)
 {
-  if(window == NULL)
+  if(window == NULL || mainWindow == NULL)
     return;
 
   // get the position and width of the main window
