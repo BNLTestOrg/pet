@@ -1,7 +1,7 @@
 "MTRE",3
 797093749,"Wed Apr  5 10:55:49 1995"
-1071245299,"Fri Dec 12 11:08:19 2003"
-32,29,29
+1089216078,"Wed Jul  7 12:01:18 2004"
+32,30,30
 
 "NODE 0"
 "SSmain"
@@ -126,7 +126,7 @@ in one or more device lists."
 
 "NODE 13"
 "Read Archive Log"
-13,11,14,12,-1
+13,11,29,12,-1
 1
 65,""
 0,0
@@ -136,7 +136,7 @@ with the archiving system."
 
 "NODE 14"
 "----"
-14,11,21,13,-1
+14,11,21,29,-1
 6
 0,""
 0,0
@@ -263,12 +263,14 @@ by choosing the Show menu item."
 ""
 
 "NODE 29"
-""
-29,-1,30,-1,-1
+"PPM User Monitor"
+29,11,14,13,-1
 1
 0,""
 0,0
-""
+"Run program that lets you see which ppm users
+and supercycle tables are active and have been
+active recently."
 
 "NODE 30"
 ""
