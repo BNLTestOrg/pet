@@ -792,6 +792,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	  if (type == PET_ADO_WINDOW || type == PET_HYBRID_WINDOW) { 
 	    char s[512];
 	    DirTree* tree = (DirTree*)treeTable->GetTree();
+	    const StdNode* theNode = tree->GetRootNode();
+	    if (tree->GenerateFullNodePathname(theNode, s) == 0)
+	      petWin->SetTreeRootPath(s);
 	    tree->GenerateFullNodePathname(treeTable->GetNodeSelected(), s);
 	    strcat(s, "/");
 	    strcat(s, ADO_DEVICE_LIST);
@@ -845,6 +848,21 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	int ppmUser = petWin->GetPPMUser();
 	petWin = new PetWindow(this, "petWindow");
 	petWin->SetLocalPetWindowCreating(false);
+	// make sure tree root path is set
+	if (treeTable != NULL)
+	  {
+	    char s[512];
+	    DirTree* tree = (DirTree*)treeTable->GetTree();
+	    if (tree != NULL)
+	      {
+		const StdNode* theNode = tree->GetRootNode();
+		if (theNode != NULL)
+		  {
+		    if (tree->GenerateFullNodePathname(theNode, s) == 0)
+		      petWin->SetTreeRootPath(s);
+		  }
+	      }
+	  }
 	petWin->LoadFile(object->GetMessage(), NULL, ppmUser);
 	AddListWindow(petWin);
 	petWin->Show();
