@@ -19,7 +19,6 @@
 #include <UIAgs/generic_popups_derived.h>	// for gp_set_ppm _program() _user()
 #include <UIAgs/cld_popup.hxx>			// for cld popups
 #include <UIGenerics/GenericPopups.hxx>
-#include <UIDevice/UIDeviceSelect.hxx>
 #include "control.hxx"
 #include <sys/stat.h>				// for umask printing permissions
 #include <sys/types.h>
@@ -27,11 +26,12 @@
 #include <agsPage/KnobPanel.hxx>		// for supporting a knob panel
 #include <UIUtils/UIPPM.hxx>
 #include <cdevCns/cdevCns.hxx>
+#include "MenuTree.cxx"
 
 #define SS_PRINT_FILE		"/tmp/SSPagePrintFile"
 
-#define DEFAULT_PET_FILE "device_list.pet"
-#define DEFAULT_SS_FILE  "device_list.ss"
+//#define DEFAULT_PET_FILE "device_list.ado"
+//#define DEFAULT_SS_FILE  "device_list.ld"
 
 static UIApplication*	application;
 static UIArgumentList	argList;
@@ -51,25 +51,6 @@ static void clean_up(int st)
   rpc_udp_cleanup();
   exit(st);
 }
-
-//   ////////////////////////////TEMPORARY CODE  DELETE  DELETE ///////////////////////////////////////////
-// int actionFunc(StdTree* tree, StdNode* node, void* argBlock)
-// {
-//   DirTree* d = (DirTree*) tree;
-
-//   char cmd[1024];
-//   char fullPath[512];
-//   d->GenerateFullNodePathname(node, fullPath);
-//   if (node->FirstChild() == NULL){
-//     sprintf(cmd, "ln -s device_list %s/device_list.ss", fullPath);
-//     cout << cmd << endl;
-//     system(cmd);
-//   }
-  
-//   return 1; // ok
-//   return 0; // error
-// }
-//   ////////////////////////////TEMPORARY CODE  DELETE  DELETE ///////////////////////////////////////////
 
 main(int argc, char *argv[])
 {
@@ -94,6 +75,7 @@ main(int argc, char *argv[])
   // check for single window switch
   if (argList.IsPresent("-single")){
     mainPetWindow = new PetWindow(application, "PetWindow");
+    mainPetWindow->SetLocalPetWindowCreating(false);
     mainPetWindow->AddEventReceiver(&controlEventReceiver);
     mainPetWindow->Show();
   }
@@ -141,8 +123,6 @@ main(int argc, char *argv[])
     // set up the archive lib tools
     mainWindow->InitArchiveLib();
     
-//     // establish a relway connection
-//     mainWindow->InitRelwayServer();
   } else {
     // load files that are untagged on the command line
     int fileNum;
@@ -161,10 +141,10 @@ main(int argc, char *argv[])
 	  *ptr = '\0';
 	  ptr++;
 	  path = new char[strlen(tmpFile) + 10];
-	  sprintf(path, "%s/*.pet", tmpFile);
+	  sprintf(path, "%s/*.ado", tmpFile);
 	}
 	else			// no path given
-	  path = strdup("*.pet");
+	  path = strdup("*.ado");
       
 	if(fileNum==0) {	// only do the first file
 	  mainPetWindow->LoadFile(file);
@@ -258,8 +238,10 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   menubar->AttachTo(this, this, NULL, this);
 
   // put a pulldown menu in the menubar
+  pulldownMenuTree = CreateMenuTree();
+  
   // the name of the tree file is in the resource file
-  pulldownMenu = new UIPulldownMenu(menubar, "mainPulldown");
+  pulldownMenu = new UIPulldownMenu(menubar, "mainPulldown", pulldownMenuTree);
   if(pulldownMenu->IsTreeLoaded() == UIFalse)
     {	printf("Could not load menu tree.  Aborting.\n");
     clean_up(1);
@@ -287,16 +269,19 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
 
   // add the table which displays the machine tree
   // put this in last so that it is the one that grows when the window is resized
-  treeTable = new UICombineMachineTree(this, "treeTable");
+  treeTable = new UIMachineTreeTable(this, "treeTable");
   treeTable->AttachTo(ppmLabel, this, pageList, this);
   treeTable->EnableEvent(UITableBtn2Down);
   treeTable->EnableEvent(UIAccept);
   treeTable->AddEventReceiver(this);
 
+  MachineTree* machTree = treeTable->GetMachineTree();
+//   printf("Loading Copy of tree (link to tree_model in Susan's home area, /home/cfsd/susan/acop)\n");
+//   machTree->SetRootDirPath("/home/cfsd/susan/acop");
   // check to see if users wants to use a new root to the machine tree
   if( strlen( argList.String("-root") ) )
     {
-      MachineTree* machTree = treeTable->GetAgsTreePtr();
+//       MachineTree* machTree = treeTable->GetAgsTreePtr();
       machTree->SetRootDirPath( argList.String("-root") );
     }
 
@@ -326,7 +311,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
 
 void SSMainWindow::InitArchiveLib()
 {
-  MachineTree* mtree = treeTable->GetAgsTreePtr();
+  MachineTree* mtree = treeTable->GetMachineTree();
   const dir_node_t* root = mtree->GetDirRootNode();
   init_archive_lib_globals(GlobalDdfPointers(), false, 0, -1, table_dummy, (dir_node_t*) root); 
 }
@@ -406,7 +391,7 @@ dir_node_t* SSMainWindow::GetSelectedDirNode()
 {
   const StdNode* theNode = treeTable->GetNodeSelected();
   if(theNode != NULL)
-    return( treeTable->GetAgsTreePtr()->Convert(theNode) );
+    return( treeTable->GetMachineTree()->Convert(theNode) );
   else
     return NULL;
 }
@@ -498,16 +483,17 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       if(event == UISelect)		// view the selected device list
 	{
 	  // get the selected node
-	  DirTree* dtree = treeTable->GetTreePtr();
-	  StdNode* rootNode = dtree->GetRootNode();
-	  const char* rootPath = dtree->GenerateNodePathname(rootNode);
+// 	  DirTree* dtree = treeTable->GetTreePtr();
+	  MachineTree* mtree = treeTable->GetMachineTree();
+	  StdNode* rootNode = mtree->GetRootNode();
+	  const char* rootPath = mtree->GenerateNodePathname(rootNode);
 	  const char* selectString = searchPopup->GetDeviceListSelection();
 	  char* nodeName = new char[strlen(rootPath) + strlen(selectString) + 2];
 	  strcpy(nodeName, rootPath);
 	  strcat(nodeName, "/");
 	  strcat(nodeName, selectString);
 	  nodeName[strlen(nodeName)-1] = 0;		// get ride of newline at the end
-	  StdNode* selectNode = dtree->FindNode(nodeName);
+	  StdNode* selectNode = mtree->FindNode(nodeName);
 	  delete [] nodeName;
 	  if(selectNode == NULL)
 	    {
@@ -639,7 +625,6 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 		{
 		  win = (UIWindow*) this->GetWindow(selection);
 		  if (type != WindowType(win)){ // current selection is of different type
-// 		    DeleteListWindow(win);
 		    RemoveWindow(win);
 		    LoadTable((const StdNode*) selectedNode);
 		    HandleEvent(treeTable, UITableBtn2Down);   // same as 2nd button event
@@ -689,8 +674,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 		// create a new device page window and load list
 		pageWin = new SSPageWindow(this, "pageWindow");
 	      }
-	      else{
+	      if (type == CONTROL_PET_WINDOW || type == CONTROL_HYBRID_WINDOW){
 		petWin = new PetWindow(this, "PetWindow");
+		petWin->SetLocalPetWindowCreating(false);
 	      }
 	    }
 	  // load the proper device list into the window
@@ -739,16 +725,19 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	    // update the device page list
 	    LoadPageList(pageWin);
 	  }
-	  else { // Pet Window
+	  if (type == CONTROL_PET_WINDOW || type == CONTROL_HYBRID_WINDOW) { 
 	    char s[512];
 	    DirTree* tree = (DirTree*)treeTable->GetTree();
 	    tree->GenerateFullNodePathname(treeTable->GetNodeSelected(), s);
 	    strcat(s, "/");
-	    strcat(s, DEFAULT_PET_FILE);
-	    petWin->Show();
+	    strcat(s, ADO_DEVICE_LIST);
 	    petWin->LoadFile(s, tree->GenerateNodePathnameWithoutRoot( treeTable->GetNodeSelected() ));
-	    AddListWindow(petWin);
+	    if (type == CONTROL_HYBRID_WINDOW)
+	      SetWindowPos(petWin);
+	    if (event == UITableBtn2Down)
+	      AddListWindow(petWin);
 	    petWin->SetPageNode( treeTable->GetNodeSelected() );
+	    petWin->Show();
 	    LoadPageList(petWin);
 	  }
 	  
@@ -763,7 +752,23 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       SetMessage("");
       SP_Show();
     }
-
+  else if(event == UIEvent3)
+    {
+      SSPageWindow* pageWin = (SSPageWindow*) GetWindow(pageList->GetSelection());
+      char name[64];
+      pageWin->CreateAgsPage(name);
+      pageWin->SetListString(name);
+      AddWindow(pageWin);
+      if (supportKnobPanel)
+	pageWin->SupportKnobPanel(knobPanel);
+      pageWin->Show();
+      pageWin->UpdateContinuous();
+      LoadPageList(pageWin);
+      // An existing page is being replaced.  Remove references to old location in tree
+      pageWin->SetDevListPath("");
+      pageWin->SetPageNode(NULL);
+      SetStandardCursor();
+    }
   else if(event == UIEvent2)
     {
       // event passed up from pet library
@@ -771,6 +776,15 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
   else if(event == UIEvent1)
     {
       // event passed up from pet library
+      if (IsWindowInList((UIWindow*) object)){
+	PetWindow* petWin = (PetWindow*) object;
+	int ppmUser = petWin->GetPPMUser();
+	petWin = new PetWindow(this, "PetWindow");
+	petWin->LoadFile(object->GetMessage(), NULL, ppmUser);
+	AddListWindow(petWin);
+	petWin->Show();
+	LoadPageList(petWin);
+      }
     }      
   
   // user made a selection from the pulldown menus
@@ -852,7 +866,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 int SSMainWindow::LoadDeviceList(SSPageWindow* win, const char* deviceList, short ppmUser)
 {
   // find a title which starts with /Booster, /Ags, etc
-  MachineTree* machTree = treeTable->GetAgsTreePtr();
+  MachineTree* machTree = treeTable->GetMachineTree();
   const char* rootPath = machTree->GetRootPath();
   const StdNode* rootNode = machTree->GetRootNode();
   const char* rootName = rootNode->Name();
@@ -866,7 +880,7 @@ int SSMainWindow::LoadDeviceList(SSPageWindow* win, const char* deviceList, shor
   char* filename = new char[strlen(deviceList) + 16];
   strcpy(filename, deviceList);
   strcat(filename, "/");
-  strcat(filename, DEFAULT_SS_FILE);
+  strcat(filename, LD_DEVICE_LIST);
 
   // load the device list
   int retval = win->LoadFile(filename, &deviceList[len], ppmUser);
@@ -896,7 +910,7 @@ void SSMainWindow::SetWindowPos(UIWindow* window)
 
   // set ypos
   short ypos = 0;
-  if( !strcmp( window->ClassName(), "SSPageWindow") )
+  if( !strcmp( window->ClassName(), "SSPageWindow") || !strcmp( window->ClassName(), "PetWindow") )
     {
       // get the position and height of the current device page
       // and set the ypos of the new window accordingly
@@ -931,9 +945,9 @@ UIWindow* SSMainWindow::FindWindow(const char* file)
   char petName[512];
   char ssName[512];
   strcpy(petName, file);
-  strcat(petName, DEFAULT_PET_FILE);
+  strcat(petName, ADO_DEVICE_LIST);
   strcpy(ssName, file);
-  strcat(ssName, DEFAULT_SS_FILE);
+  strcat(ssName, LD_DEVICE_LIST);
 
   CONTROL_WINDOW_TYPE type;
   if (file) {
@@ -946,8 +960,10 @@ UIWindow* SSMainWindow::FindWindow(const char* file)
 	  winName = ((PetWindow*)win)->GetCurrentFileName();
 	  break;
 	case CONTROL_SS_WINDOW:
-	case CONTROL_CLD_WINDOW:
 	  winName = ((SSPageWindow*)win)->GetCurrentFileName();
+	  break;
+	case CONTROL_CLD_WINDOW:
+	  winName = ((SSCldWindow*)win)->GetCldName();
 	  break;
 	}
       
@@ -961,6 +977,9 @@ UIWindow* SSMainWindow::FindWindow(const char* file)
 
 CONTROL_WINDOW_TYPE SSMainWindow::WindowType(UIWindow* window)
 {
+  if (window == NULL)
+    return CONTROL_UNKNOWN_WINDOW;
+  
   if (!strcmp(window->ClassName(), "pageWindow") || !strcmp(window->ClassName(), "SSPageWindow"))
     return CONTROL_SS_WINDOW;
   else if (!strcmp(window->ClassName(), "SSCldWindow"))
@@ -973,18 +992,20 @@ CONTROL_WINDOW_TYPE SSMainWindow::WindowType(UIWindow* window)
 
 CONTROL_WINDOW_TYPE SSMainWindow::WindowType(const char* path)
 {
-  // determine whether a DEFAULT_PET_FILE or a DEFAULT_SS_FILE can be found at the base of path
+  // determine whether a ADO_DEVICE_LIST or a LD_DEVICE_LIST can be found at the base of path
   char petfile[512];
   strcpy(petfile, path);
   strcat(petfile, "/");
-  strcat(petfile, DEFAULT_PET_FILE);
+  strcat(petfile, ADO_DEVICE_LIST);
 
   char ssfile[512];
   strcpy(ssfile, path);
   strcat(ssfile, "/");
-  strcat(ssfile, DEFAULT_SS_FILE);
+  strcat(ssfile, LD_DEVICE_LIST);
 
-  if (UIFileExists(petfile))
+  if (UIFileExists(petfile) && UIFileExists(ssfile))
+    return CONTROL_HYBRID_WINDOW;
+  else if (UIFileExists(petfile))
     return CONTROL_PET_WINDOW;
   else if (UIFileExists(ssfile))
     return CONTROL_SS_WINDOW;
@@ -1020,6 +1041,9 @@ void SSMainWindow::DeleteListWindow(UIWindow* window)
 
 void SSMainWindow::RemoveWindow(UIWindow* window)
 {
+  if (window == NULL)
+    return;
+  
   // make the window invisible
   window->Hide();
 
@@ -1141,6 +1165,7 @@ void SSMainWindow::LoadTable(const StdNode* node)
 void SSMainWindow::SS_New()
 {
   PetWindow* petWin = new PetWindow(this, "PetWindow");
+  petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
   petWin->TF_Open();
   petWin->Show();
@@ -1159,11 +1184,13 @@ void SSMainWindow::SS_Open()
       petWin = (PetWindow*) win;
     else{
       petWin = new PetWindow(this, "PetWindow");
+      petWin->SetLocalPetWindowCreating(false);
       AddListWindow(petWin);
     }
   }
   else{
     petWin = new PetWindow(this, "PetWindow");
+    petWin->SetLocalPetWindowCreating(false);
     AddListWindow(petWin);
   }
   
@@ -1254,6 +1281,7 @@ void SSMainWindow::SS_Create_RHIC_Page()
 {
   SetWorkingCursor();
   PetWindow* petWin = new PetWindow(this, "PetWindow");
+  petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
   petWin->TF_Create_Pet_Page();
   petWin->Show();
@@ -1265,6 +1293,7 @@ void SSMainWindow::SS_Create_PS_RHIC_Page()
 {
   SetWorkingCursor();
   PetWindow* petWin = new PetWindow(this, "PetWindow");
+  petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
   petWin->TF_Create_PS_Pet_Page();
   petWin->Show();
@@ -1276,7 +1305,9 @@ void SSMainWindow::SS_Create_AGS_Page()
 {
   SetWorkingCursor();
   SSPageWindow* pageWin = new SSPageWindow(this, "pageWindow");
-  pageWin->CreateAgsPage();
+  char name[64];
+  pageWin->CreateAgsPage(name);
+  pageWin->SetListString(name);
   AddListWindow(pageWin);
   if (supportKnobPanel)
     pageWin->SupportKnobPanel(knobPanel);
@@ -1613,7 +1644,7 @@ void SSMainWindow::ShowSingleDeviceList(const char* deviceListPath)
   //  if (supportKnobPanel)
   //    pageWin->SupportKnobPanel();
 
-  MachineTree* mtree = treeTable->GetAgsTreePtr();
+  MachineTree* mtree = treeTable->GetMachineTree();
   const char* rootPath = mtree->GetRootPath();
   StdNode* rootNode = mtree->GetRootNode();
   const char* rootName = rootNode->Name();
@@ -1665,8 +1696,6 @@ void SSMainWindow::ShowSingleDeviceList(const char* deviceListPath)
 }
 
 /////////////////// SSPageWindow Class ////////////////////////////////////
-short SSPageWindow::tmpAgsPageCount = 0;
-
 SSPageWindow::SSPageWindow(const UIObject* parent, const char* name,
 			   AGS_PAGE_MODE mode, const char* title, UIBoolean create)
   : AgsPageWindow(parent, name, mode, title, UIFalse, UIFalse)
@@ -1682,7 +1711,6 @@ SSPageWindow::~SSPageWindow()
     delete [] listString;
   if(devListPath != NULL)
     free(devListPath);
-  delete agsDeviceWindow;
   parent->RemoveEventReceiver(this);
 }
 
@@ -1691,7 +1719,6 @@ void SSPageWindow::Initialize()
   listString = NULL;
   devListPath = NULL;
   pageNode = NULL;
-  agsDeviceWindow = NULL;
   
   // setup this window to receive events from the main window for icon events
   parent->AddEventReceiver(this);
@@ -2066,48 +2093,6 @@ void SSPageWindow::SetSingleDeviceListMode()
 		}
 	    }
 	}
-    }
-}
-
-void SSPageWindow::CreateAgsPage()
-{
-  if(agsDeviceWindow == NULL){
-    agsDeviceWindow = new UIDeviceSelectWindow(this, "agsDeviceWindow");
-
-    agsDeviceWindow->ShowAgsViewMenu();
-    agsDeviceWindow->SetViewAgsController();
-    agsDeviceWindow->ShowFilterFields();
-//     agsDeviceWindow->SetAdoPetStyle();    // make sure that return selections are something SS would understand
-    const char* buttons[] = { "Append",
-			      "Insert",
-			      "Open...",
-			      "Load",
-			      "Revert",
-			      "Save",
-			      "Save As...",
-			      "Print",
-			      "Clear",
-			      "Undo",
-			      NULL };
-    agsDeviceWindow->ShowDeviceList(buttons);
-  }
-
-  agsDeviceWindow->Show();
-  int result = agsDeviceWindow->Wait();
-  if(result == 1)
-    {
-//       LoadFile(agsDeviceWindow->GetSelections());
-      page->LoadDevicesAutoColumns(agsDeviceWindow->GetSelections());
-      tmpAgsPageCount++;
-      char titleStr[32];
-      sprintf(titleStr, "Temp AGS Page %d", tmpAgsPageCount);
-      SetIconName(titleStr);
-      SetTitle(titleStr);
-      char listString[64];
-      sprintf(listString, "%-26.25sU%d", titleStr, GetPPMUser() );
-      SetListString(listString);
-      // noitfy users that I have internally decided to load a new file
-      DispatchEvent(UIEvent2);
     }
 }
 
