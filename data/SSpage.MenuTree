@@ -1,7 +1,7 @@
 "MTRE",3
 797096602,"Wed Apr  5 11:43:22 1995"
-1048627943,"Tue Mar 25 16:32:23 2003"
-64,56,56
+1055956783,"Wed Jun 18 13:19:43 2003"
+64,60,60
 
 "NODE 0"
 "SSpage"
@@ -42,7 +42,7 @@ operations, engineering and diagnostic users."
 
 "NODE 4"
 "----"
-4,1,5,3,-1
+4,1,56,3,-1
 6
 0,""
 0,0
@@ -50,7 +50,7 @@ operations, engineering and diagnostic users."
 
 "NODE 5"
 "Set PPM User..."
-5,1,38,4,-1
+5,1,38,59,-1
 1
 80,"Ctrl+P"
 0,0
@@ -356,7 +356,7 @@ devices on this device page."
 device page."
 
 "NODE 39"
-"View\Edit Metadevice"
+"View/Edit Metadevice"
 39,12,55,44,-1
 1
 77,""
@@ -511,38 +511,38 @@ with a name."
 "Delay Channel Editor"
 55,12,-1,39,-1
 1
-68,"Ctrl+E"
+68,""
 0,0
 "Bring up the delay channel editor for the selected delay module"
 
 "NODE 56"
-""
-56,-1,57,-1,-1
+"View Source"
+56,1,57,4,-1
 1
 0,""
 0,0
-""
+"View the contents of the file that creates this page"
 
 "NODE 57"
-""
-57,-1,58,-1,-1
+"Save As..."
+57,1,58,56,-1
 1
 0,""
 0,0
 ""
 
 "NODE 58"
-""
-58,-1,59,-1,-1
+"Create AGS Page..."
+58,1,59,57,-1
 1
 0,""
 0,0
 ""
 
 "NODE 59"
-""
-59,-1,60,-1,-1
-1
+"----"
+59,1,5,58,-1
+6
 0,""
 0,0
 ""
