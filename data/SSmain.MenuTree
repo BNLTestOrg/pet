@@ -1,0 +1,287 @@
+"MTRE",3
+797093749,"Wed Apr  5 10:55:49 1995"
+1023131463,"Mon Jun  3 15:11:03 2002"
+32,27,2
+
+"NODE 0"
+"SSmain"
+0,-1,-1,-1,1
+1
+0,""
+0,0
+""
+
+"NODE 1"
+"File"
+1,0,6,-1,20
+1
+70,""
+0,0
+"This menu provides options for setting up
+the program as a whole."
+
+"NODE 2"
+""
+2,-1,28,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 3"
+"----"
+3,1,24,4,-1
+6
+0,""
+0,0
+""
+
+"NODE 4"
+"Default PPM User..."
+4,1,3,22,-1
+1
+80,""
+0,0
+"Sets the default PPM user for this program.
+The default PPM user is used as the PPM user
+for any new device lists that are displayed.
+It does not affect existing device pages."
+
+"NODE 5"
+"Exit..."
+5,1,-1,27,-1
+1
+69,""
+0,0
+"Exits this program after a confirmation."
+
+"NODE 6"
+"Page"
+6,0,11,1,7
+1
+80,""
+0,0
+"This menu displays options which affect one
+or more device pages.  In some cases, the menu
+item refers to the current device page selected in
+the Device Pages list."
+
+"NODE 7"
+"Find"
+7,6,18,-1,-1
+1
+70,"Ctrl+F"
+0,0
+"Clears the machine tree keyboard selection area,
+readying the program for a new selection either
+using the mouse or the keyboard."
+
+"NODE 8"
+"Show"
+8,6,19,17,-1
+1
+83,""
+0,0
+"Brings the currently selected page to the front
+and makes it visible if not already."
+
+"NODE 9"
+"Close"
+9,6,10,19,-1
+1
+67,"Ctrl+C"
+0,0
+"Closes the currently selected device page."
+
+"NODE 10"
+"Close All..."
+10,6,-1,9,-1
+1
+65,"Ctrl+A"
+0,0
+"Closes all devices pages after issuing
+a confirmation."
+
+"NODE 11"
+"Options"
+11,0,-1,6,12
+1
+79,""
+0,0
+"This menu provides miscellaneous options
+available to the program as a whole."
+
+"NODE 12"
+"Search..."
+12,11,13,-1,-1
+1
+83,""
+0,0
+"This option allows the user to search for a particular
+device.  A prompt will ask for a search string, which
+could be a partial device name.  The result of the search
+will then be displayed allowing the user to view the device
+in one or more device lists."
+
+"NODE 13"
+"Read Archive Log"
+13,11,14,12,-1
+1
+65,""
+0,0
+"Brings up a separate window allowing the user
+to view the log of archives that have been made
+with the archiving system."
+
+"NODE 14"
+"----"
+14,11,21,13,-1
+6
+0,""
+0,0
+""
+
+"NODE 15"
+"CLDs..."
+15,11,16,21,-1
+1
+67,""
+0,0
+"Brings up a 'cld window' allowing the user to set
+values and/or view measurements for CLDs."
+
+"NODE 16"
+"CLD Events..."
+16,11,-1,15,-1
+1
+69,""
+0,0
+"Brings up a 'cld window' allowing the user
+to set timing events for CLDs."
+
+"NODE 17"
+"----"
+17,6,8,18,-1
+6
+0,""
+0,0
+""
+
+"NODE 18"
+"New"
+18,6,17,7,-1
+1
+78,"F1"
+0,0
+"If a leaf node is selected on the machine tree
+table, creates a new device page for that node.
+This does the same thing as clicking on the
+node with the 2nd mouse button."
+
+"NODE 19"
+"Hide"
+19,6,9,8,-1
+1
+72,""
+0,0
+"Hide (make invisible) the currently selected
+page in the list.  This takes the page off the screen,
+but leaves it in the list.  You can then show it
+by choosing the Show menu item."
+
+"NODE 20"
+"New..."
+20,1,23,-1,-1
+1
+78,"Ctrl+N"
+0,0
+"Make a new window and select a file"
+
+"NODE 21"
+"SLDs via Controller..."
+21,11,15,14,-1
+1
+0,""
+0,0
+"Choose a controller and bring up its SLDs on a page."
+
+"NODE 22"
+"----"
+22,1,4,23,-1
+6
+0,""
+0,0
+""
+
+"NODE 23"
+"Open..."
+23,1,22,20,-1
+1
+79,"Ctrl+O"
+0,0
+"Open a file in the current window"
+
+"NODE 24"
+"Create RHIC Page..."
+24,1,25,3,-1
+1
+0,""
+0,0
+"Create a page from selected parameters"
+
+"NODE 25"
+"Create PS RHIC Page..."
+25,1,26,24,-1
+1
+0,""
+0,0
+"Create a RHIC page from a list of selected Power Supplies"
+
+"NODE 26"
+"Create AGS Page..."
+26,1,27,25,-1
+1
+0,""
+0,0
+"Create an AGS page from selected devices"
+
+"NODE 27"
+"----"
+27,1,5,26,-1
+6
+0,""
+0,0
+""
+
+"NODE 28"
+""
+28,-1,29,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 29"
+""
+29,-1,30,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 30"
+""
+30,-1,31,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 31"
+""
+31,-1,32,-1,-1
+1
+0,""
+0,0
+""
+
