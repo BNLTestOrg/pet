@@ -1721,11 +1721,8 @@ void SSMainWindow::SO_CLD_Events()
   // select the event line
   UIListPopup listPopup(this, "listPopup", "Set events on which line?");
   listPopup.SetListItems(	"AGS real time",
-				"AGS gauss",
 				"Booster real time",
-				"Booster gauss",
-				"Test real time",
-				"Test gauss time");
+				"Test real time");
 
   if( listPopup.Wait() == 2)	// Cancel
     return;
@@ -1733,11 +1730,8 @@ void SSMainWindow::SO_CLD_Events()
 
   const char* ctlname;
   if (selection == 1)      ctlname = "CDC.RT.AGS.GEN";
-  else if (selection == 2) ctlname = "CDC.GT.AGS.GEN";
-  else if (selection == 3) ctlname = "CDC.RT.GENERATOR";
-  else if (selection == 4) ctlname = "CDC.GT.GENERATOR";
-  else if (selection == 5) ctlname = "CDC.RT.GEN.TEST";
-  else if (selection == 6) ctlname = "CDC.LAB.GT.GEN";
+  else if (selection == 2) ctlname = "CDC.RT.GENERATOR";
+  else if (selection == 3) ctlname = "CDC.RT.GEN.TEST";
   else                     return;
 
   // create popup for getting device name if neccessary
