@@ -78,7 +78,7 @@ main(int argc, char *argv[])
   }
   else{
     // create the main window and its user interface and display it
-    mainWindow = new SSMainWindow(application, "mainWindow", application->Name());
+    mainWindow = new SSMainWindow(application, "mainWindow", "pet");
     application->AddEventReceiver(mainWindow);
   }
   
