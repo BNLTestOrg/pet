@@ -270,42 +270,37 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
     "*metaEditor*defaultPosition: false",
     "*loadArchivePopup*defaultPosition: false",
     "*allUserPopup*defaultPosition: false",
-    "*mainWindow*treeTable.uihelpText:
-The machine tree display.  A right facing arrow next to a node name
-indicates that this node is expandable, but is not currently expanded.
-A down facing arrow indicates that the node is currently expanded.
-No arrow next to a node name indicates that this is a leaf node of the tree.
-Clicking on the name or a right facing arrow will expand that section
-and cause and already expanded section to collapse if neccessary.
-To cause a section to collapse, click on the down facing arrow.",
-    "*mainWindow*pageList.uihelpText: 
-Displays the leaf name of all of the device pages currently being displayed.
-Clicking on a name in this list will cause the device page to come to the
-front of the screen and cause its path in the machine tree to be displayed.",
-    "*loadArchivePopup*arclist.uihelpText: 
-This list contains all archives for the current device page.",
-    "*loadArchivePopup*archeader.uihelpText: 
-Displays information pertaining to the selected archive.",
-    "*loadArchivePopup*arctoggles*Show timed archives in archive list.uihelpText: 
-When this is selected (it looks pushed in), timed archives are also
-shown in the list, otherwise they are not.",
-    "*loadArchivePopup*arctoggles*Sort archive list alphabetically.uihelpText: 
-When this is selected (it looks pushed in), the archive list is sorted
-alphabetically, otherwise it is sorted chronologically.",
-    "*loadArchivePopup*OK.uihelpText: 
-Loads the selected archive and closes this window.",
-    "*loadArchivePopup*Apply.uihelpText: 
-Loads the selected archive.  Does not close this window.",
-    "*loadArchivePopup*Close.uihelpText: 
-Closes this window without loading an archive.",
-    "*loadArchivePopup*Help.uihelpText: 
-This window allows you to load one or more archives into a device page.
-The list displays all archives for the device page shown.
-\nTo load an archive, select the archive, then click the Apply button.
-To load an archive and close this window, then click the OK button.
-To close this window without loading and archive, then click the Close button.
-\nTo get information on individual items in the window, move the cursor over
-the item of interest, then press and hold the 3rd mouse button.",
+    "*mainWindow*treeTable.uihelpText: "
+        "The machine tree display.  A right facing arrow next to a node name\n"
+        "indicates that this node is expandable, but is not currently expanded.\n"
+        "A down facing arrow indicates that the node is currently expanded.\n"
+        "No arrow next to a node name indicates that this is a leaf node of the tree.\n"
+        "Clicking on the name or a right facing arrow will expand that section\n"
+        "and cause and already expanded section to collapse if neccessary.\n"
+        "To cause a section to collapse, click on the down facing arrow.",
+    "*mainWindow*pageList.uihelpText: "
+        "Displays the leaf name of all of the device pages currently being displayed.\n"
+        "Clicking on a name in this list will cause the device page to come to the\n"
+        "front of the screen and cause its path in the machine tree to be displayed.",
+    "*loadArchivePopup*arclist.uihelpText: This list contains all archives for the current device page.",
+    "*loadArchivePopup*archeader.uihelpText: Displays information pertaining to the selected archive.",
+    "*loadArchivePopup*arctoggles*Show timed archives in archive list.uihelpText: "
+        "When this is selected (it looks pushed in), timed archives are also\n"
+        "shown in the list, otherwise they are not.",
+    "*loadArchivePopup*arctoggles*Sort archive list alphabetically.uihelpText: "
+        "When this is selected (it looks pushed in), the archive list is sorted\n"
+        "alphabetically, otherwise it is sorted chronologically.",
+    "*loadArchivePopup*OK.uihelpText: Loads the selected archive and closes this window.",
+    "*loadArchivePopup*Apply.uihelpText: Loads the selected archive.  Does not close this window.",
+    "*loadArchivePopup*Close.uihelpText: Closes this window without loading an archive.",
+    "*loadArchivePopup*Help.uihelpText: "
+        "This window allows you to load one or more archives into a device page.\n"
+        "The list displays all archives for the device page shown.\n"
+        "\nTo load an archive, select the archive, then click the Apply button.\n"
+        "To load an archive and close this window, then click the OK button.\n"
+        "To close this window without loading and archive, then click the Close button.\n"
+        "\nTo get information on individual items in the window, move the cursor over\n"
+        "the item of interest, then press and hold the 3rd mouse button.",
     NULL};
   UISetDefaultResources(defaults);
    
@@ -820,7 +815,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     }
   else if(event == UIEvent2)
     {
-      // event passed up from pet library
+      // event passed up from pet library indicating a window was created or reloaded
+      LoadPageList( (UIWindow*) object);
     }
   else if(event == UIEvent1)
     {
@@ -1612,8 +1608,7 @@ void SSMainWindow::SO_CLDs()
 void SSMainWindow::SO_Load_DDF()
 {
   // put up warning message
-  UILabelPopup popup(this, "DDF Reload", "Reloading the DDF will force all LD and CLD windows
-to be reopened.  Continue?", "OK", "Cancel");
+  UILabelPopup popup(this, "DDF Reload", "Reloading the DDF will force all LD and CLD windows to be reopened.  Continue?", "OK", "Cancel");
   if (popup.Wait() == 2){
     SetMessage("Reload DDF Operation Cancelled");
     return;
@@ -1866,9 +1861,6 @@ int SSPageWindow::LoadFile(const char* filename, const char* pageTitle, short pp
 {
   // load the file
   int retval = AgsPageWindow::LoadFile(filename, pageTitle, ppmUser);
-
-  // always append the PPM user name in the title area
-  TitleAppendPPMUser();
 
   return retval;
 }
@@ -2254,15 +2246,6 @@ void SSCldWindow::CreateWidgets(UIBoolean dialogWindow)
   // set up events to trap program going into/out of an icon
   EnableEvent(UIMap);
   EnableEvent(UIUnmap);
-}
-
-void SSCldWindow::UpdatePPM()
-{
-  // let base class do most of this work
-  UICldObjectWindow::UpdatePPM();
-
-  // change the page list to reflect the new ppm user
-  SetListString();
 }
 
 void SSCldWindow::SetListString(const char* string)
