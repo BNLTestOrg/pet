@@ -508,9 +508,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	  searchPopup->SetWorkingCursor();
 	  treeTable->SetNodeSelected(selectNode);
 	  treeTable->LoadTreeTable();
-	  if(searchPage != NULL)
-	    HandleEvent(treeTable, UISelect);
-	  else
+// 	  if(searchPage != NULL)
+// 	    HandleEvent(treeTable, UISelect);
+// 	  else
 	    {
 	      HandleEvent(treeTable, UITableBtn2Down);
 	      // store a ptr to window so can reload if neccessary
@@ -988,7 +988,7 @@ UIWindow* SSMainWindow::FindWindow(const char* file)
 
 PET_WINDOW_TYPE SSMainWindow::WindowType(UIWindow* window)
 {
-  if (window == NULL)
+  if (window == NULL || window->ClassName() == NULL)
     return PET_UNKNOWN_WINDOW;
   
   if (!strcmp(window->ClassName(), "pageWindow") || !strcmp(window->ClassName(), "SSPageWindow"))
@@ -1060,7 +1060,7 @@ void SSMainWindow::RemoveWindow(UIWindow* window)
 
   // if the window was an SSPageWindow, and the window was stored as the searchPage,
   // set searchPage to NULL prior to deleting the window
-  if ( !strcmp(window->ClassName(), "SSPageWindow") )
+  if ( !strcmp(window->ClassName(), "SSPageWindow") || !strcmp(window->ClassName(), "pageWindow"))
     {
       SSPageWindow* tmpWindow = (SSPageWindow*) window;
       if ( (SSPageWindow*) searchPage == (SSPageWindow*) window )
