@@ -112,6 +112,7 @@ protected:
   void SP_Close_All();
   void SO_Search();
   void SO_Read_Archive_Log();
+  void SO_PpmUserMonitor();
   void SO_SLDs();
   void SO_CLDs();
   void SO_CLD_Events();
