@@ -59,7 +59,7 @@ public:
 
   // load the device page list from the set of attached windows
   // indicate which window string you want selected
-  void LoadPageList(const UIWindow* winSelection);
+  void LoadPageList(const UIWindow* winSelection = NULL);
 
   // load a single device list, by tree path name (start-up option)
   void ShowSingleDeviceList(const char* deviceListPath);
@@ -211,9 +211,6 @@ public:
   // by default it creates one based on CLD name and PPM user
   void SetListString(const char* string = NULL);
   const char* GetListString() const;
-
-  // override this to change the page list
-  void UpdatePPM();
 
   // handle icon events - send other events to parent class
   void HandleEvent(const UIObject* object, UIEvent event);
