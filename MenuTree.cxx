@@ -43,9 +43,10 @@ MenuTree* CreateMenuTree()
 	snode = menuTree->InsertMenuItem("----", "/File", NULL);
 	menuTree->SetNodeType(snode, MenuSeparatorType);
 
-	snode = menuTree->InsertMenuItem("Exit...", "/File", NULL);
-	menuTree->SetNodeHelpText(snode, "Exits this program after a confirmation.");
-	menuTree->SetNodeMnemonic(snode, 'E');
+	snode = menuTree->InsertMenuItem("Quit", "/File", NULL);
+	menuTree->SetNodeHelpText(snode, "Select 'Quit' to exit the program immediately.\n\t");
+	menuTree->SetNodeMnemonic(snode, 'Q');
+	menuTree->SetNodeAccelerator(snode, "Ctrl+Q");
 
 	snode = menuTree->InsertMenuItem("Page", NULL, NULL);
 	menuTree->SetNodeHelpText(snode, "This menu displays options which affect one\nor more device pages.  In some cases, the menu\nitem refers to the current device page selected in\nthe Device Pages list.");
