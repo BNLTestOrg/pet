@@ -848,21 +848,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	int ppmUser = petWin->GetPPMUser();
 	petWin = new PetWindow(this, "petWindow");
 	petWin->SetLocalPetWindowCreating(false);
-	// make sure tree root path is set
-	if (treeTable != NULL)
-	  {
-	    char s[512];
-	    DirTree* tree = (DirTree*)treeTable->GetTree();
-	    if (tree != NULL)
-	      {
-		const StdNode* theNode = tree->GetRootNode();
-		if (theNode != NULL)
-		  {
-		    if (tree->GenerateFullNodePathname(theNode, s) == 0)
-		      petWin->SetTreeRootPath(s);
-		  }
-	      }
-	  }
+	// in this case, we will assume the file loaded is not from the tree
+	// so don't set the tree - otherwise need to somehow be smart - skip it for now
 	petWin->LoadFile(object->GetMessage(), NULL, ppmUser);
 	AddListWindow(petWin);
 	petWin->Show();
