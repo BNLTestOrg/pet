@@ -39,6 +39,7 @@ public:
   
   // delete a device page or CLD window and remove it from the list
   void DeleteListWindow(UIWindow* window);
+  void DeleteAllWindows();
 
   // hide (make invisible) a device page or CLD window - don't remove it from the list
   void HideListWindow(UIWindow* window);
@@ -47,7 +48,7 @@ public:
   void ShowListWindow(UIWindow* window);
 
   // find out if a window is already in the window list
-  UIWindow* FindWindow(const char* file);
+  UIWindow* FindWindow(const char* file, PET_WINDOW_TYPE wtype);
 
   // find out what type of window
   PET_WINDOW_TYPE WindowType(UIWindow* window);
@@ -87,7 +88,7 @@ protected:
   MenuTree*                     pulldownMenuTree;
   
   // set the window position for a newly created window
-  void SetWindowPos(UIWindow* win);
+  void SetWindowPos(UIWindow* newWin, UIWindow* currWin = NULL);
 
   // set the label for displaying PPM user name using process PPM user
   void SetPPMLabel();
@@ -124,6 +125,9 @@ protected:
   const StdNode* GetSelectedNode();
   dir_node_t*    GetSelectedDirNode();
   void           ShowCldEditor(const char* devname, int ppmuser);
+  SSPageWindow*  CreateLdWindow();
+  PetWindow*     CreateAdoWindow();
+  
 };
 
 /////////////////////////////////////////////////////////////////////
