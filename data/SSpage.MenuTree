@@ -1,7 +1,7 @@
 "MTRE",3
 797096602,"Wed Apr  5 11:43:22 1995"
-959353654,"Fri May 26 11:07:34 2000"
-64,55,55
+1048627943,"Tue Mar 25 16:32:23 2003"
+64,56,56
 
 "NODE 0"
 "SSpage"
@@ -357,7 +357,7 @@ device page."
 
 "NODE 39"
 "View\Edit Metadevice"
-39,12,-1,44,-1
+39,12,55,44,-1
 1
 77,""
 0,0
@@ -508,12 +508,12 @@ to existing snapshot graph"
 with a name."
 
 "NODE 55"
-""
-55,-1,56,-1,-1
+"Delay Channel Editor"
+55,12,-1,39,-1
 1
-0,""
+68,"Ctrl+E"
 0,0
-""
+"Bring up the delay channel editor for the selected delay module"
 
 "NODE 56"
 ""
