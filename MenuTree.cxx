@@ -108,5 +108,10 @@ MenuTree* CreateMenuTree()
 	menuTree->SetNodeHelpText(snode, "Brings up a 'cld window' allowing the user\nto set timing events for CLDs.");
 	menuTree->SetNodeMnemonic(snode, 'E');
 
+	snode = menuTree->InsertMenuItem("----", "/Options", NULL);
+	menuTree->SetNodeType(snode, MenuSeparatorType);
+
+	snode = menuTree->InsertMenuItem("Reload DDF...", "/Options", NULL);
+
 	return menuTree;
 }
