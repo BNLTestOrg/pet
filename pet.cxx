@@ -1884,21 +1884,16 @@ void SSPageWindow::SetPPMUser(short user)
 
 void SSPageWindow::SetListString(const char* string)
 {
-  if(listString != NULL)
-    {
-      delete [] listString;
-      listString = NULL;
-    }
+  if(listString == NULL)
+    listString = new char[80];
 
   if(string != NULL)
     {
-      listString = new char[strlen(string)+1];
       strcpy(listString, string);
     }
   else	// create a default display string
     {
       const char* leaf = GetLeafName( GetDevListPath() );
-      listString = new char[40];
       sprintf(listString, "%-22sSLD  U%d", leaf, GetPPMUser() );
     }
 }
@@ -2272,20 +2267,15 @@ void SSCldWindow::UpdatePPM()
 
 void SSCldWindow::SetListString(const char* string)
 {
-  if(listString != NULL)
-    {
-      delete [] listString;
-      listString = NULL;
-    }
+  if(listString == NULL)
+    listString = new char[80];
 
   if(string != NULL)
     {
-      listString=new char[strlen(string)+1];
       strcpy(listString, string);
     }
   else	// create a default display string
     {
-      listString = new char[40];
       sprintf(listString, "%-22sCLD  U%d", GetCldName(), GetCldPPM() );
     }
 }
