@@ -11,7 +11,7 @@
 #include <agsPage/genCldLib.hxx>		// for UICldObjectWindow class
 #include <UI/UIHelp.hxx>			// for UIHelpMenu class
 
-enum CONTROL_WINDOW_TYPE {CONTROL_SS_WINDOW, CONTROL_CLD_WINDOW, CONTROL_PET_WINDOW, CONTROL_HYBRID_WINDOW, CONTROL_UNKNOWN_WINDOW};
+enum PET_WINDOW_TYPE {PET_LD_WINDOW, PET_CLD_WINDOW, PET_ADO_WINDOW, PET_HYBRID_WINDOW, PET_UNKNOWN_WINDOW};
 
 class SSPageWindow;
 class MenuTree;
@@ -50,8 +50,8 @@ public:
   UIWindow* FindWindow(const char* file);
 
   // find out what type of window
-  CONTROL_WINDOW_TYPE WindowType(UIWindow* window);
-  CONTROL_WINDOW_TYPE WindowType(const char* path);
+  PET_WINDOW_TYPE WindowType(UIWindow* window);
+  PET_WINDOW_TYPE WindowType(const char* path);
   
   // add an already created device page or CLD window to the list
   void AddListWindow(UIWindow* window);
@@ -225,7 +225,7 @@ private:
 
 
 /// class used to close single page window.
-class ControlEventReceiver : public UIEventReceiver
+class PetEventReceiver : public UIEventReceiver
 {
 public:
   /// override this to handle window close events properly
