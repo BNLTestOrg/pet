@@ -57,7 +57,7 @@ main(int argc, char *argv[])
   argList.AddString("-device_list");
   argList.AddSwitch("-knob");
   argList.AddSwitch("-single");         // single window mode
-  argList.AddString("-file");		// file to open initially
+  argList.AddSwitch("-file");		// file to open initially
   argList.AddString("-path");		// default path for file open
 
   // set up the CNS as the source for names
@@ -68,11 +68,13 @@ main(int argc, char *argv[])
   application  = new UIApplication(argc, argv, &argList);
 
   // check for single window switch
-  if (argList.IsPresent("-single")){
+  bool singleWindowMode = false;
+  if(argList.IsPresent("-file") || argList.IsPresent("-single")){
     mainPetWindow = new PetWindow(application, "petWindow");
     mainPetWindow->SetLocalPetWindowCreating(true);
     mainPetWindow->AddEventReceiver(&petEventReceiver);
     mainPetWindow->Show();
+    singleWindowMode = true;
   }
   else{
     // create the main window and its user interface and display it
@@ -80,16 +82,16 @@ main(int argc, char *argv[])
     application->AddEventReceiver(mainWindow);
   }
   
-  const char *file = argList.String("-file");
-  if(file && strlen(file)) {
-    cout << "Not implemented yet" << endl;
-    exit(0);
-  }
-
   const char *path = argList.String("-path");
-  if(strlen(path)) {
-    cout << "Not implemented yet" << endl;
-    exit(0);
+  if(path && strlen(path)) {
+    char *str = new char[strlen(path) + 10];
+    sprintf(str, "%s/*.pet", path);
+    if(singleWindowMode)
+      mainPetWindow->ChangePath(str);
+//     else
+//       petTable->ChangePath(str);
+    if(str)
+      delete [] str;
   }
   
   // check values of some command line arguments
@@ -114,45 +116,47 @@ main(int argc, char *argv[])
 	}
     }
 
-  if (!argList.IsPresent("-single")){
+  if (!argList.IsPresent("-file") && !argList.IsPresent("-single"))
     // set up the archive lib tools
     mainWindow->InitArchiveLib();
+
+  // load files that are untagged on the command line
+  int fileNum;
+  for(fileNum=0; fileNum<argList.NumUntaggedItems(); fileNum++) {
     
-  } else {
-    // load files that are untagged on the command line
-    int fileNum;
-    for(fileNum=0; fileNum<argList.NumUntaggedItems(); fileNum++) {
+    const char* file = argList.UntaggedItem(fileNum);
+    if(file && strlen(file)) {
       
-      file = argList.UntaggedItem(fileNum);
-      if(file && strlen(file)) {
-	
-	char *tmpFile;
-	char *path;
-	char *ptr;
-	
-	tmpFile = strdup(file);
-	ptr = strrchr(tmpFile, '/');
-	if(ptr) {
-	  *ptr = '\0';
-	  ptr++;
-	  path = new char[strlen(tmpFile) + 10];
-	  sprintf(path, "%s/*.ado", tmpFile);
-	}
-	else			// no path given
-	  path = strdup("*.ado");
+      char *tmpFile;
+      char *path;
+      char *ptr;
       
-	if(fileNum==0) {	// only do the first file
-	  mainPetWindow->LoadFile(file);
-	  mainPetWindow->ChangePath(path);
-	  if(path)
-	    free(path);
-	  if(tmpFile)
-	    free(tmpFile);
-	  break;
-	}
-      } // if file good
-    } // for
-  }
+      tmpFile = strdup(file);
+      ptr = strrchr(tmpFile, '/');
+      if(ptr) {
+        *ptr = '\0';
+        ptr++;
+        path = new char[strlen(tmpFile) + 10];
+        sprintf(path, "%s/*.ado", tmpFile);
+      }
+      else			// no path given
+        path = strdup("*.ado");
+      
+      if(fileNum==0) {	// only do the first file
+        if (mainPetWindow == NULL){
+          mainPetWindow = new PetWindow(application, "petWindow");
+          mainPetWindow->Show();
+        }
+        mainPetWindow->LoadFile(file);
+        mainPetWindow->ChangePath(path);
+        if(path)
+          free(path);
+        if(tmpFile)
+          free(tmpFile);
+        break;
+      }
+    } // if file good
+  } // for
   
   // Assert protected subsystem rights
 #ifdef __APOLLO
