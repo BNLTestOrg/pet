@@ -14,6 +14,7 @@
 enum CONTROL_WINDOW_TYPE {CONTROL_SS_WINDOW, CONTROL_CLD_WINDOW, CONTROL_PET_WINDOW, CONTROL_HYBRID_WINDOW, CONTROL_UNKNOWN_WINDOW};
 
 class SSPageWindow;
+class MenuTree;
 
 class SSMainWindow : public UIMainWindow
 {
@@ -72,7 +73,7 @@ protected:
   UIPulldownMenu*	       	pulldownMenu;
   UILabel*			ppmLabel;
   UIMessageArea*	       	messageArea;
-  UICombineMachineTree*		treeTable;
+  UIMachineTreeTable*           treeTable;
   UIScrollingEnumList*		pageList;
   UIHelpMenu*			helpMenu;
   UIDevicesFromControllerPopup*	ctrlPopup;
@@ -83,7 +84,8 @@ protected:
   UISearchDeviceList*		searchPopup;
 //   SSPageWindow*			searchPage;
   UIWindow*			searchPage;
-
+  MenuTree*                     pulldownMenuTree;
+  
   // set the window position for a newly created window
   void SetWindowPos(UIWindow* win);
 
@@ -165,15 +167,10 @@ public:
   // pulldown menu
   void SetSingleDeviceListMode();
 
-  // Create a SS page on the fly using device selection tools
-  void CreateAgsPage();
-  
 protected:
   char*		listString;	// string to display in device page list
   const StdNode*	pageNode;	// the node in the machine tree
   char*		devListPath;	// the path to the current device list
-  UIDeviceSelectWindow* agsDeviceWindow; // for creating ss pages on the fly
-  static short tmpAgsPageCount;
   
   void CreateWidgets(AGS_PAGE_MODE mode);
 
