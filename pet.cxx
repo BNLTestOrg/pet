@@ -539,7 +539,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	  strcpy(nodeName, rootPath);
 	  strcat(nodeName, "/");
 	  strcat(nodeName, selectString);
-	  nodeName[strlen(nodeName)-1] = 0;		// get ride of newline at the end
+	  nodeName[strlen(nodeName)-1] = 0;		// get rid of newline at the end
 	  StdNode* selectNode = mtree->FindNode(nodeName);
 	  delete [] nodeName;
 	  if(selectNode == NULL)
@@ -909,6 +909,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	else if(!strcmp(data->namesSelected[1], "CLD Events..."))
 	  {	SO_CLD_Events();
 	  }
+        else if(!strcmp(data->namesSelected[1], "Reload DDF..."))
+          {     SO_Load_DDF();
+          }
 	}
     }
   else if (event == UIMessage)
@@ -1542,6 +1545,70 @@ void SSMainWindow::SO_CLDs()
 
   // create a new SSCldWindow
   ShowCldEditor(devname, get_ppm_user() );
+}
+
+void SSMainWindow::SO_Load_DDF()
+{
+  // put up warning message
+  UILabelPopup popup(this, "DDF Reload", "Reloading the DDF will force all LD and CLD windows
+to be reopened.  Continue?", "OK", "Cancel");
+  if (popup.Wait() == 2){
+    SetMessage("Reload DDF Operation Cancelled");
+    return;
+  }
+
+  StdNode* nodes[128];
+  for (int i=0; i<128; i++) nodes[i] = NULL;
+  int index = 0;
+  SSPageWindow* pageWin; 
+  UIWindow* win;
+
+  // first remove LD windows
+  int numWins = GetNumWindows();
+  for (int i=0; i<numWins; i++){
+    win = GetWindow(pageList->GetSelection());
+    if (WindowType(win) == PET_LD_WINDOW || WindowType(win) == PET_CLD_WINDOW){
+      pageWin = (SSPageWindow*) win;
+      // keep track of the node
+      StdNode* selectNode = (StdNode*) pageWin->GetPageNode();
+      if (selectNode)
+        nodes[index++] = selectNode;
+      // delete the page
+      pageWin->Hide();
+      DeleteListWindow(pageWin);
+    }
+  }
+
+  // map a ddf
+  char msg[128];
+  if( strlen( argList.String("-ddf") ) )
+    {
+      if( DeviceDirectory.load( argList.String("-ddf") ) <= 0)
+	{
+          sprintf(msg, "Could not map ddf %s.", argList.String("-ddf"));
+	}
+      else{
+        sprintf(msg, "ddf %s successfully mapped.", argList.String("-ddf"));
+      }
+    }
+  else	// map the current ddf
+    {
+      if( DeviceDirectory.load() <= 0)
+	{
+	  sprintf(msg, "Could not map current ddf.");
+	}
+      else
+        sprintf(msg, "ddf successfully mapped.");
+    }
+
+  // now reload the ld pages
+  for (int i=0; i<index; i++){
+    treeTable->SetNodeSelected(nodes[i]);
+    treeTable->LoadTreeTable();
+    HandleEvent(treeTable, UITableBtn2Down);
+  }
+
+  SetMessage(msg);
 }
 
 void SSMainWindow::ShowCldEditor(const char* devname, int ppmuser)
