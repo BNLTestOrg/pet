@@ -103,7 +103,7 @@ protected:
   void SS_Create_RHIC_Page();
   void SS_Create_PS_RHIC_Page();
   void SS_Create_AGS_Page();
-  void SS_Exit();
+  void SS_Quit();
   void SP_Find();
   void SP_New();
   void SP_Show();
@@ -116,6 +116,7 @@ protected:
   void SO_CLDs();
   void SO_CLD_Events();
   void SO_Load_DDF();
+  void Exit();
 
   // helper routines
   const char*    GetSelectedPath();
