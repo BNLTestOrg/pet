@@ -224,6 +224,77 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   searchPopup = NULL;
   searchPage = NULL;
 
+  // resources
+  static const char* defaults[] = {
+    "*foreground: navy",
+    "*background: gray82",
+    "*pageWindow*page*background: gray86",
+    "*pageWindow*page*uilabelBackground: gray82",
+    "*mainWindow*treeTable*foreground: black",
+    "*mainWindow*pageList*list*foreground: black",
+    "*fontList: -adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1",
+    "*mainWindow*treeTable*font: 9x15bold",
+    "*mainWindow*pageList*list*fontList: 9x15bold",
+    "*mainWindow.geometry: +0+0",
+//     "*sscldWindow.uipulldownMenuFile: /ride/release/SUN/data/SpreadSheet/GenericCldTree1",
+    "*mainWindow.allowShellResize: true",
+    "*mainWindow*treeTable*showHeaders: false",
+     "*mainWindow*treeTable*visibleRows: 30",
+     "*mainWindow*treeTable*uinameWidth: 30",
+     "*mainWindow*treeTable*table.width: 293",
+    "*mainWindow*treeTable*table*showHScroll: true",
+    "*mainWindow*pageList*prompt*alignment: alignment_center",
+    "*mainWindow*pageList*traversalOn: false",
+    "*pageWindow*defaultPosition: true",
+    //    "*pageWindow*uipulldownMenuFile: /ride/release/SUN/data/SpreadSheet/SSpage.MenuTree",
+    "*pageWindow*page*tableHelp*background: white",    
+    "*sscldWindow*defaultPosition: true",
+    "*deviceInfoPopup*defaultPosition: false",
+    "*deviceInfoPopup.allowShellResize: false",
+    "*metaEditor*defaultPosition: false",
+//     "*metaEditor.pulldownMenu*uimenuFile: /ride/release/SUN/data/SpreadSheet/MetaEditorMenuTree",
+    "*loadArchivePopup*defaultPosition: false",
+    "*allUserPopup*defaultPosition: false",
+//     "*pageWindow*allUserPopup*uipulldownMenuFile: /ride/release/SUN/data/SpreadSheet/AllUserPageMenuTree",
+    "*mainWindow*treeTable.uihelpText:
+The machine tree display.  A right facing arrow next to a node name
+indicates that this node is expandable, but is not currently expanded.
+A down facing arrow indicates that the node is currently expanded.
+No arrow next to a node name indicates that this is a leaf node of the tree.
+Clicking on the name or a right facing arrow will expand that section
+and cause and already expanded section to collapse if neccessary.
+To cause a section to collapse, click on the down facing arrow.",    
+    "*mainWindow*pageList.uihelpText: 
+Displays the leaf name of all of the device pages currently being displayed.
+Clicking on a name in this list will cause the device page to come to the
+front of the screen and cause its path in the machine tree to be displayed.",
+    "*loadArchivePopup*arclist.uihelpText: 
+This list contains all archives for the current device page.",
+    "*loadArchivePopup*archeader.uihelpText: 
+Displays information pertaining to the selected archive.",
+    "*loadArchivePopup*arctoggles*Show timed archives in archive list.uihelpText: 
+When this is selected (it looks pushed in), timed archives are also
+shown in the list, otherwise they are not.",
+    "*loadArchivePopup*arctoggles*Sort archive list alphabetically.uihelpText: 
+When this is selected (it looks pushed in), the archive list is sorted
+alphabetically, otherwise it is sorted chronologically.",
+    "*loadArchivePopup*OK.uihelpText: 
+Loads the selected archive and closes this window.",
+    "*loadArchivePopup*Apply.uihelpText: 
+Loads the selected archive.  Does not close this window.",
+    "*loadArchivePopup*Close.uihelpText: 
+Closes this window without loading an archive.",
+    "*loadArchivePopup*Help.uihelpText: 
+This window allows you to load one or more archives into a device page.
+The list displays all archives for the device page shown.
+\nTo load an archive, select the archive, then click the Apply button.
+To load an archive and close this window, then click the OK button.
+To close this window without loading and archive, then click the Close button.
+\nTo get information on individual items in the window, move the cursor over
+the item of interest, then press and hold the 3rd mouse button.",
+    NULL};
+  UISetDefaultResources(defaults);
+   
   // create the window
   UIMainWindow::CreateWidgets();
 
@@ -276,12 +347,9 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   treeTable->AddEventReceiver(this);
 
   MachineTree* machTree = treeTable->GetMachineTree();
-//   printf("Loading Copy of tree (link to tree_model in Susan's home area, /home/cfsd/susan/acop)\n");
-//   machTree->SetRootDirPath("/home/cfsd/susan/acop");
   // check to see if users wants to use a new root to the machine tree
   if( strlen( argList.String("-root") ) )
     {
-//       MachineTree* machTree = treeTable->GetAgsTreePtr();
       machTree->SetRootDirPath( argList.String("-root") );
     }
 
@@ -294,19 +362,15 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   // for compatibility, initialize menubar tools and generic popups
   mb_init(this, messageArea);
 
+  // prevent main window from auto resizing itself
+  UIForm* form = GetForm();
+  if (form)
+    form->ResizeOff();
+
   // if there is a passed argument with device_list, don't show the SSMainWindow
   if( strlen( argList.String("-device_list") ) == 0 )
     // display the tree table window to get any device list
     Show();
-
-//   ////////////////////////////TEMPORARY CODE  DELETE  DELETE ///////////////////////////////////////////
-//   UICombineMachineTree* t = new UICombineMachineTree(this, "t");
-// //   DirTree* d = t->GetRhicTreePtr();
-// //   d->TreeTraversePreorder((short) 0, &actionFunc, NULL);
-
-//   MachineTree* m = t->GetAgsTreePtr();
-//   m->TreeTraversePreorder((short) 0, &actionFunc, NULL);
-//   ////////////////////////////TEMPORARY CODE  DELETE  DELETE ///////////////////////////////////////////
 }
 
 void SSMainWindow::InitArchiveLib()
@@ -318,14 +382,6 @@ void SSMainWindow::InitArchiveLib()
 
 void SSMainWindow::InitRelwayServer()
 {
-//   // establish a relway connection
-//   // this task is time consuming and needs to be done eventually anyway
-//   if( strlen( argList.String("-host") ) )
-//     RelwayGateway.sethost( (char*) argList.String("-host") );
-//   else
-//     RelwayGateway.sethost("NULL.HOST");
-
-//   RelwayGateway.connect();
 }
 
 void SSMainWindow::SetMessage(const char* message)
@@ -441,9 +497,9 @@ void SSMainWindow::LoadPageList(const UIWindow* winSelection)
   // make sure all of the items are displayed
   if(numWins > 1)
     {
-      if(numWins >= 9)
+      if(numWins >= 5)
 	{
-	  pageList->SetItemsVisible(9);
+	  pageList->SetItemsVisible(5);
 	  pageList->ShowSelection();
 	}
       else
@@ -452,6 +508,7 @@ void SSMainWindow::LoadPageList(const UIWindow* winSelection)
   else
     pageList->SetItemsVisible(1);
 
+  UIForceResize(pageList);
   delete [] items;
 }
 
