@@ -95,6 +95,9 @@ MenuTree* CreateMenuTree()
 	menuTree->SetNodeHelpText(snode, "Brings up a separate window allowing the user\nto view the log of archives that have been made\nwith the archiving system.");
 	menuTree->SetNodeMnemonic(snode, 'A');
 
+	snode = menuTree->InsertMenuItem("PPM User Monitor", "/Options", NULL);
+	menuTree->SetNodeHelpText(snode, "Run program that lets you see which ppm users\nand supercycle tables are active and have been\nactive recently.");
+
 	snode = menuTree->InsertMenuItem("----", "/Options", NULL);
 	menuTree->SetNodeType(snode, MenuSeparatorType);
 
