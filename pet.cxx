@@ -73,7 +73,6 @@ main(int argc, char *argv[])
     mainPetWindow = new PetWindow(application, "petWindow");
     mainPetWindow->SetLocalPetWindowCreating(true);
     mainPetWindow->AddEventReceiver(&petEventReceiver);
-    mainPetWindow->Show();
     singleWindowMode = true;
   }
   else{
@@ -88,8 +87,6 @@ main(int argc, char *argv[])
     sprintf(str, "%s/*.pet", path);
     if(singleWindowMode)
       mainPetWindow->ChangePath(str);
-//     else
-//       petTable->ChangePath(str);
     if(str)
       delete [] str;
   }
@@ -145,7 +142,8 @@ main(int argc, char *argv[])
       if(fileNum==0) {	// only do the first file
         if (mainPetWindow == NULL){
           mainPetWindow = new PetWindow(application, "petWindow");
-          mainPetWindow->Show();
+          if (mainWindow)
+            mainWindow->AddListWindow(mainPetWindow);
         }
         mainPetWindow->LoadFile(file);
         mainPetWindow->ChangePath(path);
@@ -153,6 +151,7 @@ main(int argc, char *argv[])
           free(path);
         if(tmpFile)
           free(tmpFile);
+        mainPetWindow->Show();
         break;
       }
     } // if file good
@@ -196,6 +195,11 @@ main(int argc, char *argv[])
   // if there is a passed argument with device_list, don't show the SSMainWindow
   if( strlen( argList.String("-device_list") )  )
     {
+      if (mainWindow == NULL){
+        mainWindow = new SSMainWindow(application, "mainWindow", "pet");
+        application->AddEventReceiver(mainWindow);
+      }
+       
       // now display the AgsPageWindow with the passed in device list 
       mainWindow->ShowSingleDeviceList((char*) argList.String("-device_list"));
       singleDeviceListOnly=UITrue;
