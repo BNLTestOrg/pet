@@ -2,7 +2,7 @@
 
 include /vobs/libs/makefiles/MakeStd.inc
 
-NAME = control
+NAME = pet
 
 PROG1 = $(NAME)
 SRCS1 = $(PROG1).cxx
