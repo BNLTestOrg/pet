@@ -1,6 +1,6 @@
 "MTRE",3
 797093749,"Wed Apr  5 10:55:49 1995"
-1056120511,"Fri Jun 20 10:48:31 2003"
+1071245299,"Fri Dec 12 11:08:19 2003"
 32,29,29
 
 "NODE 0"
@@ -48,12 +48,13 @@ for any new device lists that are displayed.
 It does not affect existing device pages."
 
 "NODE 5"
-"Exit..."
+"Quit"
 5,1,-1,27,-1
 1
-69,""
+81,"Ctrl+Q"
 0,0
-"Exits this program after a confirmation."
+"Select 'Quit' to exit the program immediately.
+	"
 
 "NODE 6"
 "Page"
