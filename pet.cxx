@@ -656,6 +656,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	  tree->GenerateFullNodePathname(selectedNode, s);
 	  strcat(s, "/");
 	  PET_WINDOW_TYPE type = WindowType(s);
+          if (type == PET_UNKNOWN_WINDOW)
+            return;
 	  if(event == UISelect || event == UIAccept)	// load current window
 	    {
 	      // find out which window is the current one, if there is one
