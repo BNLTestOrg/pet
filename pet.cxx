@@ -39,6 +39,7 @@ static unsigned long	knobPanelId = 0;
 static SSPageWindow*	activePageWindow = NULL;
 static PetWindow*       mainPetWindow = NULL;
 static PetEventReceiver petEventReceiver;
+static unsigned long    dumpElogAndExitTimerId = 0;
 
 static void clean_up(int st)
 {
@@ -59,6 +60,8 @@ main(int argc, char *argv[])
   argList.AddSwitch("-single");         // single window mode
   argList.AddSwitch("-file");		// file to open initially
   argList.AddString("-path");		// default path for file open
+  argList.AddSwitch("-printToElog");    // used with -single or -file to print pet page to elog after data acquisition, then exit
+  argList.AddString("-elog");           // when used with -printToElog, the name of the elog, else the default
 
   // set up the CNS as the source for names
   // does each application really need to do this?
@@ -79,6 +82,8 @@ main(int argc, char *argv[])
     // create the main window and its user interface and display it
     mainWindow = new SSMainWindow(application, "mainWindow", "pet");
     application->AddEventReceiver(mainWindow);
+    if (argList.IsPresent("-printToElog") && !argList.IsPresent("-device_list"))
+      cout << "-printToElog option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
   }
   
   const char *path = argList.String("-path");
@@ -205,6 +210,21 @@ main(int argc, char *argv[])
       singleDeviceListOnly=UITrue;
     }
 
+  if ( argList.IsPresent("-printToElog") && (singleWindowMode || singleDeviceListOnly)){
+    const char* elogName = NULL;
+    if(argList.IsPresent("-elog") )
+      elogName = argList.String("-elog");
+    UIPrintTool* pt = GetPrintTool();
+    pt->SetPrintOutputType(UIPrintToElog);
+    if(elogName != NULL && elogName[0] != 0)
+      pt->SetElogName(elogName);
+    // dump snap shot of the AGS page to the elog and exit
+    if (singleDeviceListOnly)
+      dumpElogAndExitTimerId = application->EnableTimerEvent(1000);
+    else
+      mainPetWindow->ElogDumpAndExit();
+  }
+  
   // loop forever handling user events
   application->HandleEvents();
 }
@@ -226,7 +246,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   viewer = NULL;
   searchPopup = NULL;
   searchPage = NULL;
-
+  
   // resources
   static const char* defaults[] = {
     "*foreground: navy",
@@ -930,6 +950,17 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
   else if (event == UIMessage)
     {
       SetMessage(object->GetMessage());
+    }
+  else if (object == application && event == UITimer)
+    {
+      if (application->GetTimerId() == dumpElogAndExitTimerId){
+        SSPageWindow* pageWin = (SSPageWindow*) GetWindow(1);
+        if (pageWin){
+          pageWin->PrintDump();
+          exit(0);
+        } else
+          SetMessage("Unable to find window for elog dump");
+      }
     }
   // otherwise, pass event to base class
   else
