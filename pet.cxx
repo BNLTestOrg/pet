@@ -1095,8 +1095,8 @@ void SSMainWindow::DeleteListWindow(UIWindow* window)
 	  break;
 	}
     }
-  if(winFound == UIFalse)
-    LoadTable( (const StdNode*) NULL);
+//   if(winFound == UIFalse)
+//     LoadTable( (const StdNode*) NULL);
 }
 
 void SSMainWindow::RemoveWindow(UIWindow* window)
