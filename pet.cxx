@@ -527,7 +527,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 
   // main window events
   if(object == this && event == UIWindowMenuClose)
-    SS_Exit();
+    Exit();
 
   // user closing the viewer window used to display archive summary log
   else if(object == viewer && event == UIWindowMenuClose)
@@ -627,7 +627,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       if (singleDeviceListOnly && !strcmp( object->ClassName(), "SSPageWindow") )
 	//if is an SSPageWindow, may be leaving application
 	{
-	  SS_Exit();
+	  Exit();
 	  return;
 	}
       // check to see if sent from one of the device pages
@@ -895,8 +895,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	else if(!strcmp(data->namesSelected[1], "Create AGS Page..."))
 	  {     SS_Create_AGS_Page();
 	  }
-	else if(!strcmp(data->namesSelected[1], "Exit..."))
-	  {	SS_Exit();
+	else if(!strcmp(data->namesSelected[1], "Quit"))
+	  {	SS_Quit();
 	  }
 	}
       else if(!strcmp(data->namesSelected[0], "Page"))
@@ -1348,7 +1348,12 @@ void SSMainWindow::SS_Create_AGS_Page()
   SetStandardCursor();
 }
 
-void SSMainWindow::SS_Exit()
+void SSMainWindow::SS_Quit()
+{
+  clean_up(0);
+}
+
+void SSMainWindow::Exit()
 {
   // first put up an exit confirmation
   UILabelPopup popup(this, "exitPopup", NULL, "Yes", "No");
