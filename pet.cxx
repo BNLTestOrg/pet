@@ -1498,7 +1498,7 @@ void SSMainWindow::SO_SLDs()
   if (controller_record == NULL) return;
   const char* theController = controller_record->name;
   TextString path;
-  path << "/tmp/" << theController << "_pid" << getpid();
+  path << "/tmp/" << theController << "_pid" << getpid() << ".ld";
   unlink(path);
   TextString command;
   command << "echo " << theController << " > " << path;
@@ -1537,7 +1537,9 @@ void SSMainWindow::SO_SLDs()
   LoadPageList(pageWin);
   SetStandardCursor();
   SetMessage("");
-  unlink(path);
+
+  // don't unlink yet - we may use it for archive access ( but when will we ever get rid of it? )
+  //unlink(path);
 }
 
 void SSMainWindow::SO_CLDs()
