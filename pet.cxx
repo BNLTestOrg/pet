@@ -1,5 +1,4 @@
 // #define __DEBUG_KNOB
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -14,7 +13,6 @@
 #include <archive/archive_lib.h>		// for init_archive_lib_globals() and ARCHIVE_LOG;
 #include <ddf/DeviceDirectory.hxx>		// for DeviceDirectory global object
 #include <dgTools/dg_tools.h>			// for check_connection()
-//#include <agsDevices/RelwayGateway.hxx>		// for RelwayGateway class
 #include <UIGenerics/UIMenubarTools.hxx>	// for mb_init()
 #include <UIAgs/generic_popups_derived.h>	// for gp_set_ppm _program() _user()
 #include <UIAgs/cld_popup.hxx>			// for cld popups
@@ -29,9 +27,6 @@
 #include "MenuTree.cxx"
 
 #define SS_PRINT_FILE		"/tmp/SSPagePrintFile"
-
-//#define DEFAULT_PET_FILE "device_list.ado"
-//#define DEFAULT_SS_FILE  "device_list.ld"
 
 static UIApplication*	application;
 static UIArgumentList	argList;
@@ -236,26 +231,22 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
     "*mainWindow*treeTable*font: 9x15bold",
     "*mainWindow*pageList*list*fontList: 9x15bold",
     "*mainWindow.geometry: +0+0",
-//     "*sscldWindow.uipulldownMenuFile: /ride/release/SUN/data/SpreadSheet/GenericCldTree1",
     "*mainWindow.allowShellResize: true",
     "*mainWindow*treeTable*showHeaders: false",
-     "*mainWindow*treeTable*visibleRows: 30",
-     "*mainWindow*treeTable*uinameWidth: 30",
-     "*mainWindow*treeTable*table.width: 293",
+    "*mainWindow*treeTable*visibleRows: 30",
+    "*mainWindow*treeTable*uinameWidth: 30",
+    "*mainWindow*treeTable*table.width: 293",
     "*mainWindow*treeTable*table*showHScroll: true",
     "*mainWindow*pageList*prompt*alignment: alignment_center",
     "*mainWindow*pageList*traversalOn: false",
     "*pageWindow*defaultPosition: true",
-    //    "*pageWindow*uipulldownMenuFile: /ride/release/SUN/data/SpreadSheet/SSpage.MenuTree",
     "*pageWindow*page*tableHelp*background: white",    
     "*sscldWindow*defaultPosition: true",
     "*deviceInfoPopup*defaultPosition: false",
     "*deviceInfoPopup.allowShellResize: false",
     "*metaEditor*defaultPosition: false",
-//     "*metaEditor.pulldownMenu*uimenuFile: /ride/release/SUN/data/SpreadSheet/MetaEditorMenuTree",
     "*loadArchivePopup*defaultPosition: false",
     "*allUserPopup*defaultPosition: false",
-//     "*pageWindow*allUserPopup*uipulldownMenuFile: /ride/release/SUN/data/SpreadSheet/AllUserPageMenuTree",
     "*mainWindow*treeTable.uihelpText:
 The machine tree display.  A right facing arrow next to a node name
 indicates that this node is expandable, but is not currently expanded.
@@ -540,7 +531,6 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       if(event == UISelect)		// view the selected device list
 	{
 	  // get the selected node
-// 	  DirTree* dtree = treeTable->GetTreePtr();
 	  MachineTree* mtree = treeTable->GetMachineTree();
 	  StdNode* rootNode = mtree->GetRootNode();
 	  const char* rootPath = mtree->GenerateNodePathname(rootNode);
@@ -565,16 +555,13 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	  searchPopup->SetWorkingCursor();
 	  treeTable->SetNodeSelected(selectNode);
 	  treeTable->LoadTreeTable();
-// 	  if(searchPage != NULL)
-// 	    HandleEvent(treeTable, UISelect);
-// 	  else
-	    {
-	      HandleEvent(treeTable, UITableBtn2Down);
-	      // store a ptr to window so can reload if neccessary
-	      long selection = pageList->GetSelection();
-	      if(selection > 0)
-		searchPage = this->GetWindow(selection);
-	    }
+          HandleEvent(treeTable, UITableBtn2Down);
+
+          // store a ptr to window so can reload if neccessary
+          long selection = pageList->GetSelection();
+          if(selection > 0)
+            searchPage = this->GetWindow(selection);
+
 	  // make sure the first device name with the search string is highlighted
 	  const char* searchStr = searchPopup->GetSearchString();
 	  if(searchStr != NULL && searchStr[0] != 0 && searchPage != NULL)
@@ -1270,65 +1257,10 @@ void SSMainWindow::SS_Open()
 
 void SSMainWindow::SS_Set_Host()
 {
-//   // get a list of all the possible hosts
-//   // find the current host and select it
-//   ddf_pointers_t* ddf_pointers = DeviceDirectory.ddfpointers();
-//   hosts_t* hosts  = ddf_pointers->hosts_ptr;
-//   char** host_list = new char* [hosts->no_hosts+1];
-//   char* currHost = RelwayGateway.host();
-//   long selection = 1;
-//   for(int i=0; i<hosts->no_hosts; i++)
-//     {
-//       host_list[i] = hosts->host[i].name;
-//       if(currHost != NULL && !strcmp(host_list[i], currHost) )
-// 	selection = i+1;
-//     }
-//   host_list[hosts->no_hosts] = NULL;
-
-//   // put up a popup and let user select a host
-//   UIListPopup popup(this, "hostsPopup", "Select a new host below.", (const char**) host_list, "OK", "Cancel");
-//   popup.SetSelection(selection);
-//   if( popup.Wait() == 2)		// user cancel
-//     return;
-//   const char* hostname = popup.GetSelectionString();
-//   delete [] host_list;
-
-//   // use this as the new relway host
-//   ReconnectToRelway(hostname);
 }
 
 void SSMainWindow::ReconnectToRelway(const char* newHost)
 {
-//   // first turn off any continuous reports from any device pages
-//   long numWins = GetNumWindows();
-//   const UIWindow** wins = GetWindows();
-//   int i;
-//   SSPageWindow* pageWin;
-//   for(i=0; i<numWins; i++)
-//     {
-//       if( !strcmp(wins[i]->ClassName(), "SSPageWindow") )
-// 	{
-// 	  pageWin = (SSPageWindow*) wins[i];
-// 	  pageWin->StopContinuousUpdate();
-// 	}
-//     }
-
-//   // now disconnect and reconnect
-//   while( RelwayGateway.isconnected() )
-//     RelwayGateway.disconnect();
-//   if(newHost != NULL)
-//     RelwayGateway.sethost(newHost);
-//   RelwayGateway.connect();
-
-//   // now put device pages back in continuous update mode
-//   for(i=0; i<numWins; i++)
-//     {
-//       if( !strcmp(wins[i]->ClassName(), "SSPageWindow") )
-// 	{
-// 	  pageWin = (SSPageWindow*) wins[i];
-// 	  pageWin->CheckUpdate();
-// 	}
-//     }
 }
 
 void SSMainWindow::SS_Default_PPM_User()
@@ -1502,7 +1434,6 @@ void SSMainWindow::SO_Search()
       const StdNode* currentNode = treeTable->GetNodeSelected();
       if(currentNode != NULL)
 	{
-// 	  MachineTree* mtree = treeTable->GetAgsTreePtr();
 	  DirTree* dtree = (DirTree*) treeTable->GetTree();
 	  searchPopup->SetStartNode( dtree->GenerateNodePathname(currentNode) );
 	}
@@ -1594,7 +1525,6 @@ void SSMainWindow::SO_SLDs()
   SetStandardCursor();
   SetMessage("");
   unlink(path);
-
 }
 
 void SSMainWindow::SO_CLDs()
@@ -1709,8 +1639,6 @@ void SSMainWindow::ShowSingleDeviceList(const char* deviceListPath)
 {
   // create a new device page window and load list
   SSPageWindow* pageWin = new SSPageWindow(this, "pageWindow");
-  //  if (supportKnobPanel)
-  //    pageWin->SupportKnobPanel();
 
   MachineTree* mtree = treeTable->GetMachineTree();
   const char* rootPath = mtree->GetRootPath();
@@ -1916,7 +1844,7 @@ int SSPageWindow::PrintVisible(long startCol, long endCol)
   fclose(fp);
   umask(oldMask);
 
-	// now send the print file to the printer using lpr
+  // now send the print file to the printer using lpr
   char command[128];
   strcpy(command, "lpr ");
   strcat(command, SS_PRINT_FILE);
@@ -2115,7 +2043,7 @@ void SSPageWindow::SD_Show_CLD_Editor()
   if (singleDeviceListOnly)
     newWin->SetSingleDeviceListMode();
 
-  //set the device list path for the cld window
+  // set the device list path for the cld window
   newWin->SetDeviceListForArchiveRetrieval(GetDevListPath());
   newWin->SetMachineTreeRootPath(GetMachineTreeRootPath());
 
