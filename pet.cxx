@@ -2,10 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <signal.h>    
-#ifdef __APOLLO
-#include  <apollo/aclm.h>			// for protected subsystem call aclm_$up()
-#endif
+#include <signal.h>
 #include <UI/UIApplication.hxx>			// for UIApplication class
 #include <UI/UIArgumentList.hxx>		// for UIArgumentList class	
 #include <pet/PetWindow.hxx>
@@ -25,6 +22,8 @@
 #include <UIUtils/UIPPM.hxx>
 #include <cdevCns/cdevCns.hxx>
 #include "MenuTree.cxx"
+
+using namespace std;
 
 #define SS_PRINT_FILE		"/tmp/SSPagePrintFile"
 
@@ -48,7 +47,7 @@ static void clean_up(int st)
   exit(st);
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   //set up command line arguments
   argList.AddString("-host");
@@ -162,11 +161,6 @@ main(int argc, char *argv[])
     } // if file good
   } // for
   
-  // Assert protected subsystem rights
-#ifdef __APOLLO
-  aclm_$up();
-#endif
-
   // if the switch know is provided, enable the sio line
   if( argList.IsPresent("-knob") )
     {
@@ -204,8 +198,8 @@ main(int argc, char *argv[])
         mainWindow = new SSMainWindow(application, "mainWindow", "pet");
         application->AddEventReceiver(mainWindow);
       }
-       
-      // now display the AgsPageWindow with the passed in device list 
+      
+      // now display the AgsPageWindow with the passed in device list
       mainWindow->ShowSingleDeviceList((char*) argList.String("-device_list"));
       singleDeviceListOnly=UITrue;
     }
@@ -268,7 +262,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
     "*mainWindow*pageList*prompt*alignment: alignment_center",
     "*mainWindow*pageList*traversalOn: false",
     "*pageWindow*defaultPosition: true",
-    "*pageWindow*page*tableHelp*background: white",    
+    "*pageWindow*page*tableHelp*background: white",
     "*sscldWindow*defaultPosition: true",
     "*deviceInfoPopup*defaultPosition: false",
     "*deviceInfoPopup.allowShellResize: false",
@@ -282,7 +276,7 @@ A down facing arrow indicates that the node is currently expanded.
 No arrow next to a node name indicates that this is a leaf node of the tree.
 Clicking on the name or a right facing arrow will expand that section
 and cause and already expanded section to collapse if neccessary.
-To cause a section to collapse, click on the down facing arrow.",    
+To cause a section to collapse, click on the down facing arrow.",
     "*mainWindow*pageList.uihelpText: 
 Displays the leaf name of all of the device pages currently being displayed.
 Clicking on a name in this list will cause the device page to come to the
@@ -396,7 +390,7 @@ void SSMainWindow::InitArchiveLib()
 {
   MachineTree* mtree = treeTable->GetMachineTree();
   const dir_node_t* root = mtree->GetDirRootNode();
-  init_archive_lib_globals(GlobalDdfPointers(), false, 0, -1, table_dummy, (dir_node_t*) root); 
+  init_archive_lib_globals(GlobalDdfPointers(), false, 0, -1, table_dummy, (dir_node_t*) root);
 }
 
 void SSMainWindow::InitRelwayServer()
@@ -498,6 +492,8 @@ void SSMainWindow::LoadPageList(const UIWindow* winSelection)
       case PET_ADO_WINDOW:
 	petWin = (PetWindow*) wins[i];
 	items[i] = UIGetLeafName( petWin->GetTitle() );
+	break;
+      default:
 	break;
       }
       
@@ -601,6 +597,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 		break;
 	      case PET_ADO_WINDOW:
 		((PetWindow*) searchPage)->ShowSubString(searchStr);
+		break;
+	      default:
 		break;
 	      }
 	  searchPopup->SetStandardCursor();
@@ -809,7 +807,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	    // update the device page list
 	    LoadPageList(pageWin);
 	  }
-	  if (type == PET_ADO_WINDOW || type == PET_HYBRID_WINDOW) { 
+	  if (type == PET_ADO_WINDOW || type == PET_HYBRID_WINDOW) {
 	    char s[512];
 	    DirTree* tree = (DirTree*)treeTable->GetTree();
 	    const StdNode* theNode = tree->GetRootNode();
@@ -875,7 +873,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	petWin->Show();
 	LoadPageList(petWin);
       }
-    }      
+    }
   
   // user made a selection from the pulldown menus
   else if(object == pulldownMenu && event == UISelect)
@@ -1072,9 +1070,11 @@ UIWindow* SSMainWindow::FindWindow(const char* file)
 	case PET_CLD_WINDOW:
 	  winName = ((SSCldWindow*)win)->GetCldName();
 	  break;
+	default:
+	  break;
 	}
       
-      if(winName) 
+      if(winName)
 	if(!strcmp(petName, winName) || !strcmp(ssName, winName))
 	  return win;
     } // for
@@ -1252,6 +1252,8 @@ void SSMainWindow::LoadTable(const UIWindow* window)
       break;
     case PET_ADO_WINDOW:
       node = ((PetWindow*)window)->GetPageNode();
+      break;
+    default:
       break;
     }
 
@@ -1594,7 +1596,7 @@ void SSMainWindow::SO_SLDs()
 void SSMainWindow::SO_CLDs()
 {
   // get a CLD name from the user
-  if(ctrlPopup == NULL) 
+  if(ctrlPopup == NULL)
     ctrlPopup = new UIDevicesFromControllerPopup(this, "ctrlPopup");
 
   ctrlPopup->SetDeviceType(TYPE_CLD);
@@ -1619,7 +1621,7 @@ to be reopened.  Continue?", "OK", "Cancel");
   StdNode* nodes[128];
   for (int i=0; i<128; i++) nodes[i] = NULL;
   int index = 0;
-  SSPageWindow* pageWin; 
+  SSPageWindow* pageWin;
   UIWindow* win;
 
   // first remove LD windows
@@ -2072,7 +2074,7 @@ void SSPageWindow::HandleEvent(const UIObject* object, UIEvent event)
 void SSPageWindow::SP_Duplicate()
 {
   // ask user for PPM user for the duplicate page
-  static const char* defaults[] = 
+  static const char* defaults[] =
   {
     "*duplicatePpmPopup*uiuseSetupToggle: false",
     NULL,
@@ -2161,7 +2163,7 @@ void SSPageWindow::SD_Show_CLD_Editor()
 	    SetMessage("CLD ", GetDeviceName(), " - report error. CLD window creation aborted.");
 	  else
 	    SetMessage("CLD ", GetDeviceName(), " - unknown error. CLD window creation aborted.");
-	}	  
+	}
       else
 	SetMessage("Cld ", GetDeviceName(), " - no data to collect. CLD window creation aborted.");
       delete newWin;
