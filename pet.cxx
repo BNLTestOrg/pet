@@ -942,6 +942,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	else if(!strcmp(data->namesSelected[1], "CLD Events..."))
 	  {	SO_CLD_Events();
 	  }
+	else if(!strcmp(data->namesSelected[1], "PPM User Monitor"))
+	  {	SO_PpmUserMonitor();
+	  }
         else if(!strcmp(data->namesSelected[1], "Reload DDF..."))
           {     SO_Load_DDF();
           }
@@ -1512,6 +1515,11 @@ void SSMainWindow::SO_Read_Archive_Log()
   else
     SetMessage("Could not read Archive Summary Log");
 }
+
+void SSMainWindow::SO_PpmUserMonitor()
+{
+  system("/usr/controls/bin/PpmUserMon &");     
+} 
 
 static controller_record_t*  get_controller() {
 
