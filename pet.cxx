@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
   argList.AddString("-path");		// default path for file open
   argList.AddSwitch("-printToElog");    // used with -single or -file to print pet page to elog after data acquisition, then exit
   argList.AddString("-elog");           // when used with -printToElog, the name of the elog, else the default
+  argList.AddNumber("-ppm");            // start pet with the specified user
 
   // set up the CNS as the source for names
   // does each application really need to do this?
@@ -69,6 +70,9 @@ int main(int argc, char *argv[])
 
   // initialize the application
   application  = new UIApplication(argc, argv, &argList);
+
+  if (argList.IsPresent("-ppm"))
+    set_ppm_user(argList.Value("-ppm"));
 
   // check for single window switch
   bool singleWindowMode = false;
@@ -402,6 +406,8 @@ void SSMainWindow::SetPPMLabel()
 {
   // get the ppm user number used by this process
   int ppmUser = get_ppm_user();
+  if (argList.IsPresent("-ppm"))
+    ppmUser = argList.Value("-ppm");
 
   // find the name associated with that number
   ppm_users_t	users[MAX_PPM_USERS];
