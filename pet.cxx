@@ -21,6 +21,7 @@
 #include <agsPage/KnobPanel.hxx>		// for supporting a knob panel
 #include <UIUtils/UIPPM.hxx>
 #include <cdevCns/cdevCns.hxx>
+#include <setHist/SetStorage.hxx>               // to turn on storage of ADO/LD sets
 #include "MenuTree.cxx"
 
 using namespace std;
@@ -65,8 +66,10 @@ int main(int argc, char *argv[])
   argList.AddNumber("-ppm");            // start pet with the specified user
 
   // set up the CNS as the source for names
-  // does each application really need to do this?
   cdevCnsInit();
+  
+  // turn on storage of ADO/LD sets
+  globalSetStorage()->storageOn();
 
   // initialize the application
   application  = new UIApplication(argc, argv, &argList);
