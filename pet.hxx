@@ -86,6 +86,7 @@ protected:
 //   SSPageWindow*			searchPage;
   UIWindow*			searchPage;
   MenuTree*                     pulldownMenuTree;
+  UILabelPopup*                 errFillExistWindowPopup;
   
   // set the window position for a newly created window
   void SetWindowPos(UIWindow* newWin, UIWindow* currWin = NULL);
@@ -95,6 +96,12 @@ protected:
 
   // reconnect to a new relway server
   void ReconnectToRelway(const char* newHost = NULL);
+
+  // remove the device_list ending of the file name
+  void AdjustName(char* devicePath);
+
+  // a display popup - to show that could not load a device list
+  void DisplayError(char* errToDisplay);
 
   // pulldown menu routines
   void SS_New();
