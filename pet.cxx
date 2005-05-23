@@ -248,6 +248,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   viewer = NULL;
   searchPopup = NULL;
   searchPage = NULL;
+  errFillExistWindowPopup = NULL;
   
   // resources
   static const char* defaults[] = {
@@ -676,6 +677,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     SSPageWindow* ldWin = NULL;
     PetWindow* adoWin = NULL;
     UIWindow* win;
+    bool creatLdWin = false;
+    bool creatAdoWin = false;
     if(event == UISelect || event == UIAccept || event == UITableBtn2Down) {
       char s[512];
       DirTree* tree = (DirTree*)treeTable->GetTree();
@@ -686,6 +689,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       if (type == PET_UNKNOWN_WINDOW)
 	return;
       SetWorkingCursor();
+      // in case we have an error - loading a window - let's remember the window we are replacing!
+      char* ldWindowPath = NULL;
+      char* adoWindowPath = NULL;
       if(event == UISelect || event == UIAccept) {	// load current window
 	// do we have a window (or windows) to reload of the right type - otherwise create one
 	if(type == PET_LD_WINDOW || type == PET_HYBRID_WINDOW) {
@@ -694,15 +700,37 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	    if (supportKnobPanel)
 	      activeLdWin->ClearTheKnobPanel();
 	    ldWin = activeLdWin;
+            const char* ldPath = ldWin->GetCurrentFileName();
+            if (ldPath != NULL)
+              {
+                ldWindowPath = new char[strlen(ldPath)+1];
+                strcpy(ldWindowPath, ldPath);
+                // now null terminate the /device_list.ado or /device_list ending away
+                AdjustName(ldWindowPath);
+              }
 	  }
-	  else
+	  else {
+            creatLdWin = true;
 	    ldWin = CreateLdWindow();
-	}
+          }
+        }
 	if(type == PET_ADO_WINDOW || type == PET_HYBRID_WINDOW) {
 	  if(activeAdoWin)
-	    adoWin = activeAdoWin;
-	  else
+            {
+              adoWin = activeAdoWin;
+              const char* adoPath = adoWin->GetCurrentFileName();
+              if (adoPath != NULL)
+                {
+                  adoWindowPath = new char[strlen(adoPath)+20]; // need space - because will append ending back later!
+                  strcpy(adoWindowPath, adoPath);
+                  // now null terminate the /device_list.ado or /device_list ending away
+                  AdjustName(adoWindowPath);
+                }
+            }
+	  else {
+            creatAdoWin = true;
 	    adoWin = CreateAdoWindow();
+          }
 	}
       }
       else if(event == UITableBtn2Down) {  // create new window(s)
@@ -727,7 +755,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	    }
 	    if(type == PET_UNKNOWN_WINDOW) { // nothing more to create
 	      SetStandardCursor();
-	      return;
+              delete [] ldWindowPath;
+              delete [] adoWindowPath;
+              return;
 	    }
 	  }
 	  else { // Yes - make sure we create new windows
@@ -737,9 +767,15 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	}
 	// create a window (or windows) of the right type
 	if(type == PET_LD_WINDOW || type == PET_HYBRID_WINDOW)
-	  ldWin = CreateLdWindow();
+          {
+            creatLdWin = true;
+            ldWin = CreateLdWindow();
+          }
 	if(type == PET_ADO_WINDOW || type == PET_HYBRID_WINDOW)
-	  adoWin = CreateAdoWindow();
+          {
+            creatAdoWin = true;
+            adoWin = CreateAdoWindow();
+          }
       }
       // now we have one (or two) windows - load the proper device list(s)
       const char* selectPath = treeTable->GetNodePath();
@@ -747,6 +783,20 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	RingBell();
 	SetMessage("Can't determine path to device list.");
 	SetStandardCursor();
+        
+        // if created a window - delete it - remove it from the list!
+        if (creatLdWin)
+          {
+            if (ldWin)
+              DeleteWindow(ldWin);
+          }
+        if (creatAdoWin)
+          {
+            if (adoWin)
+              DeleteWindow(adoWin);
+          }
+        delete [] ldWindowPath;
+        delete [] adoWindowPath;
 	return;
       }
       SetMessage("Loading device page(s)...");
@@ -754,12 +804,34 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	if( LoadDeviceList(ldWin, selectPath) < 0) {
 	  RingBell();
 	  SetMessage("Could Not Load Device List");
-	  if (event == UITableBtn2Down) {
-	    //a new window was created but not loaded successfully, better delete it
-	    delete ldWin;  ldWin = NULL;
-	  }
-	  SetStandardCursor();
-	  return;
+          //	  if (event == UITableBtn2Down) {
+          //	    //a new window was created but not loaded successfully, better delete it
+          //	    delete ldWin;  ldWin = NULL;
+          //	  }
+          // if created a window - delete it - remove it from the list!
+          if (creatLdWin)
+            {
+              DeleteWindow(ldWin);
+              delete [] ldWindowPath;
+              delete [] adoWindowPath;
+              SetStandardCursor();
+              return;
+            }
+          else
+            {
+              // we were loading a device page into an existing window
+              // restore to its original path
+              if( ldWindowPath != NULL && LoadDeviceList(ldWin, ldWindowPath) < 0)
+                {
+                  RingBell();
+                  delete [] ldWindowPath;
+                  delete [] adoWindowPath;
+                  SetStandardCursor();
+                  return;
+                }
+              else
+                DisplayError("Problem loading device list.\nRestored to initial page.");
+            }
 	}
 	else
 	{
@@ -787,12 +859,83 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	strcat(s, "/");
 	strcat(s, ADO_DEVICE_LIST);
 	adoWin->LoadFile(s, tree->GenerateNodePathnameWithoutRoot( treeTable->GetNodeSelected() ));
-	if (type == PET_HYBRID_WINDOW && !adoWin->IsManaged() )
-	  SetWindowPos(adoWin, ldWin);
-	adoWin->SetPageNode( treeTable->GetNodeSelected() );
-	adoWin->Show();
-	LoadPageList(adoWin);
-	activeAdoWin = adoWin;
+        if (adoWin->CreateOK())
+          {
+            if (type == PET_HYBRID_WINDOW && !adoWin->IsManaged() )
+              SetWindowPos(adoWin, ldWin);
+            adoWin->SetPageNode( treeTable->GetNodeSelected() );
+            adoWin->Show();
+            LoadPageList(adoWin);
+            activeAdoWin = adoWin;
+          }
+        else
+          {
+            if (creatAdoWin)
+              {
+                RingBell();
+                delete [] ldWindowPath;
+                delete [] adoWindowPath;
+                SetStandardCursor();
+                SetMessage("Could Not Load Device List");
+                DeleteWindow(adoWin);
+                return;
+              }
+            else
+              {
+                // we were loading a device page into an existing window
+                // restore to its original path
+                bool anError = false;
+                if( adoWindowPath != NULL)
+                  {
+                    DirTree* tree = (DirTree*)treeTable->GetTree();
+                    // the adoWindowPath should not begin with /operations the root of the tree - for this call
+                    StdNode* selectedNode = NULL;
+                    if ( !strncmp(adoWindowPath, "/operations/", strlen("/operations/")) )
+                      selectedNode = tree->FindNode(&(adoWindowPath[strlen("/operations/")-1]));
+                    strcat(adoWindowPath, "/");
+                    strcat(adoWindowPath, ADO_DEVICE_LIST);
+                    if (selectedNode != NULL)
+                      adoWin->LoadFile(adoWindowPath, tree->GenerateNodePathnameWithoutRoot(selectedNode) );
+                    else
+                      adoWin->LoadFile(adoWindowPath);
+                    if (adoWin->CreateOK())
+                      {
+                        if (type == PET_HYBRID_WINDOW && !adoWin->IsManaged() )
+                          SetWindowPos(adoWin, ldWin);
+                        adoWin->SetPageNode(selectedNode);
+                        adoWin->Show();
+                        LoadPageList(adoWin);
+                        activeAdoWin = adoWin;
+                        SetMessage("Could Not Load Device List");
+                        DisplayError("Problem loading device list.\nRestored to initial page.");
+                        anError = true;
+                      }
+                    else
+                      {
+                        RingBell();
+                        SetMessage("Could Not Load Device List");
+                        DisplayError("Problem restoring original device list.");
+                        anError = true;
+                      }
+                  }
+                else
+                  {
+                    SetMessage("Could Not Load Device List");
+                    RingBell();
+                    DisplayError("Problem restoring original device list.");
+                    anError = true;
+                  }
+                if (anError)
+                  {
+                    delete [] ldWindowPath;
+                    delete [] adoWindowPath;
+                    SetStandardCursor();
+                    return;
+                  }
+              }
+          }
+        delete [] ldWindowPath;
+        delete [] adoWindowPath;
       }
       SetStandardCursor();
       SetMessage("");
@@ -838,10 +981,17 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	// in this case, we will assume the file loaded is not from the tree
 	// so don't set the tree - otherwise need to somehow be smart - skip it for now
 	adoWin->LoadFile(object->GetMessage(), NULL, ppmUser);
-	AddListWindow(adoWin);
-	adoWin->Show();
-	LoadPageList(adoWin);
-	activeAdoWin = adoWin;
+        if (adoWin->CreateOK())
+          {
+            AddListWindow(adoWin);
+            adoWin->Show();
+            LoadPageList(adoWin);
+            activeAdoWin = adoWin;
+          }
+        else
+          {
+            SetMessage("Received window creation event - problem loading");
+          }
       }
     }
   
@@ -966,6 +1116,19 @@ PetWindow* SSMainWindow::CreateAdoWindow()
   adoWin->SetLocalPetWindowCreating(false);
   AddListWindow(adoWin);
   return adoWin;
+}
+
+void SSMainWindow::DisplayError(char* errToDisplay)
+{
+  if (errFillExistWindowPopup == NULL)
+    {
+      errFillExistWindowPopup = new UILabelPopup(this, "errFillExistWindowPopup");
+    }
+  if (errToDisplay != NULL)
+    {
+      errFillExistWindowPopup->SetLabel(errToDisplay);
+      errFillExistWindowPopup->Show();
+    }
 }
 
 int SSMainWindow::LoadDeviceList(SSPageWindow* win, const char* deviceList, short ppmUser)
@@ -1321,6 +1484,16 @@ void SSMainWindow::SS_Set_Host()
 
 void SSMainWindow::ReconnectToRelway(const char* newHost)
 {
+}
+
+void SSMainWindow::AdjustName(char* devicePath)
+{
+  if (devicePath != NULL)
+    {
+      char* theSlashDevice = strstr(devicePath, "/device_list");
+      if (theSlashDevice != NULL)
+        theSlashDevice[0] = '\0';
+    }
 }
 
 void SSMainWindow::SS_Default_PPM_User()
