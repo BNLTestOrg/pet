@@ -687,7 +687,12 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       strcat(s, "/");
       PET_WINDOW_TYPE type = WindowType(s);
       if (type == PET_UNKNOWN_WINDOW)
-	return;
+        {
+          // give an error message - no file found!
+          RingBell();
+          SetMessage("No ld or ado device list found.");
+          return;
+        }
       SetWorkingCursor();
       // in case we have an error - loading a window - let's remember the window we are replacing!
       char* ldWindowPath = NULL;
