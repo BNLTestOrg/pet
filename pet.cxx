@@ -679,6 +679,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     UIWindow* win;
     bool creatLdWin = false;
     bool creatAdoWin = false;
+    long numWins = GetNumWindows();
     if(event == UISelect || event == UIAccept || event == UITableBtn2Down) {
       char s[512];
       DirTree* tree = (DirTree*)treeTable->GetTree();
@@ -700,7 +701,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       if(event == UISelect || event == UIAccept) {	// load current window
 	// do we have a window (or windows) to reload of the right type - otherwise create one
 	if(type == PET_LD_WINDOW || type == PET_HYBRID_WINDOW) {
-	  if(activeLdWin) {
+	  if(numWins > 0 && activeLdWin && IsWindowInList( (UIWindow*) activeLdWin)) {
 	    activeLdWin->CancelContinuousUpdate();
 	    if (supportKnobPanel)
 	      activeLdWin->ClearTheKnobPanel();
@@ -719,9 +720,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	    ldWin = CreateLdWindow();
           }
         }
-	if(type == PET_ADO_WINDOW || type == PET_HYBRID_WINDOW) {
-	  if(activeAdoWin)
-            {
+	if(type == PET_ADO_WINDOW || type == PET_HYBRID_WINDOW)
+          {
+            if(numWins > 0 && activeAdoWin && IsWindowInList( (UIWindow*) activeAdoWin)) {
               adoWin = activeAdoWin;
               const char* adoPath = adoWin->GetCurrentFileName();
               if (adoPath != NULL)
@@ -732,11 +733,11 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
                   AdjustName(adoWindowPath);
                 }
             }
-	  else {
-            creatAdoWin = true;
-	    adoWin = CreateAdoWindow();
+            else {
+              creatAdoWin = true;
+              adoWin = CreateAdoWindow();
+            }
           }
-	}
       }
       else if(event == UITableBtn2Down) {  // create new window(s)
 	// check to see if a window already exists
