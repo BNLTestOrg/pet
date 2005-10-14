@@ -41,6 +41,7 @@ static PetWindow*       activeAdoWin = NULL;
 static PetWindow*       singlePetWin = NULL;
 static PetEventReceiver petEventReceiver;
 static unsigned long    dumpElogAndExitTimerId = 0;
+static const char* wname;
 
 static void clean_up(int st)
 {
@@ -74,6 +75,9 @@ int main(int argc, char *argv[])
   // initialize the application
   application  = new UIApplication(argc, argv, &argList);
 
+  if( argList.IsPresent("-knob") ) wname = "KnobPanel";
+  else wname = "pet";
+
   if (argList.IsPresent("-ppm"))
     set_ppm_user(argList.Value("-ppm"));
 
@@ -87,7 +91,7 @@ int main(int argc, char *argv[])
   }
   else{
     // create the main window and its user interface and display it
-    mainWindow = new SSMainWindow(application, "mainWindow", "pet");
+    mainWindow = new SSMainWindow(application, "mainWindow", wname);
     application->AddEventReceiver(mainWindow);
     if (argList.IsPresent("-printToElog") && !argList.IsPresent("-device_list"))
       cout << "-printToElog option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
@@ -203,7 +207,7 @@ int main(int argc, char *argv[])
   if( strlen( argList.String("-device_list") )  )
     {
       if (mainWindow == NULL){
-        mainWindow = new SSMainWindow(application, "mainWindow", "pet");
+        mainWindow = new SSMainWindow(application, "mainWindow", wname);
         application->AddEventReceiver(mainWindow);
       }
       
@@ -1113,7 +1117,7 @@ PetWindow* SSMainWindow::CreateAdoWindow()
     char treeRootPathAndNode[512];
     const StdNode* theNode = tree->GetRootNode();
     if (tree->GenerateFullNodePathname(theNode, treeRootPathAndNode) == 0)
-      adoWin = new PetWindow(this, "adoWindow", "pet", treeRootPathAndNode);
+      adoWin = new PetWindow(this, "adoWindow", wname, treeRootPathAndNode);
     else
       adoWin = new PetWindow(this, "adoWindow");
   }
