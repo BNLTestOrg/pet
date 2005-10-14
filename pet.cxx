@@ -1273,8 +1273,10 @@ PET_WINDOW_TYPE SSMainWindow::WindowType(const char* path)
   strcat(ssfile, "/");
   strcat(ssfile, LD_DEVICE_LIST);
 
-  if (UIFileExists(petfile) && UIFileExists(ssfile))
+  if (UIFileExists(petfile) && UIFileExists(ssfile)) {
+    if (supportKnobPanel) return PET_LD_WINDOW;
     return PET_HYBRID_WINDOW;
+  }
   else if (UIFileExists(petfile))
     return PET_ADO_WINDOW;
   else if (UIFileExists(ssfile))
