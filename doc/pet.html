@@ -1488,6 +1488,20 @@ characters.</li>
       </td>
     </tr>
     <tr>
+      <td>monAlarmState</td>
+      <td>T,C,R,L</td>
+      <td>true/false</td>
+      <td>false</td>
+      <td>Use alarmLevel property to determine cell color</td>
+    </tr>
+    <tr>
+      <td>monAlarmParam</td>
+      <td>T,C,R,L</td>
+      <td>string (7)</td>
+      <td>none</td>
+      <td>Use device:param:prop to determine cell color</td>
+    </tr>
+    <tr>
       <td colspan="5">
       <ol>
         <li> T = Table, R = Row, C = Column, L = Cell</li>
@@ -1508,6 +1522,11 @@ titleBackground = foreground</li>
         <li> The filter types can be <b>skipFactor</b>, <b>minInterval</b>,<b>minChange</b>,
 or <b>outOfTol</b>. All filters except "outOfTol" must also have the
 filterArg attribute set. There are no default values for these filters.</li>
+        <li>The format for value is device:parameter:property where property is optional.
+  If no property is specified the alarmLevel property is used.  Note that legal values
+are 0 through 8.  This is important when using a property other than alarmLevel.  Values
+greater than 8 or less than 0 will result in no change to the cell color.  monAlarmParam
+and monAlarmState should be used exclusively.</li>
       </ol>
       </td>
     </tr>
@@ -1521,7 +1540,13 @@ Notes:
   <li> strings for color values can be found in /usr/lib/X11/rgb.txt</li>
 </ol>
 <h3> <a name="attribExamples"></a>Attribute Examples</h3>
-<pre>BEGIN ATTRIBUTES<br>! change the table foreground and background colors<br>R0C0.foreground: firebrick<br>R0C0.background: white<br>! change the foreground color for quoted text<br>R0C0.labelForeground: DarkGreen<br>! change the color for an individual cell<br>R3C4.foreground: cyan<br>R3C4.background: gray50<br>! change the size of the table<br>R0C0.visibleRows: 6<br>R0C0.visibleColumns: 5<br>! make a particular cell editable<br>R3C3.editable: true<br>! change the font for the table<br>R0C0.font: 9x15bold<br>! change the width of column 4<br>R0C4.width: 5<br>! force a cell to display in 3 decimal places<br>R6C4.formatString: %.3f<br>! set limits in what can be entered into a cell<br>R5C3.min: 0<br>R5C3.max: 200<br>! here's another way to put a string in a cell<br>R4C5.string: BPM Gain<br>END ATTRIBUTES</pre>
+<pre>BEGIN ATTRIBUTES<br>! change the table foreground and background colors<br>R0C0.foreground: firebrick<br>R0C0.background: white<br>! change the foreground color for quoted text<br>R0C0.labelForeground: DarkGreen<br>! change the color for an individual cell<br>R3C4.foreground: cyan<br>R3C4.background: gray50<br>! change the size of the table<br>R0C0.visibleRows: 6<br>R0C0.visibleColumns: 5<br>! make a particular cell editable<br>R3C3.editable: true<br>! change the font for the table<br>R0C0.font: 9x15bold<br>! change the width of column 4<br>R0C4.width: 5<br>! force a cell to display in 3 decimal places<br>R6C4.formatString: %.3f<br>! set limits in what can be entered into a cell<br>R5C3.min: 0<br>R5C3.max: 200<br>! here's another way to put a string in a cell<br>R4C5.string: BPM Gain
+! use the alarmLevel property of the parameters in each cell of column 2 to determine color of cell
+R0C2.monAlarmState: true
+! in row 4, column 2 use the value property of the specified device:parameter to determine cell color
+R4C2.monAlarmParam: device:param:value
+! in row 4, column 3 use the alarmLevel property of the specified device:parameter to determine cell color
+R4C3.monAlarmParam: device:param<br>END ATTRIBUTES</pre>
 <a href="#TableOfContents">Back to Table of Contents</a>
 <p> </p>
 <hr width="100%">
@@ -1565,7 +1590,24 @@ Here is a screen snapshot of a pet window and the pet file that created
 it. Note that the C preprocessor is used here also.
 <p><img src="pet1.gif" style="height: 598px; width: 556px;" title=""
  alt=""> </p>
-<pre>!USECPP<br>! flag pet to use the c preprocessor (needs to be the first line)<br>! normal line<br>simple.test, "menuM", menuM<br>! change the back ground of a cell<br>simple.test, "longM";bg:green, longM<br>! change background and foreground<br>simple.test, "doubleM", doubleM; bg:green; fg:red<br>! change bg of a whole row<br>simple.test;R.bg:green, "longArrayM", longArrayM<br>! add a blank line (normal blank lines are ignored when using CPP)<br>!BLANK<br>! this is a trick to get a blank line with attributes<br>;R.bg:green<br>!BLANK<br>!<br>! use the c preprocessor to define a variable<br>#define ADO simple.test<br>!<br>! use the new variable<br>ADO, "commandC", commandC<br>ADO, "menuS", menuS<br>ADO, "ucharS", ucharS<br>simple.test, "charS", charS<br>simple.test, "longS", longS<br>simple.test, "floatS", floatS<br>simple.test, "doubleS", doubleS;formatString:%.3g<br>simple.test, "stringS", stringS<br>simple.test, "longArrayS", longArrayS<br>!BLANK<br>simple.test, "varArrayS", varArrayS<br>! you can still use an attribute section<br>BEGIN ATTRIBUTES<br>R8C1.bg:green<br>END ATTRIBUTES</pre>
+<pre>!USECPP<br>! flag pet to use the c preprocessor (needs to be the first line)<br>! normal line<br>simple.test, "menuM", menuM
+! change the back ground of a cell<br>simple.test, "longM";bg:green, longM
+! change background and foreground<br>simple.test, "doubleM", doubleM; bg:green; fg:red
+! change bg of a whole row<br>simple.test;R.bg:green, "longArrayM", longArrayM
+! add a blank line (normal blank lines are ignored when using CPP)<br>!BLANK
+! this is a trick to get a blank line with attributes<br>;R.bg:green<br>!BLANK
+!<br>! use the c preprocessor to define a variable
+#define ADO simple.test<br>!<br>! use the new variable<br>ADO, "commandC", commandC
+ADO, "menuS", menuS<br>ADO, "ucharS", ucharS<br>simple.test, "charS", charS
+simple.test, "longS", longS<br>simple.test, "floatS", floatS
+simple.test, "doubleS", doubleS;formatString:%.3g<br>simple.test, "stringS", stringS
+simple.test, "longArrayS", longArrayS<br>!BLANK<br>simple.test, "varArrayS", varArrayS
+simple.test, "alarmModeS", alarmModeS;monAlarmState:true
+simple.test, "sinM", sinM;monAlarmParam:simple.test:shortS:value
+! you can still use an attribute section
+BEGIN ATTRIBUTES
+R8C1.bg:green
+END ATTRIBUTES</pre>
 <a href="#TableOfContents">Back to Table of Contents</a></div>
 <h2 style="margin-left: 40px;"><a name="SLDPages"></a>SLD/CLD Style Page<br>
 </h2>
@@ -1956,7 +1998,7 @@ Monitor tools that are used in the new release of Gpm4.0.&nbsp;&nbsp;
 Read the <a href="http:/Controls/doc/Gpm/Gpm.html">Gpm documentation</a>
 for a fuller description of the Monitors.&nbsp;&nbsp; To use these
 options, first select a device on the pet page.&nbsp; Then click on the
-menu option to create or add this device to the desired type of graph. 
+menu option to create or add this device to the desired type of graph.
   <ul>
     <li> <b>New StripChart</b></li>
     <li> <b>Add to StripChart</b></li>
