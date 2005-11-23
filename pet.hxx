@@ -36,7 +36,7 @@ public:
 
   // delete a device page or CLD window
   void RemoveWindow(UIWindow* window);
-  
+
   // delete a device page or CLD window and remove it from the list
   void DeleteListWindow(UIWindow* window);
   void DeleteAllWindows();
@@ -53,7 +53,7 @@ public:
   // find out what type of window
   PET_WINDOW_TYPE WindowType(UIWindow* window);
   PET_WINDOW_TYPE WindowType(const char* path);
-  
+
   // add an already created device page or CLD window to the list
   void AddListWindow(UIWindow* window);
 
@@ -87,7 +87,7 @@ protected:
   UIWindow*			searchPage;
   MenuTree*                     pulldownMenuTree;
   UILabelPopup*                 errFillExistWindowPopup;
-  
+
   // set the window position for a newly created window
   void SetWindowPos(UIWindow* newWin, UIWindow* currWin = NULL);
 
@@ -134,7 +134,7 @@ protected:
   void           ShowCldEditor(const char* devname, int ppmuser);
   SSPageWindow*  CreateLdWindow();
   PetWindow*     CreateAdoWindow();
-  
+
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -168,7 +168,7 @@ public:
 
   // return the current path to the file that this window is showing
   const char* GetCurrentFileName() const;
-  
+
   // override this to put a header in
   // default starts are 1 or first visible, default ends are last row/column or last visible
   virtual int PrintVisible(long startCol = 0, long endCol = 0);
@@ -185,7 +185,7 @@ protected:
   char*		listString;	// string to display in device page list
   const StdNode*	pageNode;	// the node in the machine tree
   char*		devListPath;	// the path to the current device list
-  
+
   void CreateWidgets(AGS_PAGE_MODE mode);
 
   // override this from the base class
@@ -239,8 +239,14 @@ private:
 class PetEventReceiver : public UIEventReceiver
 {
 public:
+  PetEventReceiver();
+  virtual ~PetEventReceiver();
+
   /// override this to handle window close events properly
   void HandleEvent(const UIObject* object, UIEvent event);
+protected:
+  /// store pointers to cld editor windows when in single window mode
+  SSCldWindow* cldWins[50];
 };
 
 // C++ helper functions
