@@ -12,4 +12,6 @@ ifdef XRTHOME
 LIBS1 += gpm
 endif
 
+USESOLIBS = true
+
 include $(MAKEDIR)/MakeApp.inc
