@@ -239,6 +239,10 @@ private:
 class PetEventReceiver : public UIEventReceiver
 {
 public:
+  PetEventReceiver();
+
+  virtual ~PetEventReceiver();
+
   /// override this to handle window close events properly
   void HandleEvent(const UIObject* object, UIEvent event);
 protected:
