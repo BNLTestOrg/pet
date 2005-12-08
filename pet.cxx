@@ -4,7 +4,7 @@
 #include <time.h>
 #include <signal.h>
 #include <UI/UIApplication.hxx>			// for UIApplication class
-#include <UI/UIArgumentList.hxx>		// for UIArgumentList class	
+#include <UI/UIArgumentList.hxx>		// for UIArgumentList class
 #include <pet/PetWindow.hxx>
 #include <utils/utilities.h>			// for set_default_fault_handler()
 #include <archive/archive_lib.h>		// for init_archive_lib_globals() and ARCHIVE_LOG;
@@ -50,6 +50,18 @@ static void clean_up(int st)
   exit(st);
 }
 
+// poll the CDEV services to catch any async data from CDEV servers
+static void CDEV_poll(void*, unsigned long*)
+{
+  cdevSystem::defaultSystem().poll();
+  GlobalAsyncHandler()->RegisterTimer(100, CDEV_poll, NULL);
+}
+
+// prevent cdev errors from being printed to std out
+void errorHandler(int severity, char* text, cdevRequestObject* obj)
+{
+}
+
 int main(int argc, char *argv[])
 {
   //set up command line arguments
@@ -68,7 +80,11 @@ int main(int argc, char *argv[])
 
   // set up the CNS as the source for names
   cdevCnsInit();
-  
+
+  cdevSystem& defSystem = cdevSystem::defaultSystem();
+  defSystem.autoErrorOff();
+  defSystem.setErrorHandler(errorHandler);
+
   // turn on storage of ADO/LD sets
   globalSetStorage()->storageOn();
 
@@ -81,12 +97,17 @@ int main(int argc, char *argv[])
   if (argList.IsPresent("-ppm"))
     set_ppm_user(argList.Value("-ppm"));
 
+  // 10Hz timer event for polling cdev - needed to handle asyncs from CDEV servers
+  // this is commented out for now until Gpm starts getting built with shared object libraries
+  GlobalAsyncHandler()->RegisterTimer(100, CDEV_poll, NULL);
+
   // check for single window switch
   bool singleWindowMode = false;
   if(argList.IsPresent("-file") || argList.IsPresent("-single")){
     singlePetWin = new PetWindow(application, "petWindow");
     singlePetWin->SetLocalPetWindowCreating(true);
     singlePetWin->AddEventReceiver(&petEventReceiver);
+    singlePetWin->GetPetPage()->AddEventReceiver(&petEventReceiver);
     singleWindowMode = true;
   }
   else{
@@ -96,7 +117,7 @@ int main(int argc, char *argv[])
     if (argList.IsPresent("-printToElog") && !argList.IsPresent("-device_list"))
       cout << "-printToElog option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
   }
-  
+
   const char *path = argList.String("-path");
   if(path && strlen(path)) {
     char *str = new char[strlen(path) + 10];
@@ -106,7 +127,7 @@ int main(int argc, char *argv[])
     if(str)
       delete [] str;
   }
-  
+
   // check values of some command line arguments
   if( strlen( argList.String("-db_server") ) )
     set_data_db_name( (char*) argList.String("-db_server") );
@@ -136,14 +157,14 @@ int main(int argc, char *argv[])
   // load files that are untagged on the command line
   int fileNum;
   for(fileNum=0; fileNum<argList.NumUntaggedItems(); fileNum++) {
-    
+
     const char* file = argList.UntaggedItem(fileNum);
     if(file && strlen(file)) {
-      
+
       char *tmpFile;
       char *path;
       char *ptr;
-      
+
       tmpFile = strdup(file);
       ptr = strrchr(tmpFile, '/');
       if(ptr) {
@@ -154,7 +175,7 @@ int main(int argc, char *argv[])
       }
       else			// no path given
         path = strdup("*.ado");
-      
+
       if(fileNum==0) {	// only do the first file
         if (singlePetWin == NULL){
           singlePetWin = new PetWindow(application, "petWindow");
@@ -172,7 +193,7 @@ int main(int argc, char *argv[])
       }
     } // if file good
   } // for
-  
+
   // if the switch know is provided, enable the sio line
   if( argList.IsPresent("-knob") )
     {
@@ -210,7 +231,7 @@ int main(int argc, char *argv[])
         mainWindow = new SSMainWindow(application, "mainWindow", wname);
         application->AddEventReceiver(mainWindow);
       }
-      
+
       // now display the AgsPageWindow with the passed in device list
       mainWindow->ShowSingleDeviceList((char*) argList.String("-device_list"));
       singleDeviceListOnly=UITrue;
@@ -230,16 +251,80 @@ int main(int argc, char *argv[])
     else
       singlePetWin->ElogDumpAndExit();
   }
-  
+
   // loop forever handling user events
   application->HandleEvents();
 }
 
 ///////////////////////// PetEventReceiver class ///////////////////////
+PetEventReceiver::PetEventReceiver()
+{
+   for (int i=0; i<50; i++)
+      cldWins[i] = NULL;
+}
+
+PetEventReceiver::~PetEventReceiver()
+{
+   for (int i=0; i<50; i++)
+      delete cldWins[i];
+}
+
 void PetEventReceiver::HandleEvent(const UIObject* object, UIEvent event)
 {
   if(object == singlePetWin && event == UIWindowMenuClose)
     exit(0);
+  else if (event == UIEvent4){
+     // this is essentially ShowCldEditor() but cld window pointers are stored
+     // here
+     PetPage* ppage = singlePetWin->GetPetPage();
+     const char* devname = ppage->CellGetAdo();
+     SSCldWindow* win = new SSCldWindow(singlePetWin, "sscldWindow", devname,
+                                        ppage->GetPPMUser());
+     if (win->SuccessfullyCreated() == UIFalse || win->DataToCollect() == UIFalse){
+        UILabelPopup popup(singlePetWin, "cldProbPopup", "NULL", "OK");
+        if (win->SuccessfullyCreated() == UIFalse)
+        {
+           int failure=win->ReasonNoCreate();
+           if (failure == DEVICE_BAD_NAME)
+              popup.SetLabel("CLD ", devname, " does not exist.\nCLD window creation aborted.");
+           else if (failure == DC_GET_TIMEOUT)
+              popup.SetLabel("CLD ", devname, " not reporting.\nCLD window creation aborted.");
+           else if (failure == DEVICE_BAD_REPORTFORMAT)
+              popup.SetLabel("CLD ", devname, " - bad report format.\nCLD window creation aborted.");
+           else if (failure == DEVICE_NODATA)
+              popup.SetLabel("CLD ", devname, " - no report received.\nCLD window creation aborted.");
+           else if (failure == DEVICE_UNPACKERROR || failure == DEVICE_BAD_REPORTFORMAT || failure == DEVICE_NOBUFFERSPACE)
+              popup.SetLabel("CLD ", devname, " - report format error.\nCLD window creation aborted.");
+           else
+              popup.SetLabel("CLD ", devname, " - unknown error.\nCLD window creation aborted.");
+        }
+        else
+           popup.SetLabel("CLD ", devname, " - no data to collect.\nCLD window creation aborted.");
+        delete win;
+        popup.RingBell();
+        popup.Wait();
+        return;
+     }
+     win->EnableEvent(UIWindowMenuClose);
+     win->AddEventReceiver(&petEventReceiver);
+     win->Show();
+     // store the window pointer
+     for (int i=0; i<50; i++){
+        if (cldWins[i] == NULL) {
+           cldWins[i] = win;
+           break;
+        }
+     }
+
+  } else if (event == UIWindowMenuClose){
+     for (int i=0; i<50; i++){
+        if (cldWins[i] == object){
+           cldWins[i]->DeleteThis();
+           cldWins[i] = NULL;
+           break;
+        }
+     }
+  }
 }
 
 ////////////// SSMainWindow Class Methods ////////////////////////
@@ -253,7 +338,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   searchPopup = NULL;
   searchPage = NULL;
   errFillExistWindowPopup = NULL;
-  
+
   // resources
   static const char* defaults[] = {
     "*foreground: navy",
@@ -315,7 +400,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
         "the item of interest, then press and hold the 3rd mouse button.",
     NULL};
   UISetDefaultResources(defaults);
-   
+
   // create the window
   UIMainWindow::CreateWidgets();
 
@@ -331,7 +416,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
 
   // put a pulldown menu in the menubar
   pulldownMenuTree = CreateMenuTree();
-  
+
   // the name of the tree file is in the resource file
   pulldownMenu = new UIPulldownMenu(menubar, "mainPulldown", pulldownMenuTree);
   if(pulldownMenu->IsTreeLoaded() == UIFalse)
@@ -343,7 +428,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   // put in the AGS help menu
   helpMenu = new UIHelpMenu(menubar, "helpPulldown");
   helpMenu->AddEventReceiver(this);
-  
+
   // put in a label to display the PPM user name
   ppmLabel = new UILabel(this, "ppmLabel");
   ppmLabel->AttachTo(menubar, this, NULL, this);
@@ -507,7 +592,7 @@ void SSMainWindow::LoadPageList(const UIWindow* winSelection)
       default:
 	break;
       }
-      
+
       if(wins[i] == winSelection)
 	selection = i+1;
     }
@@ -624,13 +709,13 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     // check to see if sent from one of the device pages
     if( IsWindowInList( (UIWindow*) object) == 0)
       return;
-    
+
     if (activeLdWin != NULL)
     {
       if (supportKnobPanel && activeLdWin != object )
 	((SSPageWindow*) activeLdWin)->ClearTheKnobPanel();
     }
-    
+
     // redisplay the tree table and list
     LoadTable( (UIWindow*) object);
     if( !strcmp( object->ClassName(), "SSPageWindow") )
@@ -793,7 +878,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	RingBell();
 	SetMessage("Can't determine path to device list.");
 	SetStandardCursor();
-        
+
         // if created a window - delete it - remove it from the list!
         if (creatLdWin)
           {
@@ -811,7 +896,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       }
       SetMessage("Loading device page(s)...");
       if(ldWin != NULL) {
-	if( LoadDeviceList(ldWin, selectPath) < 0) {
+	if( LoadDeviceList(ldWin, selectPath, get_ppm_user()) < 0) {
 	  RingBell();
 	  SetMessage("Could Not Load Device List");
           //	  if (event == UITableBtn2Down) {
@@ -853,7 +938,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	// make sure the window is visible
 	ldWin->Show();
 	ldWin->Refresh();
-	
+
 	// put table in continuous acquisition mode
 	ldWin->UpdateContinuous();
 	LoadPageList(ldWin);
@@ -868,7 +953,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	tree->GenerateFullNodePathname(treeTable->GetNodeSelected(), s);
 	strcat(s, "/");
 	strcat(s, ADO_DEVICE_LIST);
-	adoWin->LoadFile(s, tree->GenerateNodePathnameWithoutRoot( treeTable->GetNodeSelected() ));
+	adoWin->LoadFile(s, tree->GenerateNodePathnameWithoutRoot( treeTable->GetNodeSelected() ),
+                    get_ppm_user());
         if (adoWin->CreateOK())
           {
             if (type == PET_HYBRID_WINDOW && !adoWin->IsManaged() )
@@ -905,9 +991,10 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
                     strcat(adoWindowPath, "/");
                     strcat(adoWindowPath, ADO_DEVICE_LIST);
                     if (selectedNode != NULL)
-                      adoWin->LoadFile(adoWindowPath, tree->GenerateNodePathnameWithoutRoot(selectedNode) );
+                      adoWin->LoadFile(adoWindowPath, tree->GenerateNodePathnameWithoutRoot(selectedNode),
+                                       get_ppm_user());
                     else
-                      adoWin->LoadFile(adoWindowPath);
+                      adoWin->LoadFile(adoWindowPath, NULL, get_ppm_user());
                     if (adoWin->CreateOK())
                       {
                         if (type == PET_HYBRID_WINDOW && !adoWin->IsManaged() )
@@ -951,13 +1038,21 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       SetMessage("");
     }
   }
-  
+
   // user made a selection from the list of device pages
   else if(object == pageList && event == UISelect)
     {
       SetMessage("");
       SP_Show();
     }
+    // user wants a cld window
+  else if(event == UIEvent4)
+  {
+     PetWindow* win = (PetWindow*) GetWindow(pageList->GetSelection());
+     PetPage* ppage = win->GetPetPage();
+     const char* devName = ppage->CellGetAdo();
+     ShowCldEditor(devName, ppage->GetPPMUser());
+  }
   else if(event == UIEvent3)
     {
       SSPageWindow* ldWin = (SSPageWindow*) GetWindow(pageList->GetSelection());
@@ -987,6 +1082,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	PetWindow* adoWin = (PetWindow*) object;
 	int ppmUser = adoWin->GetPPMUser();
 	adoWin = new PetWindow(this, "adoWindow");
+   adoWin->GetPetPage()->AddEventReceiver(this);
 	adoWin->SetLocalPetWindowCreating(false);
 	// in this case, we will assume the file loaded is not from the tree
 	// so don't set the tree - otherwise need to somehow be smart - skip it for now
@@ -1004,7 +1100,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
           }
       }
     }
-  
+
   // user made a selection from the pulldown menus
   else if(object == pulldownMenu && event == UISelect)
     {
@@ -1103,7 +1199,7 @@ SSPageWindow* SSMainWindow::CreateLdWindow()
   SSPageWindow* ldWin;
   if (supportKnobPanel && activeLdWin != NULL)
     activeLdWin->ClearTheKnobPanel();
-  
+
   ldWin = new SSPageWindow(this, "ldWindow");
   AddListWindow(ldWin);
   return ldWin;
@@ -1124,6 +1220,7 @@ PetWindow* SSMainWindow::CreateAdoWindow()
   else
     adoWin = new PetWindow(this, "adoWindow");
   adoWin->SetLocalPetWindowCreating(false);
+  adoWin->GetPetPage()->AddEventReceiver(this);
   AddListWindow(adoWin);
   return adoWin;
 }
@@ -1161,6 +1258,7 @@ int SSMainWindow::LoadDeviceList(SSPageWindow* win, const char* deviceList, shor
   strcat(filename, LD_DEVICE_LIST);
 
   // load the device list
+  win->SetPPMUser(ppmUser);
   int retval = win->LoadFile(filename, &deviceList[len], ppmUser);
   if(retval >= 0)	// success
     {
@@ -1222,7 +1320,7 @@ UIWindow* SSMainWindow::FindWindow(const char* file, PET_WINDOW_TYPE wtype)
     strcat(fileName, ADO_DEVICE_LIST);
   else
     strcat(fileName, LD_DEVICE_LIST);
-  
+
   UIWindow* win;
   int numWindows = GetNumWindows();
   const char* winName;
@@ -1253,7 +1351,7 @@ PET_WINDOW_TYPE SSMainWindow::WindowType(UIWindow* window)
 {
   if (window == NULL || window->ClassName() == NULL)
     return PET_UNKNOWN_WINDOW;
-  
+
   if (!strcmp(window->ClassName(), "pageWindow") || !strcmp(window->ClassName(), "SSPageWindow"))
     return PET_LD_WINDOW;
   else if (!strcmp(window->ClassName(), "SSCldWindow"))
@@ -1292,7 +1390,7 @@ PET_WINDOW_TYPE SSMainWindow::WindowType(const char* path)
 void SSMainWindow::DeleteListWindow(UIWindow* window)
 {
   RemoveWindow(window);
-  
+
   // reload the list with the 1st item selected
   LoadPageList(NULL);
 
@@ -1328,7 +1426,7 @@ void SSMainWindow::RemoveWindow(UIWindow* window)
 {
   if (window == NULL)
     return;
-  
+
   // make the window invisible
   window->Hide();
 
@@ -1338,7 +1436,7 @@ void SSMainWindow::RemoveWindow(UIWindow* window)
   {
     if ( (SSPageWindow*) searchPage == (SSPageWindow*) window )
       searchPage=NULL;
-    
+
     // if knobbing is supported, be sure to clear the knob panel
     if (supportKnobPanel)
     {
@@ -1350,7 +1448,7 @@ void SSMainWindow::RemoveWindow(UIWindow* window)
     activeLdWin = NULL;
   else if(window == activeAdoWin)
     activeAdoWin = NULL;
-  
+
   // delete it (delayed) and remove it from the window list
   DeleteWindow(window);
 }
@@ -1365,7 +1463,7 @@ void SSMainWindow::HideListWindow(UIWindow* window)
       // if knobbing is supported, be sure to clear the knob panel
       if (supportKnobPanel)
 	pageWin->ClearTheKnobPanel();
-      
+
       pageWin->StopContinuousUpdate();
     }
     else if(!strcmp( window->ClassName(), "SSCldWindow") )
@@ -1420,7 +1518,7 @@ void SSMainWindow::LoadTable(const UIWindow* window)
   // get the node in the machine tree that was selected
   if(window == NULL)
     return;
-  
+
   const StdNode* node = NULL;
   switch (WindowType((UIWindow*) window))
     {
@@ -1439,7 +1537,7 @@ void SSMainWindow::LoadTable(const UIWindow* window)
 
   if (node == NULL)
     return;
-  
+
   LoadTable(node);
 }
 
@@ -1460,6 +1558,7 @@ void SSMainWindow::SS_New()
   petWin->Show();
   LoadPageList(petWin);
   activeAdoWin = petWin;
+  petWin->GetPetPage()->AddEventReceiver(this);
 }
 
 void SSMainWindow::SS_Open()
@@ -1483,7 +1582,8 @@ void SSMainWindow::SS_Open()
     petWin->SetLocalPetWindowCreating(false);
     AddListWindow(petWin);
   }
-  
+
+  petWin->GetPetPage()->AddEventReceiver(this);
   petWin->TF_Open();
   petWin->Show();
   LoadPageList(petWin);
@@ -1528,6 +1628,7 @@ void SSMainWindow::SS_Create_RHIC_Page()
   PetWindow* petWin = new PetWindow(this, "petWindow");
   petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
+  petWin->GetPetPage()->AddEventReceiver(this);
   petWin->TF_Create_Pet_Page();
   petWin->Show();
   LoadPageList(petWin);
@@ -1539,6 +1640,7 @@ void SSMainWindow::SS_Create_PS_RHIC_Page()
 {
   SetWorkingCursor();
   PetWindow* petWin = new PetWindow(this, "petWindow");
+  petWin->GetPetPage()->AddEventReceiver(this);
   petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
   petWin->TF_Create_PS_Pet_Page();
@@ -1710,8 +1812,8 @@ void SSMainWindow::SO_Read_Archive_Log()
 
 void SSMainWindow::SO_PpmUserMonitor()
 {
-  system("/usr/controls/bin/PpmUserMon &");     
-} 
+  system("/usr/controls/bin/PpmUserMon &");
+}
 
 static controller_record_t*  get_controller() {
 
@@ -1765,14 +1867,14 @@ void SSMainWindow::SO_SLDs()
 
   pageWin->SetListString();
   pageWin->SetSingleDeviceListMode();
-  
+
   // make sure the window is visible
   pageWin->Show();
   pageWin->Refresh();
-  
+
   // put table in continuous acquisition mode
   pageWin->UpdateContinuous();
-  
+
   // update main window if device list loaded successfully
   // update the device page list
   LoadPageList(pageWin);
@@ -1990,14 +2092,14 @@ void SSMainWindow::ShowSingleDeviceList(const char* deviceListPath)
 
   pageWin->SetListString();
   pageWin->SetSingleDeviceListMode();
-  
+
   // make sure the window is visible
   pageWin->Show();
   pageWin->Refresh();
-  
+
   // put table in continuous acquisition mode
   pageWin->UpdateContinuous();
-  
+
   // update main window if device list loaded successfully
   // update the device page list
   LoadPageList(pageWin);
@@ -2030,7 +2132,7 @@ void SSPageWindow::Initialize()
   listString = NULL;
   devListPath = NULL;
   pageNode = NULL;
-  
+
   // setup this window to receive events from the main window for icon events
   parent->AddEventReceiver(this);
 }
@@ -2039,7 +2141,7 @@ void SSPageWindow::CreateWidgets(AGS_PAGE_MODE mode)
 {
   // create a standard AgsPageWindow as a UIPrimaryWindow
   AgsPageWindow::CreateWidgets(mode, NULL, UIFalse);
-  
+
   // set up events to trap program going into/out of an icon
   EnableEvent(UIMap);
   EnableEvent(UIUnmap);
@@ -2266,7 +2368,7 @@ void SSPageWindow::SP_Duplicate()
   if(popup.Wait() == 2)	// Cancel
     return;
   ppmUser = popup.GetPopupUserNum();
-	
+
   // create a new device page window
   SetMessage("Creating duplicate device page...");
   SetWorkingCursor();
@@ -2289,7 +2391,7 @@ void SSPageWindow::SP_Duplicate()
       if (supportKnobPanel)
 	newWin->SupportKnobPanel(knobPanel);
     }
-  
+
   // make sure the window is visible
   newWin->Refresh();
 
@@ -2390,7 +2492,7 @@ void SSPageWindow::SetSingleDeviceListMode()
 		  pulldownMenu->DeleteMenuItem(disable1);
 		  pulldownMenu->DeleteMenuItem(disable2);
 		  pulldownMenu->SetMenuItemString(oldString1, "Exit...");
-		  
+
 		  delete [] disable1;
 		  delete [] disable2;
 		  delete [] oldString1;
@@ -2430,7 +2532,7 @@ void SSCldWindow::CreateWidgets(UIBoolean dialogWindow)
 {
   // create a standard UICldObjectWindow as a UIDialogWindow
   UICldObjectWindow::CreateWidgets(dialogWindow);
-  
+
   // set up events to trap program going into/out of an icon
   EnableEvent(UIMap);
   EnableEvent(UIUnmap);
@@ -2487,7 +2589,7 @@ void SSCldWindow::SetSingleDeviceListMode()
 		  sprintf(disable1, "/%s/Hide", parentName);
 
 		  pulldownMenu->DeleteMenuItem(disable1);
-		  
+
 		  delete [] disable1;
 		}
 	    }
