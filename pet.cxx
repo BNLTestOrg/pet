@@ -565,6 +565,7 @@ void SSMainWindow::LoadPageList(const UIWindow* winSelection)
   // get the list of strings to load
   const UIWindow** wins = GetWindows();
   long numWins = GetNumWindows();
+  long oldNumInList = pageList->GetNumDisplayedItems();
 
   const char** items = (const char**) new char*[numWins+1];
   long selection = 0;
@@ -619,7 +620,10 @@ void SSMainWindow::LoadPageList(const UIWindow* winSelection)
   else
     pageList->SetItemsVisible(1);
 
-  UIForceResize(pageList);
+  if (oldNumInList != numWins)
+    // only force the resize if the scroll list has changed
+    UIForceResize(pageList);
+
   delete [] items;
 }
 
