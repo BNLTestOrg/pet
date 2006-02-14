@@ -772,6 +772,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     UIWindow* win;
     bool creatLdWin = false;
     bool creatAdoWin = false;
+    bool ldWinCont = true;
+    bool adoWinCont = true;
     long numWins = GetNumWindows();
     if(event == UISelect || event == UIAccept || event == UITableBtn2Down) {
       char s[512];
@@ -903,6 +905,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	if( LoadDeviceList(ldWin, selectPath, get_ppm_user()) < 0) {
 	  RingBell();
 	  SetMessage("Could Not Load Device List");
+          ldWinCont = false;
           //	  if (event == UITableBtn2Down) {
           //	    //a new window was created but not loaded successfully, better delete it
           //	    delete ldWin;  ldWin = NULL;
@@ -912,9 +915,10 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
             {
               DeleteWindow(ldWin);
               delete [] ldWindowPath;
-              delete [] adoWindowPath;
+              ldWindowPath = NULL;
+              //              delete [] adoWindowPath;
               SetStandardCursor();
-              return;
+              //               return;
             }
           else
             {
@@ -924,12 +928,16 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
                 {
                   RingBell();
                   delete [] ldWindowPath;
-                  delete [] adoWindowPath;
+                  ldWindowPath = NULL;
+                  //                  delete [] adoWindowPath;
                   SetStandardCursor();
-                  return;
+//                   return;
                 }
               else
-                DisplayError("Problem loading device list.\nRestored to initial page.");
+                {
+                  DisplayError("Problem loading device list.\nRestored to initial page.");
+                  ldWinCont = true;
+                }
             }
 	}
 	else
@@ -937,16 +945,18 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	  if (supportKnobPanel)
 	    ldWin->SupportKnobPanel(knobPanel);
 	}
-	ldWin->SetListString();
-	ldWin->SetPageNode( treeTable->GetNodeSelected() );
-	// make sure the window is visible
-	ldWin->Show();
-	ldWin->Refresh();
+        if (ldWinCont == true && ldWin != NULL) {
+          ldWin->SetListString();
+          ldWin->SetPageNode( treeTable->GetNodeSelected() );
+          // make sure the window is visible
+          ldWin->Show();
+          ldWin->Refresh();
 
-	// put table in continuous acquisition mode
-	ldWin->UpdateContinuous();
-	LoadPageList(ldWin);
-	activeLdWin = ldWin;
+          // put table in continuous acquisition mode
+          ldWin->UpdateContinuous();
+          LoadPageList(ldWin);
+          activeLdWin = ldWin;
+        }
       }
       if(adoWin != NULL) {
 	char s[512];
@@ -973,12 +983,15 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
             if (creatAdoWin)
               {
                 RingBell();
+                adoWinCont = false;
                 delete [] ldWindowPath;
+                ldWindowPath = NULL;
                 delete [] adoWindowPath;
+                adoWindowPath = NULL;
                 SetStandardCursor();
                 SetMessage("Could Not Load Device List");
                 DeleteWindow(adoWin);
-                return;
+                //                return;
               }
             else
               {
