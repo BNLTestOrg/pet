@@ -775,6 +775,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     bool ldWinCont = true;
     bool adoWinCont = true;
     long numWins = GetNumWindows();
+    int petPagePPM = 0; // in case we are loading an already created page and fail and reload it to its initial list
     if(event == UISelect || event == UIAccept || event == UITableBtn2Down) {
       char s[512];
       DirTree* tree = (DirTree*)treeTable->GetTree();
@@ -801,6 +802,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	    if (supportKnobPanel)
 	      activeLdWin->ClearTheKnobPanel();
 	    ldWin = activeLdWin;
+            petPagePPM = ldWin->GetPPMUser();
             const char* ldPath = ldWin->GetCurrentFileName();
             if (ldPath != NULL)
               {
@@ -820,6 +822,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
             if(numWins > 0 && activeAdoWin && IsWindowInList( (UIWindow*) activeAdoWin)) {
               adoWin = activeAdoWin;
               const char* adoPath = adoWin->GetCurrentFileName();
+              petPagePPM = adoWin->GetPPMUser();
               if (adoPath != NULL)
                 {
                   adoWindowPath = new char[strlen(adoPath)+20]; // need space - because will append ending back later!
@@ -924,7 +927,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
             {
               // we were loading a device page into an existing window
               // restore to its original path
-              if( ldWindowPath != NULL && LoadDeviceList(ldWin, ldWindowPath) < 0)
+              if( ldWindowPath != NULL && LoadDeviceList(ldWin, ldWindowPath, petPagePPM) < 0)
                 {
                   RingBell();
                   delete [] ldWindowPath;
@@ -1009,9 +1012,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
                     strcat(adoWindowPath, ADO_DEVICE_LIST);
                     if (selectedNode != NULL)
                       adoWin->LoadFile(adoWindowPath, tree->GenerateNodePathnameWithoutRoot(selectedNode),
-                                       get_ppm_user());
+                                       petPagePPM);
                     else
-                      adoWin->LoadFile(adoWindowPath, NULL, get_ppm_user());
+                      adoWin->LoadFile(adoWindowPath, NULL, petPagePPM);
                     if (adoWin->CreateOK())
                       {
                         if (type == PET_HYBRID_WINDOW && !adoWin->IsManaged() )
@@ -1193,7 +1196,13 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     }
   else if (event == UIMessage)
     {
-      SetMessage(object->GetMessage());
+      // we only want to display messages from objects that are not device_list windows!
+      // they have their own message areas!
+      // check to see if sent from one of the device pages
+      const char* className = object->ClassName();
+      if( strcmp( className, "SSPageWindow") && strcmp( className, "SSCldWindow")
+          && strcmp( className, "PetWindow") && strcmp( className, "PetPage"))
+        SetMessage(object->GetMessage());
     }
   else if (object == application && event == UITimer)
     {
