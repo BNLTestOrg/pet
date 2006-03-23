@@ -1502,6 +1502,20 @@ characters.</li>
       <td>Use device:param:prop to determine cell color</td>
     </tr>
     <tr>
+      <td>fileBrowser</td>
+      <td>L</td>
+      <td>string (8)</td>
+      <td>none</td>
+      <td>Use file browser to update parameter value</td>
+    </tr>
+    <tr>
+      <td>launch</td>
+      <td>L</td>
+      <td>string (9)</td>
+      <td>none</td>
+      <td>Launch a process when cell is selected</td>
+    </tr> 
+    <tr>
       <td colspan="5">
       <ol>
         <li> T = Table, R = Row, C = Column, L = Cell</li>
@@ -1527,6 +1541,16 @@ filterArg attribute set. There are no default values for these filters.</li>
 are 0 through 8.  This is important when using a property other than alarmLevel.  Values
 greater than 8 or less than 0 will result in no change to the cell color.  monAlarmParam
 and monAlarmState should be used exclusively.</li>
+        <li>Specify the default path to use when opening the file
+        browser popup.  <b>Note: ADO Parameter Type MUST be a String</b></li>
+        <li>Specify the command to be executed formatted as if running from the
+        command line.  The command will automatically be executed in
+        the background. <b>Note: The Text in the Launch Cell Must Be
+        Quoted.  Example:</b> <br>
+        <i>"Launch Gpm"; launch:/usr/controls/bin/Gpm</i><br>
+        <b>Will add a cell with the text "Launch Gpm".  When the cell is
+        selected, Gpm will be launched.</b>
+        </li>
       </ol>
       </td>
     </tr>
@@ -1546,7 +1570,12 @@ R0C2.monAlarmState: true
 ! in row 4, column 2 use the value property of the specified device:parameter to determine cell color
 R4C2.monAlarmParam: device:param:value
 ! in row 4, column 3 use the alarmLevel property of the specified device:parameter to determine cell color
-R4C3.monAlarmParam: device:param<br>END ATTRIBUTES</pre>
+R4C3.monAlarmParam: device:param
+! specify that row 5, column 2 use a file browser to update the ado property 
+R5C2.fileBrowser: /operations/app_store/config
+! have row 5, column 3 launch LogView
+R5C3.launch: /usr/controls/bin/LogView -file /home/cfsb/mcr/MyLogViewFile
+<br>END ATTRIBUTES</pre>
 <a href="#TableOfContents">Back to Table of Contents</a>
 <p> </p>
 <hr width="100%">
