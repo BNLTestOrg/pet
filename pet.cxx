@@ -78,6 +78,17 @@ int main(int argc, char *argv[])
   argList.AddString("-elog");           // when used with -printToElog, the name of the elog, else the default
   argList.AddNumber("-ppm");            // start pet with the specified user
 
+  // initialize the application
+  application  = new UIApplication(argc, argv, &argList);
+  // set a fault handler to get tracebacks on program crashes
+  set_app_history( (char*) application->Name() );
+  set_default_fault_handler( (char*) application->Name() );
+  // clean-up handler
+  signal(SIGQUIT,clean_up);
+  signal(SIGTERM,clean_up);
+  signal(SIGSTOP,clean_up);
+
+
   // set up the CNS as the source for names
   cdevCnsInit();
 
@@ -87,9 +98,6 @@ int main(int argc, char *argv[])
 
   // turn on storage of ADO/LD sets
   globalSetStorage()->storageOn();
-
-  // initialize the application
-  application  = new UIApplication(argc, argv, &argList);
 
   if( argList.IsPresent("-knob") ) wname = "KnobPanel";
   else wname = "pet";
@@ -216,14 +224,6 @@ int main(int argc, char *argv[])
 	  exit(1);
 	}
     }
-
-  // set a fault handler to get tracebacks on program crashes
-  set_app_history( (char*) application->Name() );
-  set_default_fault_handler( (char*) application->Name() );
-  // clean-up handler
-  signal(SIGQUIT,clean_up);
-  signal(SIGTERM,clean_up);
-  signal(SIGSTOP,clean_up);
 
   // if there is a passed argument with device_list, don't show the SSMainWindow
   if( strlen( argList.String("-device_list") )  )
