@@ -1657,6 +1657,7 @@ void SSMainWindow::SS_Create_RHIC_Page()
   AddListWindow(petWin);
   petWin->GetPetPage()->AddEventReceiver(this);
   petWin->TF_Create_Pet_Page();
+  petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
   petWin->Show();
   LoadPageList(petWin);
   activeAdoWin = petWin;
@@ -1671,6 +1672,7 @@ void SSMainWindow::SS_Create_PS_RHIC_Page()
   petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
   petWin->TF_Create_PS_Pet_Page();
+  petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
   petWin->Show();
   LoadPageList(petWin);
   activeAdoWin = petWin;
