@@ -218,6 +218,7 @@ int main(int argc, char *argv[])
     }
 
   // set a fault handler to get tracebacks on program crashes
+  set_app_history( (char*) application->Name() );
   set_default_fault_handler( (char*) application->Name() );
   // clean-up handler
   signal(SIGQUIT,clean_up);
@@ -1102,7 +1103,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	PetWindow* adoWin = (PetWindow*) object;
 	int ppmUser = adoWin->GetPPMUser();
 	adoWin = new PetWindow(this, "adoWindow");
-   adoWin->GetPetPage()->AddEventReceiver(this);
+        adoWin->GetPetPage()->AddEventReceiver(this);
 	adoWin->SetLocalPetWindowCreating(false);
 	// in this case, we will assume the file loaded is not from the tree
 	// so don't set the tree - otherwise need to somehow be smart - skip it for now
