@@ -36,7 +36,7 @@ Parameters in the C-AD Controls System.<br>
     </tr>
     <tr>
       <th align="left">Last Modified&nbsp;</th>
-      <td align="center">3/23/06&nbsp;</td>
+      <td align="center">11/15/06&nbsp;</td>
       <td>Seth Nemesure&nbsp;</td>
       <td><a href="mailto:seth@bnl.gov">seth@bnl.gov</a></td>
     </tr>
@@ -1508,6 +1508,28 @@ characters.</li>
       <td>Launch a process when cell is selected</td>
     </tr> 
     <tr>
+      <td>monitor</td>
+      <td>T</td>
+      <td>string (10)</td>
+      <td>none</td>
+      <td>Display gpm style monitor inside the pet window</td>
+    </tr>
+    <tr>
+      <td>monitorWindow</td>
+      <td>T</td>
+      <td>string (10)</td>
+      <td>none</td>
+      <td>Display gpm style monitor in it's own window</td>
+    </tr>
+    <tr>
+      <td>monitorLayout</td>
+      <td>T</td>
+      <td>string (11)</td>
+      <td>square</td>
+      <td>used with monitor attribute only.  Defines layout of
+      monitors in pet window</td>
+    </tr>    
+    <tr>
       <td colspan="5">
       <ol>
         <li> T = Table, R = Row, C = Column, L = Cell</li>
@@ -1543,6 +1565,17 @@ and monAlarmState should be used exclusively.</li>
         <b>Will add a cell with the text "Launch Gpm".  When the cell is
         selected, Gpm will be launched.</b>
         </li>
+        <li> Specify monitor files using the gpm path
+        (eg. Scratch/myMon.mon) or using absolute path
+        (eg. /home/cfsb/mcr/myMon.mon).<br>Multiple monitors can be
+        entered for a single attribute as long as they are separated
+        by commas.
+        </li>
+        <li>
+        Set attribute to "horizontal" for a horizontal layout of
+        multiple monitors or to "vertical"<br>for a vertical layout of
+        monitors.  The default is "square".
+        </li>
       </ol>
       </td>
     </tr>
@@ -1567,6 +1600,12 @@ R4C3.monAlarmParam: device:param
 R5C2.fileBrowser: /operations/app_store/config
 ! have row 5, column 3 launch LogView
 R5C3.launch: /usr/controls/bin/LogView -file /home/cfsb/mcr/MyLogViewFile
+! add some gpm monitors to the pet page
+R0C0.monitor: Scratch/petTest.mon,Scratch/striptest.mon,Scratch/table.mon
+! add some monitors in separate windows
+R0C0.monitorWindow: Scratch/petTest.mon, Booster/BoosterCycles.mon
+! set the layout of the monitors in the pet window to vertically aligned
+R0C0.monitorLayout:vertical
 <br>END ATTRIBUTES</pre>
 <a href="#TableOfContents">Back to Table of Contents</a>
 <p> </p>
