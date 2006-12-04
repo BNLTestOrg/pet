@@ -729,7 +729,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	((SSPageWindow*) object)->EnableTheKnobPanel();
       activeLdWin = (SSPageWindow*) object;
     }
-    else
+    else if (!strcmp( object->ClassName(), "PetWindow"))
     {
       activeAdoWin = (PetWindow*) object;
     }
