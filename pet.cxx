@@ -778,6 +778,11 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     long numWins = GetNumWindows();
     int petPagePPM = 0; // in case we are loading an already created page and fail and reload it to its initial list
     if(event == UISelect || event == UIAccept || event == UITableBtn2Down) {
+	  // tree table does not automatically select the node on a button 2down
+	  if(event == UITableBtn2Down) {
+		const StdNode* node = treeTable->GetLastChanged();
+		treeTable->SelectRow(node);
+	  }
       char s[512];
       DirTree* tree = (DirTree*)treeTable->GetTree();
       const StdNode* selectedNode = treeTable->GetNodeSelected();
