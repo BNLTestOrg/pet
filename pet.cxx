@@ -145,16 +145,14 @@ int main(int argc, char *argv[])
     {
       if( DeviceDirectory.load( argList.String("-ddf") ) <= 0)
 	{
-	  fprintf(stderr, "Could not map ddf %s.  Aborting.\n", argList.String("-ddf") );
-	  exit(1);
+	  fprintf(stderr, "Could not map ddf %s.\n", argList.String("-ddf") );
 	}
     }
   else	// map the current ddf
     {
       if( DeviceDirectory.load() <= 0)
 	{
-	  fprintf(stderr, "Could not map current ddf.  Aborting.\n");
-	  exit(1);
+	  fprintf(stderr, "Could not map current ddf.\n");
 	}
     }
 
