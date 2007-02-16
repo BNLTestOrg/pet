@@ -194,6 +194,29 @@ int main(int argc, char *argv[])
           free(path);
         if(tmpFile)
           free(tmpFile);
+
+
+	// LTH - kludge to check for orphaned pet pages
+#ifdef USE_PET_MERELY_TO_ENUMERATE_ADOS_IN_MACHINE_TREE
+
+	if(mainWindow) { cerr << "Use -file or -single option when listing ADO pages" << endl; exit(-1); }
+
+	PetPage *pp = singlePetWin->GetPetPage();
+	int rowsUsed = pp->NumRows();
+	int colsUsed = pp->NumColumns();
+	
+	const char *adoName;
+	for(int i = 1; i <= rowsUsed; i++)
+	  for(int j = 1; j <= colsUsed; j++)
+	    
+	    if(adoName = pp->CellGetAdo(i,j))
+	      cout << adoName << endl;
+
+	exit(0);
+#endif
+	
+
+
         singlePetWin->Show();
         break;
       }
@@ -250,6 +273,7 @@ int main(int argc, char *argv[])
     else
       singlePetWin->ElogDumpAndExit();
   }
+
 
   // loop forever handling user events
   application->HandleEvents();
