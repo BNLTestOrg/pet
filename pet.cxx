@@ -190,6 +190,8 @@ int main(int argc, char *argv[])
         }
         singlePetWin->LoadFile(file);
         singlePetWin->ChangePath(path);
+        if (!argList.IsPresent("-file") && !argList.IsPresent("-single"))
+          singlePetWin->SetLocalPetWindowCreating(false);
         if(path)
           free(path);
         if(tmpFile)
