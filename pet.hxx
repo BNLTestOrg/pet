@@ -15,6 +15,7 @@ enum PET_WINDOW_TYPE {PET_LD_WINDOW, PET_CLD_WINDOW, PET_ADO_WINDOW, PET_HYBRID_
 
 class SSPageWindow;
 class MenuTree;
+class UICreateDeviceList;
 
 class SSMainWindow : public UIMainWindow
 {
@@ -87,7 +88,9 @@ protected:
   UIWindow*			searchPage;
   MenuTree*                     pulldownMenuTree;
   UILabelPopup*                 errFillExistWindowPopup;
-
+  UICreateDeviceList*           editDeviceList;
+  bool _creatingPageInTree;
+  
   // set the window position for a newly created window
   void SetWindowPos(UIWindow* newWin, UIWindow* currWin = NULL);
 
