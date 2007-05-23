@@ -6,6 +6,7 @@
 #include <UI/UIApplication.hxx>			// for UIApplication class
 #include <UI/UIArgumentList.hxx>		// for UIArgumentList class
 #include <pet/PetWindow.hxx>
+#include <petss/UICreateDeviceList.hxx>
 #include <utils/utilities.h>			// for set_default_fault_handler()
 #include <archive/archive_lib.h>		// for init_archive_lib_globals() and ARCHIVE_LOG;
 #include <ddf/DeviceDirectory.hxx>		// for DeviceDirectory global object
@@ -276,7 +277,6 @@ int main(int argc, char *argv[])
       singlePetWin->ElogDumpAndExit();
   }
 
-
   // loop forever handling user events
   application->HandleEvents();
 }
@@ -363,7 +363,9 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   searchPopup = NULL;
   searchPage = NULL;
   errFillExistWindowPopup = NULL;
-
+  editDeviceList = NULL;
+  _creatingPageInTree = false;
+  
   // resources
   static const char* defaults[] = {
     "*foreground: navy",
@@ -1095,7 +1097,26 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       SetMessage("");
       SP_Show();
     }
-    // user wants a cld window
+    // user canceled creating permanent page in the tree
+  else if(event == UIEvent6)
+  {
+  	_creatingPageInTree = false;
+  }
+    // user may be creating a permanent page in the tree
+  else if(event == UIEvent5)
+  {
+  	if (_creatingPageInTree) {
+  		_creatingPageInTree = false;
+  		string file = editDeviceList->GetPath();
+  		file += editDeviceList->GetDeviceName();
+  		if (!strcmp(editDeviceList->GetDeviceType(), "ado")) {
+  			activeAdoWin->SaveFile(file.c_str());
+  		} else {
+  			activeLdWin->SaveFile(file.c_str());
+  		}
+  	}
+  }
+  // user wants a cld window
   else if(event == UIEvent4)
   {
      PetWindow* win = (PetWindow*) GetWindow(pageList->GetSelection());
@@ -1167,13 +1188,13 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	else if(!strcmp(data->namesSelected[1], "Default PPM User..."))
 	  {	SS_Default_PPM_User();
 	  }
-	else if(!strcmp(data->namesSelected[1], "Create RHIC Page..."))
+	else if(!strcmp(data->namesSelected[1], "Create Temp RHIC Page..."))
 	  {     SS_Create_RHIC_Page();
 	  }
-	else if(!strcmp(data->namesSelected[1], "Create PS RHIC Page..."))
+	else if(!strcmp(data->namesSelected[1], "Create Temp PS RHIC Page..."))
 	  {     SS_Create_PS_RHIC_Page();
 	  }
-	else if(!strcmp(data->namesSelected[1], "Create AGS Page..."))
+	else if(!strcmp(data->namesSelected[1], "Create Temp AGS Page..."))
 	  {     SS_Create_AGS_Page();
 	  }
 	else if(!strcmp(data->namesSelected[1], "Quit"))
@@ -1607,14 +1628,139 @@ void SSMainWindow::LoadTable(const StdNode* node)
 
 void SSMainWindow::SS_New()
 {
-  PetWindow* petWin = new PetWindow(this, "petWindow");
-  petWin->SetLocalPetWindowCreating(false);
-  AddListWindow(petWin);
-  petWin->TF_Open();
-  petWin->Show();
-  LoadPageList(petWin);
-  activeAdoWin = petWin;
-  petWin->GetPetPage()->AddEventReceiver(this);
+
+	if (!treeTable->IsLeafNode(treeTable->GetNodeSelected())) {
+		UILabelPopup popup(this, "popup", NULL, "OK");
+		popup.SetLabel("Please Select the Leaf Node\nwhere the file is to be created/edited");
+		popup.Wait();
+		return;
+	}
+	
+	if (editDeviceList == NULL)
+		editDeviceList = new UICreateDeviceList(this, "editDeviceList");
+	
+	const char* path = GetSelectedPath();
+	editDeviceList->SetDirectory(path);
+	
+	// temporarily remember the active windows while the user is preparing to edit
+	// so that we don't lose track of the page to be edited in case the user makes
+	// a different window active before finishing with the edit popup.  
+	// Note: This is dangerous because the user could exit the active window and
+	// we'd be left with a pointer to deleted memory...
+	PetWindow* adoWinToEdit = activeAdoWin;
+	SSPageWindow* ldWinToEdit = activeLdWin;
+	
+	int retval = editDeviceList->Wait();
+	if (retval == 3)
+		// cancel
+		return;
+	else if (retval == 2) {
+		// Graphical Interface
+		//
+		// when done need to save the file (this will come back as a UIEvent5 event)
+		// 
+		// The file must be a new file since this option is not available to the user for exising files
+		_creatingPageInTree = true;
+		const char* type = editDeviceList->GetDeviceType();
+		if (!strcmp(type, "ado")) {
+			SS_Create_RHIC_Page();
+			// add the window to the window list with it's permanent designation.
+			// Do this by reloading the temp file just created and saved.
+			string path = editDeviceList->GetPath();
+			string file = path;
+			file += editDeviceList->GetDeviceName();
+			
+  			MachineTree* machTree = treeTable->GetMachineTree();
+     	    const char* rootPath = machTree->GetRootPath();
+     	    const StdNode* rootNode = machTree->GetRootNode();
+     	    const char* rootName = rootNode->Name();
+     	    int len = strlen(rootPath) + strlen(rootName) + 1;
+     	    const char* name = file.c_str();	
+     	    char* p = (char*) path.c_str();
+     	    // remove last '/' in path
+     	    if (p[strlen(p)-1] == '/') p[strlen(p)-1] = '\0';
+     	    activeAdoWin->LoadFile(name, &p[len]);
+     	    activeAdoWin->SetListString(UIGetLeafName(p));
+ 		    // this forces the pageList to refresh itself with the new tree name rather than the temp name     	    
+     	    LoadPageList(activeLdWin);
+     	    activeAdoWin->SaveVersion(file.c_str());
+		} else {
+			SS_Create_AGS_Page();
+			// add the window to the window list with it's permanent designation.
+			// Do this by reloading the temp file just created and saved.
+			string path = editDeviceList->GetPath();
+			string file = path;
+			file += editDeviceList->GetDeviceName();
+			
+  			MachineTree* machTree = treeTable->GetMachineTree();
+     	    const char* rootPath = machTree->GetRootPath();
+     	    const StdNode* rootNode = machTree->GetRootNode();
+     	    const char* rootName = rootNode->Name();
+     	    int len = strlen(rootPath) + strlen(rootName) + 1;
+     	    const char* name = file.c_str();	
+     	    char* p = (char*) path.c_str();
+     	    // remove last '/' in path
+     	    if (p[strlen(p)-1] == '/') p[strlen(p)-1] = '\0';
+     	    activeLdWin->LoadFile(name, &p[len]);
+     	    activeLdWin->SetDevListPath(p);
+     	    activeLdWin->SetListString();
+ 		    // this forces the pageList to refresh itself with the new tree name rather than the temp name     	    
+     	    LoadPageList(activeLdWin);
+     	    activeLdWin->SaveVersion(file.c_str());
+ 		}
+	} else {
+		// default editor
+		//
+		// create a new pet window and use it's edit method to modify the new file
+		const char* type = editDeviceList->GetDeviceType();
+		if (!strcmp(type, "ado")) {
+			if (editDeviceList->IsNewType()) {
+				// creating new file
+	  			PetWindow* petWin = new PetWindow(this, "petWindow");
+	   	        activeAdoWin = petWin;
+	  			petWin->SetLocalPetWindowCreating(false);
+		  		AddListWindow(petWin);
+	  			petWin->GetPetPage()->AddEventReceiver(this);
+			    petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
+			    // edit the file here
+			    petWin->EditBuiltInEditor(editDeviceList->GetPath());
+	  			string name = editDeviceList->GetPath();
+	  			petWin->SetTreeRootPath(name.c_str());
+	   	        LoadPageList(petWin);
+			} else {
+				// editing existing file
+				adoWinToEdit->EditBuiltInEditor();
+			}
+		} else {
+			if (editDeviceList->IsNewType()) {
+	  			SSPageWindow* pageWin = new SSPageWindow(this, "pageWindow");
+	  			pageWin->EditBuiltInEditor(editDeviceList->GetPath());
+	  			// do the following to prepare for when the editing of the new file is complete
+ 	  			AddListWindow(pageWin);
+  				MachineTree* machTree = treeTable->GetMachineTree();
+     	    	const char* rootPath = machTree->GetRootPath();
+     	    	const StdNode* rootNode = machTree->GetRootNode();
+     	    	const char* rootName = rootNode->Name();
+     	    	int len = strlen(rootPath) + strlen(rootName) + 1;
+				string path = editDeviceList->GetPath();
+				string file = path;
+				file += editDeviceList->GetDeviceName();
+     	    	const char* name = file.c_str();	
+     	    	char* p = (char*) path.c_str();
+     	    	// remove last '/' in path
+     	    	if (p[strlen(p)-1] == '/') p[strlen(p)-1] = '\0';
+    	   	    pageWin->SetDevListPath(p);
+     	    	pageWin->SetListString();
+	  			if (supportKnobPanel || strstr(type, "knob"))
+	    			pageWin->SupportKnobPanel(knobPanel);
+	  			LoadPageList(pageWin);
+	  			activeLdWin = pageWin;
+			} else {
+				// editing existing file
+				ldWinToEdit->EditBuiltInEditor();
+			}
+		}
+	}
 }
 
 void SSMainWindow::SS_Open()
@@ -1685,11 +1831,11 @@ void SSMainWindow::SS_Create_RHIC_Page()
   petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
   petWin->GetPetPage()->AddEventReceiver(this);
+  activeAdoWin = petWin;
   petWin->TF_Create_Pet_Page();
   petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
   petWin->Show();
   LoadPageList(petWin);
-  activeAdoWin = petWin;
   SetStandardCursor();
 }
 
@@ -1713,6 +1859,8 @@ void SSMainWindow::SS_Create_AGS_Page()
   SetWorkingCursor();
   SSPageWindow* pageWin = new SSPageWindow(this, "pageWindow");
   char name[64];
+  pageWin->AddEventReceiver(this);
+  activeLdWin = pageWin;
   pageWin->CreateAgsPage(name);
   pageWin->SetListString(name);
   AddListWindow(pageWin);
@@ -1721,7 +1869,6 @@ void SSMainWindow::SS_Create_AGS_Page()
   pageWin->Show();
   pageWin->UpdateContinuous();
   LoadPageList(pageWin);
-  activeLdWin = pageWin;
   SetStandardCursor();
 }
 
