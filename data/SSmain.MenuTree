@@ -1,6 +1,6 @@
 "MTRE",3
 797093749,"Wed Apr  5 10:55:49 1995"
-1089216078,"Wed Jul  7 12:01:18 2004"
+1179172060,"Mon May 14 15:47:40 2007"
 32,30,30
 
 "NODE 0"
@@ -223,7 +223,7 @@ by choosing the Show menu item."
 "Open a file in the current window"
 
 "NODE 24"
-"Create RHIC Page..."
+"Create Temp RHIC Page..."
 24,1,25,3,-1
 1
 0,""
@@ -231,7 +231,7 @@ by choosing the Show menu item."
 "Create a page from selected parameters"
 
 "NODE 25"
-"Create PS RHIC Page..."
+"Create Temp PS RHIC Page..."
 25,1,26,24,-1
 1
 0,""
@@ -239,7 +239,7 @@ by choosing the Show menu item."
 "Create a RHIC page from a list of selected Power Supplies"
 
 "NODE 26"
-"Create AGS Page..."
+"Create Temp AGS Page..."
 26,1,27,25,-1
 1
 0,""
