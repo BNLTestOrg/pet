@@ -31,13 +31,13 @@ MenuTree* CreateMenuTree()
 	snode = menuTree->InsertMenuItem("----", "/File", NULL);
 	menuTree->SetNodeType(snode, MenuSeparatorType);
 
-	snode = menuTree->InsertMenuItem("Create RHIC Page...", "/File", NULL);
+	snode = menuTree->InsertMenuItem("Create Temp RHIC Page...", "/File", NULL);
 	menuTree->SetNodeHelpText(snode, "Create a page from selected parameters");
 
-	snode = menuTree->InsertMenuItem("Create PS RHIC Page...", "/File", NULL);
+	snode = menuTree->InsertMenuItem("Create Temp PS RHIC Page...", "/File", NULL);
 	menuTree->SetNodeHelpText(snode, "Create a RHIC page from a list of selected Power Supplies");
 
-	snode = menuTree->InsertMenuItem("Create AGS Page...", "/File", NULL);
+	snode = menuTree->InsertMenuItem("Create Temp AGS Page...", "/File", NULL);
 	menuTree->SetNodeHelpText(snode, "Create an AGS page from selected devices");
 
 	snode = menuTree->InsertMenuItem("----", "/File", NULL);
