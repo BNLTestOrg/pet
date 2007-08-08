@@ -110,31 +110,12 @@ int main(int argc, char *argv[])
   // this is commented out for now until Gpm starts getting built with shared object libraries
   GlobalAsyncHandler()->RegisterTimer(100, CDEV_poll, NULL);
 
-  // check for single window switch
-  bool singleWindowMode = false;
-  if(argList.IsPresent("-file") || argList.IsPresent("-single")){
-    singlePetWin = new PetWindow(application, "petWindow");
-    singlePetWin->SetLocalPetWindowCreating(true);
-    singlePetWin->AddEventReceiver(&petEventReceiver);
-    singlePetWin->GetPetPage()->AddEventReceiver(&petEventReceiver);
-    singleWindowMode = true;
-  }
-  else{
-    // create the main window and its user interface and display it
+  // create the mainWindow
+  if (mainWindow == NULL) {
     mainWindow = new SSMainWindow(application, "mainWindow", wname);
     application->AddEventReceiver(mainWindow);
-    if (argList.IsPresent("-printToElog") && !argList.IsPresent("-device_list"))
-      cout << "-printToElog option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
-  }
-
-  const char *path = argList.String("-path");
-  if(path && strlen(path)) {
-    char *str = new char[strlen(path) + 10];
-    sprintf(str, "%s/*.pet", path);
-    if(singleWindowMode)
-      singlePetWin->ChangePath(str);
-    if(str)
-      delete [] str;
+    // set up the archive lib tools
+    mainWindow->InitArchiveLib();
   }
 
   // check values of some command line arguments
@@ -157,13 +138,60 @@ int main(int argc, char *argv[])
 	}
     }
 
-  if (!argList.IsPresent("-file") && !argList.IsPresent("-single"))
-    // set up the archive lib tools
-    mainWindow->InitArchiveLib();
+  // check for single window switch
+  bool singleWindowMode = false;
+  PET_WINDOW_TYPE type = PET_UNKNOWN_WINDOW;
+  if(argList.IsPresent("-file") || argList.IsPresent("-single")){
+
+    const char* fname = argList.UntaggedItem(0);
+    type = mainWindow->WindowType(fname);
+    switch (type) {
+    case PET_ADO_WINDOW:
+      singlePetWin = new PetWindow(application, "petWindow");
+      singlePetWin->SetLocalPetWindowCreating(true);
+      singlePetWin->AddEventReceiver(&petEventReceiver);
+      singlePetWin->GetPetPage()->AddEventReceiver(&petEventReceiver);
+      singleWindowMode = true;
+      break;
+    case PET_LD_WINDOW:
+      mainWindow->ShowSingleDeviceList(fname);
+      singleDeviceListOnly=UITrue;
+      singleWindowMode = true;
+      break;
+    default:
+      singlePetWin = new PetWindow(application, "petWindow");
+      singlePetWin->SetLocalPetWindowCreating(true);
+      singlePetWin->AddEventReceiver(&petEventReceiver);
+      singlePetWin->GetPetPage()->AddEventReceiver(&petEventReceiver);
+      singleWindowMode = true;
+      mainWindow->ShowSingleDeviceList(fname);
+      singleDeviceListOnly=UITrue;
+      singleWindowMode = true;
+      break;
+    }
+  }
+  else{
+    // create the main window and its user interface and display it
+    if (argList.IsPresent("-printToElog") && !argList.IsPresent("-device_list"))
+      cout << "-printToElog option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
+  }
+
+  const char *path = argList.String("-path");
+  if(path && strlen(path)) {
+    char *str = new char[strlen(path) + 10];
+    sprintf(str, "%s/*.pet", path);
+    if(singleWindowMode)
+      singlePetWin->ChangePath(str);
+    if(str)
+      delete [] str;
+  }
 
   // load files that are untagged on the command line
   int fileNum;
   for(fileNum=0; fileNum<argList.NumUntaggedItems(); fileNum++) {
+    if (fileNum==0 && type == PET_LD_WINDOW)
+      // already loaded
+      continue;
 
     const char* file = argList.UntaggedItem(fileNum);
     if(file && strlen(file)) {
@@ -172,32 +200,41 @@ int main(int argc, char *argv[])
       char *path;
       char *ptr;
 
-      tmpFile = strdup(file);
-      ptr = strrchr(tmpFile, '/');
-      if(ptr) {
-        *ptr = '\0';
-        ptr++;
-        path = new char[strlen(tmpFile) + 10];
-        sprintf(path, "%s/*.ado", tmpFile);
+      type = mainWindow->WindowType(file);
+      if (type == PET_LD_WINDOW || type == PET_HYBRID_WINDOW &&
+          (mainWindow->FindWindow(file, PET_LD_WINDOW) == NULL)) {
+        mainWindow->ShowSingleDeviceList(file);
+        singleDeviceListOnly=UITrue;
+        singleWindowMode = true;
       }
-      else			// no path given
-        path = strdup("*.ado");
-
-      if(fileNum==0) {	// only do the first file
-        if (singlePetWin == NULL){
-          singlePetWin = new PetWindow(application, "petWindow");
-          if (mainWindow)
-            mainWindow->AddListWindow(singlePetWin);
+      if (type == PET_ADO_WINDOW || type == PET_HYBRID_WINDOW &&
+          (mainWindow->FindWindow(file, PET_ADO_WINDOW)) == NULL) {
+        tmpFile = strdup(file);
+        ptr = strrchr(tmpFile, '/');
+        if(ptr) {
+          *ptr = '\0';
+          ptr++;
+          path = new char[strlen(tmpFile) + 10];
+          sprintf(path, "%s/*.ado", tmpFile);
         }
-        singlePetWin->LoadFile(file);
-        singlePetWin->ChangePath(path);
-        if (!argList.IsPresent("-file") && !argList.IsPresent("-single"))
-          singlePetWin->SetLocalPetWindowCreating(false);
-        if(path)
-          free(path);
-        if(tmpFile)
-          free(tmpFile);
-
+        else			// no path given
+          path = strdup("*.ado");
+        
+        if(fileNum==0) {	// only do the first file
+          if (singlePetWin == NULL){
+            singlePetWin = new PetWindow(application, "petWindow");
+            if (mainWindow)
+              mainWindow->AddListWindow(singlePetWin);
+          }
+          singlePetWin->LoadFile(file);
+          singlePetWin->ChangePath(path);
+          if (!argList.IsPresent("-file") && !argList.IsPresent("-single"))
+            singlePetWin->SetLocalPetWindowCreating(false);
+          if(path)
+            free(path);
+          if(tmpFile)
+            free(tmpFile);
+        }
 
 	// LTH - kludge to check for orphaned pet pages
 #ifdef USE_PET_MERELY_TO_ENUMERATE_ADOS_IN_MACHINE_TREE
@@ -501,7 +538,8 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
     form->ResizeOff();
 
   // if there is a passed argument with device_list, don't show the SSMainWindow
-  if( strlen( argList.String("-device_list") ) == 0 )
+  if( strlen( argList.String("-device_list") ) == 0 &&
+      !argList.IsPresent("-single") && !argList.IsPresent("-file"))
     // display the tree table window to get any device list
     Show();
 }
@@ -1331,8 +1369,11 @@ int SSMainWindow::LoadDeviceList(SSPageWindow* win, const char* deviceList, shor
   // create the full name for the device list
   char* filename = new char[strlen(deviceList) + 16];
   strcpy(filename, deviceList);
-  strcat(filename, "/");
-  strcat(filename, LD_DEVICE_LIST);
+  if (!strstr(deviceList, "device_list")){
+    strcat(filename, "/");
+    strcat(filename, LD_DEVICE_LIST);
+  } else if (!strstr(deviceList, ".ld"))
+    strcat(filename, ".ld");
 
   // load the device list
   win->SetPPMUser(ppmUser);
@@ -1393,11 +1434,20 @@ UIWindow* SSMainWindow::FindWindow(const char* file, PET_WINDOW_TYPE wtype)
     return NULL;
   char fileName[512];
   strcpy(fileName, file);
-  if(wtype == PET_ADO_WINDOW)
-    strcat(fileName, ADO_DEVICE_LIST);
-  else
-    strcat(fileName, LD_DEVICE_LIST);
-
+  if (!strstr(fileName, "device_list")) {
+    if(wtype == PET_ADO_WINDOW) {
+      strcat(fileName, ADO_DEVICE_LIST);
+    } else {
+      strcat(fileName, LD_DEVICE_LIST);
+    }
+  } else {
+    if (wtype == PET_ADO_WINDOW && !strstr(fileName, ".ado"))
+      strcat(fileName, ".ado");
+    else if (wtype == PET_LD_WINDOW && !strstr(fileName, ".ld"))
+      strcat(fileName, ".ld");
+  }
+  
+    
   UIWindow* win;
   int numWindows = GetNumWindows();
   const char* winName;
@@ -1441,16 +1491,28 @@ PET_WINDOW_TYPE SSMainWindow::WindowType(UIWindow* window)
 
 PET_WINDOW_TYPE SSMainWindow::WindowType(const char* path)
 {
+  // check the simple case where the path already defines the expected type
+  if (strstr(path, ".ld"))
+    return PET_LD_WINDOW;
+  else if (strstr(path, ".ado"))
+    return PET_ADO_WINDOW;
+
   // determine whether a ADO_DEVICE_LIST or a LD_DEVICE_LIST can be found at the base of path
   char petfile[512];
   strcpy(petfile, path);
-  strcat(petfile, "/");
-  strcat(petfile, ADO_DEVICE_LIST);
+  if (!strstr(path, "device_list")) {
+    strcat(petfile, "/");
+    strcat(petfile, ADO_DEVICE_LIST);
+  } else
+    strcat(petfile, ".ado");
 
   char ssfile[512];
   strcpy(ssfile, path);
-  strcat(ssfile, "/");
-  strcat(ssfile, LD_DEVICE_LIST);
+  if (!strstr(path, "device_list")) {
+    strcat(ssfile, "/");
+    strcat(ssfile, LD_DEVICE_LIST);
+  } else 
+    strcat(ssfile, ".ld");
 
   if (UIFileExists(petfile) && UIFileExists(ssfile)) {
     if (supportKnobPanel) return PET_LD_WINDOW;
@@ -2272,7 +2334,8 @@ void SSMainWindow::ShowSingleDeviceList(const char* deviceListPath)
   strcat(deviceList, "/");
   strcat(deviceList, deviceListPath);
 
-  if( LoadDeviceList(pageWin, deviceList) < 0)
+  if( LoadDeviceList(pageWin, deviceList) < 0 && 
+      LoadDeviceList(pageWin, deviceListPath) < 0)
     {
       RingBell();
       printf("Exiting... Could not load device list - %s\n", deviceList);
