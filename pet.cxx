@@ -217,25 +217,24 @@ int main(int argc, char *argv[])
           path = new char[strlen(tmpFile) + 10];
           sprintf(path, "%s/*.ado", tmpFile);
         }
-        else			// no path given
+        else {		// no path given
           path = strdup("*.ado");
-        
-        if(fileNum==0) {	// only do the first file
-          if (singlePetWin == NULL){
-            singlePetWin = new PetWindow(application, "petWindow");
-            if (mainWindow)
-              mainWindow->AddListWindow(singlePetWin);
-          }
-          singlePetWin->LoadFile(file);
-          singlePetWin->ChangePath(path);
-          if (!argList.IsPresent("-file") && !argList.IsPresent("-single"))
-            singlePetWin->SetLocalPetWindowCreating(false);
-          if(path)
-            free(path);
-          if(tmpFile)
-            free(tmpFile);
         }
-
+        
+        if (singlePetWin == NULL){
+          singlePetWin = new PetWindow(application, "petWindow");
+          if (mainWindow)
+            mainWindow->AddListWindow(singlePetWin);
+        }
+        singlePetWin->LoadFile(file);
+        singlePetWin->ChangePath(path);
+        if (!argList.IsPresent("-file") && !argList.IsPresent("-single"))
+          singlePetWin->SetLocalPetWindowCreating(false);
+        if(path)
+          free(path);
+        if(tmpFile)
+          free(tmpFile);
+        
 	// LTH - kludge to check for orphaned pet pages
 #ifdef USE_PET_MERELY_TO_ENUMERATE_ADOS_IN_MACHINE_TREE
 
