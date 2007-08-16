@@ -1493,7 +1493,7 @@ PET_WINDOW_TYPE SSMainWindow::WindowType(const char* path)
   // check the simple case where the path already defines the expected type
   if (strstr(path, ".ld"))
     return PET_LD_WINDOW;
-  else if (strstr(path, ".ado"))
+  else if (strstr(path, ".ado") || strstr(path, ".pet"))
     return PET_ADO_WINDOW;
 
   // determine whether a ADO_DEVICE_LIST or a LD_DEVICE_LIST can be found at the base of path
@@ -1513,16 +1513,24 @@ PET_WINDOW_TYPE SSMainWindow::WindowType(const char* path)
   } else 
     strcat(ssfile, ".ld");
 
-  if (UIFileExists(petfile) && UIFileExists(ssfile)) {
+
+  UIBoolean adopage = UIFileExists(petfile);
+  UIBoolean ldpage = UIFileExists(ssfile);
+  if (adopage && ldpage) {
     if (supportKnobPanel) return PET_LD_WINDOW;
     return PET_HYBRID_WINDOW;
   }
-  else if (UIFileExists(petfile))
+  else if (adopage)
     return PET_ADO_WINDOW;
-  else if (UIFileExists(ssfile))
+  else if (ldpage)
     return PET_LD_WINDOW;
-  else
-    return PET_UNKNOWN_WINDOW;
+  else {
+    // The file name doesn't provide us with enough information.  Checking the contents
+    // would be the best solution but let's just assume an ado window for now.
+    return PET_ADO_WINDOW;
+  }
+
+  return PET_UNKNOWN_WINDOW;
 }
 
 void SSMainWindow::DeleteListWindow(UIWindow* window)
