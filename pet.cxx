@@ -1225,13 +1225,13 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	else if(!strcmp(data->namesSelected[1], "Default PPM User..."))
 	  {	SS_Default_PPM_User();
 	  }
-	else if(!strcmp(data->namesSelected[1], "Create Temp RHIC Page..."))
+	else if(!strcmp(data->namesSelected[1], "Create Temp ADO Page..."))
 	  {     SS_Create_RHIC_Page();
 	  }
-	else if(!strcmp(data->namesSelected[1], "Create Temp PS RHIC Page..."))
+	else if(!strcmp(data->namesSelected[1], "Create Temp PS ADO Page..."))
 	  {     SS_Create_PS_RHIC_Page();
 	  }
-	else if(!strcmp(data->namesSelected[1], "Create Temp AGS Page..."))
+	else if(!strcmp(data->namesSelected[1], "Create Temp SLD/CLD Page..."))
 	  {     SS_Create_AGS_Page();
 	  }
 	else if(!strcmp(data->namesSelected[1], "Quit"))
