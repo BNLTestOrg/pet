@@ -805,7 +805,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       if (singleDeviceListOnly && !strcmp( object->ClassName(), "SSPageWindow") )
 	//if is an SSPageWindow, may be leaving application
 	{
-	  Exit();
+	  SS_Quit();
 	  return;
 	}
       // check to see if sent from one of the device pages
@@ -2614,7 +2614,7 @@ void SSPageWindow::HandleEvent(const UIObject* object, UIEvent event)
   else if(object == pulldownMenu && event == UISelect)
     {
       const UITreeData* data = pulldownMenu->GetTreeData();
-      if(!strcmp(data->namesSelected[0], "Page") && !strcmp(data->namesSelected[1], "Exit..."))
+      if(!strcmp(data->namesSelected[0], "Page") && !strcmp(data->namesSelected[1], "Close"))
 	SP_Close();
       else
 	AgsPageWindow::HandleEvent(object, event);
@@ -2766,7 +2766,7 @@ void SSPageWindow::SetSingleDeviceListMode()
 
 		  pulldownMenu->DeleteMenuItem(disable1);
 		  pulldownMenu->DeleteMenuItem(disable2);
-		  pulldownMenu->SetMenuItemString(oldString1, "Exit...");
+		  pulldownMenu->SetMenuItemString(oldString1, "Close");
 
 		  delete [] disable1;
 		  delete [] disable2;
