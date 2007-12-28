@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
   argList.AddString("-path");		// default path for file open
   argList.AddSwitch("-printToElog");    // used with -single or -file to print pet page to elog after data acquisition, then exit
   argList.AddString("-elog");           // when used with -printToElog, the name of the elog, else the default
+  argList.AddString("-printTogif");     // used with -single or -file to print pet page to a gif file after data acquisition, then exit
   argList.AddNumber("-ppm");            // start pet with the specified user
 
   // initialize the application
@@ -174,6 +175,8 @@ int main(int argc, char *argv[])
     // create the main window and its user interface and display it
     if (argList.IsPresent("-printToElog") && !argList.IsPresent("-device_list"))
       cout << "-printToElog option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
+    else if (argList.IsPresent("-printTogif") && !argList.IsPresent("-device_list"))
+      cout << "-printTogif option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
   }
 
   const char *path = argList.String("-path");
@@ -298,14 +301,24 @@ int main(int argc, char *argv[])
       singleDeviceListOnly=UITrue;
     }
 
-  if ( argList.IsPresent("-printToElog") && (singleWindowMode || singleDeviceListOnly)){
-    const char* elogName = NULL;
-    if(argList.IsPresent("-elog") )
-      elogName = argList.String("-elog");
+  if ( (argList.IsPresent("-printToElog") || argList.IsPresent("-printTogif")) && (singleWindowMode || singleDeviceListOnly)){
     UIPrintTool* pt = GetPrintTool();
-    pt->SetPrintOutputType(UIPrintToElog);
-    if(elogName != NULL && elogName[0] != 0)
-      pt->SetElogName(elogName);
+    if (argList.IsPresent("-printToElog"))
+      {
+        const char* elogName = NULL;
+        if(argList.IsPresent("-elog") )
+          elogName = argList.String("-elog");
+        pt->SetPrintOutputType(UIPrintToElog);
+        if(elogName != NULL && elogName[0] != 0)
+          pt->SetElogName(elogName);
+      }
+    else if (argList.IsPresent("-printTogif"))
+      {
+        const char* gifFileName = argList.String("-printTogif");
+        pt->SetPrintOutputType(UIPrintToFile);
+        pt->SetPrintFileType(UIgifFile);
+        pt->SetPrintFileName(gifFileName);
+      }
     // dump snap shot of the AGS page to the elog and exit
     if (singleDeviceListOnly)
       dumpElogAndExitTimerId = application->EnableTimerEvent(1000);
