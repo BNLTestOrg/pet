@@ -414,6 +414,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   errFillExistWindowPopup = NULL;
   editDeviceList = NULL;
   _creatingPageInTree = false;
+  _historyPopup = NULL;
   
   // resources
   static const char* defaults[] = {
@@ -707,96 +708,96 @@ void SSMainWindow::LoadPageList(const UIWindow* winSelection)
 void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 {
   if (object == application && event == UIFileDesc)
+  {
+    if (application->GetInputId() == knobPanelId)
     {
-      if (application->GetInputId() == knobPanelId)
-	{
-	  if (supportKnobPanel && (activeLdWin != NULL))
-	    //if it is an input on the knob panel sio line
-	    knobPanel->ProcessKnobPanelSIO();
-	  else
-            knobPanel->ThrowAwayKnobInput();
-	}
+      if (supportKnobPanel && (activeLdWin != NULL))
+        //if it is an input on the knob panel sio line
+      knobPanel->ProcessKnobPanelSIO();
+      else
+        knobPanel->ThrowAwayKnobInput();
     }
-
+  }
+  
   // main window events
   if(object == this && event == UIWindowMenuClose)
     Exit();
-
+  
   // user closing the viewer window used to display archive summary log
   else if(object == viewer && event == UIWindowMenuClose)
     viewer->Hide();
-
+  
   // events from the search popup
   else if(object == searchPopup)
+  {
+    if(event == UISelect)		// view the selected device list
     {
-      if(event == UISelect)		// view the selected device list
-	{
-	  // get the selected node
-	  MachineTree* mtree = treeTable->GetMachineTree();
-	  StdNode* rootNode = mtree->GetRootNode();
-	  const char* rootPath = mtree->GenerateNodePathname(rootNode);
-	  const char* selectString = searchPopup->GetDeviceListSelection();
-	  char* nodeName = new char[strlen(rootPath) + strlen(selectString) + 2];
-	  strcpy(nodeName, rootPath);
-	  strcat(nodeName, "/");
-	  strcat(nodeName, selectString);
-	  nodeName[strlen(nodeName)-1] = 0;		// get rid of newline at the end
-	  StdNode* selectNode = mtree->FindNode(nodeName);
-	  delete [] nodeName;
-	  if(selectNode == NULL)
-	    {
-	      RingBell();
-	      UILabelPopup popup(this, "searchError", "Can't find selected node in the\nMachine Tree.");
-	      popup.Wait();
-	      return;
-	    }
-	  // if this is the first selection, create a new window
-	  // otherwise, reload the save search device page window
-	  // simulate a button 1 or button 2 down event
-	  searchPopup->SetWorkingCursor();
-	  treeTable->SetNodeSelected(selectNode);
-	  treeTable->LoadTreeTable();
-          HandleEvent(treeTable, UITableBtn2Down);
-
-          // store a ptr to window so can reload if neccessary
-          long selection = pageList->GetSelection();
-          if(selection > 0)
-            searchPage = this->GetWindow(selection);
-
-	  // make sure the first device name with the search string is highlighted
-	  const char* searchStr = searchPopup->GetSearchString();
-	  if(searchStr != NULL && searchStr[0] != 0 && searchPage != NULL)
-	    switch (WindowType(searchPage))
-	      {
-	      case PET_LD_WINDOW:
-	      case PET_CLD_WINDOW:
-		((SSPageWindow*) searchPage)->ShowDeviceSubstring(searchStr);
-		break;
-	      case PET_ADO_WINDOW:
-		((PetWindow*) searchPage)->ShowSubString(searchStr);
-		break;
-	      default:
-		break;
-	      }
-	  searchPopup->SetStandardCursor();
-	}
-      else if(event == UIHide)	// the user closed the search popup
-	searchPage = NULL;	// don't save this anymore once the popup goes down
+      // get the selected node
+      MachineTree* mtree = treeTable->GetMachineTree();
+      StdNode* rootNode = mtree->GetRootNode();
+      const char* rootPath = mtree->GenerateNodePathname(rootNode);
+      const char* selectString = searchPopup->GetDeviceListSelection();
+      char* nodeName = new char[strlen(rootPath) + strlen(selectString) + 2];
+      strcpy(nodeName, rootPath);
+      strcat(nodeName, "/");
+      strcat(nodeName, selectString);
+      nodeName[strlen(nodeName)-1] = 0;		// get rid of newline at the end
+      StdNode* selectNode = mtree->FindNode(nodeName);
+      delete [] nodeName;
+      if(selectNode == NULL)
+      {
+        RingBell();
+        UILabelPopup popup(this, "searchError", "Can't find selected node in the\nMachine Tree.");
+        popup.Wait();
+        return;
+      }
+      // if this is the first selection, create a new window
+      // otherwise, reload the save search device page window
+      // simulate a button 1 or button 2 down event
+      searchPopup->SetWorkingCursor();
+      treeTable->SetNodeSelected(selectNode);
+      treeTable->LoadTreeTable();
+      HandleEvent(treeTable, UITableBtn2Down);
+      
+      // store a ptr to window so can reload if neccessary
+      long selection = pageList->GetSelection();
+      if(selection > 0)
+        searchPage = this->GetWindow(selection);
+      
+      // make sure the first device name with the search string is highlighted
+      const char* searchStr = searchPopup->GetSearchString();
+      if(searchStr != NULL && searchStr[0] != 0 && searchPage != NULL)
+        switch (WindowType(searchPage))
+      {
+      case PET_LD_WINDOW:
+      case PET_CLD_WINDOW:
+        ((SSPageWindow*) searchPage)->ShowDeviceSubstring(searchStr);
+        break;
+      case PET_ADO_WINDOW:
+        ((PetWindow*) searchPage)->ShowSubString(searchStr);
+        break;
+      default:
+        break;
+      }
+      searchPopup->SetStandardCursor();
     }
-
+    else if(event == UIHide)	// the user closed the search popup
+      searchPage = NULL;	// don't save this anymore once the popup goes down
+  }
+  
   // a device page window was made active
   else if(event == UIWindowActive)
   {
     // check to see if sent from one of the device pages
     if( IsWindowInList( (UIWindow*) object) == 0)
       return;
-
+    
     if (activeLdWin != NULL)
     {
       if (supportKnobPanel && activeLdWin != object )
 	((SSPageWindow*) activeLdWin)->ClearTheKnobPanel();
     }
-
+    
     // redisplay the tree table and list
     LoadTable( (UIWindow*) object);
     if( !strcmp( object->ClassName(), "SSPageWindow") )
@@ -811,35 +812,55 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     }
     LoadPageList( (UIWindow*) object);
   }
-
+  
   // user chose the Close menu item from the window menu of a device page
   else if(event == UIWindowMenuClose)
+  {
+    if (singleDeviceListOnly && !strcmp( object->ClassName(), "SSPageWindow") )
+      //if is an SSPageWindow, may be leaving application
     {
-      if (singleDeviceListOnly && !strcmp( object->ClassName(), "SSPageWindow") )
-	//if is an SSPageWindow, may be leaving application
-	{
-	  SS_Quit();
-	  return;
-	}
-      // check to see if sent from one of the device pages
-      if( IsWindowInList( (UIWindow*) object) == 0)
-	return;
-      // delete the window and remove it from the list
-      UIWindow* win = (UIWindow*) object;
-      win->Hide();
-      DeleteListWindow(win);
+      SS_Quit();
+      return;
     }
-
+    // check to see if sent from one of the device pages
+    if( IsWindowInList( (UIWindow*) object) == 0)
+      return;
+    // delete the window and remove it from the list
+    UIWindow* win = (UIWindow*) object;
+    win->Hide();
+    DeleteListWindow(win);
+  }
   // user chose the Hide menu item from the Page menu of a device page
   else if(event == UIHide)
-    {
-      // check to see if sent from one of the device pages
-      if( IsWindowInList( (UIWindow*) object) == 0)
-	return;
-      // hide the window
-      HideListWindow( (UIWindow*) object);
+  {
+    // check to see if sent from one of the device pages
+    if( IsWindowInList( (UIWindow*) object) == 0)
+      return;
+    // hide the window
+    HideListWindow( (UIWindow*) object);
+  }
+  // user wants to view a selected pet page from the history popup
+  else if(object == _historyPopup && event == UISelect)
+  {
+    const char* path = _historyPopup->GetSelectedFile();
+    unsigned long time = _historyPopup->GetSelectedTime();
+    if(path == NULL || time == 0)
+      return;
+    long selection = _historyPopup->GetSelection();
+    if(selection == 1) { // Show pet page
+      char treePath[1024];
+      strcpy(treePath, "/acop/");
+      strcat(treePath, path);
+      char* cptr = strstr(treePath, "/device_list");
+      if(cptr)
+        *cptr = 0;
+      else
+        return;  // not a pet page that can be loaded
+      treeTable->SelectNodePath(treePath);
+      treeTable->LoadTreeTable();
+      HandleEvent(treeTable, UISelect);  // simulate a select event
     }
-
+  }
   // user made a leaf selection from the machine tree table
   else if(object == treeTable)
   {
@@ -1274,6 +1295,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       else if(!strcmp(data->namesSelected[0], "Options"))
 	{	if(!strcmp(data->namesSelected[1], "Search..."))
 	  {	SO_Search();
+	  }
+	else if(!strcmp(data->namesSelected[1], "Pet Page History"))
+	  {	SO_Pet_Page_History();
 	  }
 	else if(!strcmp(data->namesSelected[1], "Read Archive Log"))
 	  {	SO_Read_Archive_Log();
@@ -2078,6 +2102,28 @@ void SSMainWindow::SO_Search()
     }
   // display the popup
   searchPopup->Show();
+}
+
+void SSMainWindow::SO_Pet_Page_History()
+{
+  if(_historyPopup == NULL) {
+    _historyPopup = new UIHistoryPopup(this, "historyPopup", NULL, "Show", "Close");
+    _historyPopup->SetTitle("Pet Page History");
+    _historyPopup->SetLabel("Pet pages loaded from any program between the displayed start and stop dates are shown.\n",
+                            "You can redisplay the table for different dates using the Reload Table button.");
+    _historyPopup->AddEventReceiver(this);
+    _historyPopup->SetAppFilter("pet");
+  }
+  int retval = _historyPopup->LoadTable();
+  _historyPopup->Show();
+  if(retval <= 0) {
+    UILabelPopup errPopup(this, "errPopup", NULL, "OK", NULL);
+    if(retval < 0)  // a DB error
+      errPopup.SetLabel("Could not get pet page history data from the database.");
+    else            // no data found for start/stop time
+      errPopup.SetLabel("No pet pages were found for the given\n start and stop times.");
+    errPopup.Wait();
+  }
 }
 
 void SSMainWindow::SO_Read_Archive_Log()
