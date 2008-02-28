@@ -10,6 +10,7 @@
 #include <agsPage/UISearchDeviceList.hxx>	// for UISearchDeviceList class
 #include <agsPage/genCldLib.hxx>		// for UICldObjectWindow class
 #include <UI/UIHelp.hxx>			// for UIHelpMenu class
+#include <petss/UIHistoryPopup.hxx>             // for UIHistoryPopup class
 
 enum PET_WINDOW_TYPE {PET_LD_WINDOW, PET_CLD_WINDOW, PET_ADO_WINDOW, PET_HYBRID_WINDOW, PET_UNKNOWN_WINDOW};
 
@@ -84,12 +85,12 @@ protected:
   UIBoolean			isIcon;
   UIViewerWindow*		viewer;
   UISearchDeviceList*		searchPopup;
-//   SSPageWindow*			searchPage;
   UIWindow*			searchPage;
   MenuTree*                     pulldownMenuTree;
   UILabelPopup*                 errFillExistWindowPopup;
   UICreateDeviceList*           editDeviceList;
-  bool _creatingPageInTree;
+  bool                          _creatingPageInTree;
+  UIHistoryPopup*               _historyPopup;
   
   // set the window position for a newly created window
   void SetWindowPos(UIWindow* newWin, UIWindow* currWin = NULL);
@@ -122,6 +123,7 @@ protected:
   void SP_Close();
   void SP_Close_All();
   void SO_Search();
+  void SO_Pet_Page_History();
   void SO_Read_Archive_Log();
   void SO_PpmUserMonitor();
   void SO_SLDs();
