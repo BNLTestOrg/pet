@@ -31,14 +31,14 @@ MenuTree* CreateMenuTree()
 	snode = menuTree->InsertMenuItem("----", "/File", NULL);
 	menuTree->SetNodeType(snode, MenuSeparatorType);
 
-	snode = menuTree->InsertMenuItem("Create Temp ADO Page...", "/File", NULL);
+	snode = menuTree->InsertMenuItem("Create Temp RHIC Page...", "/File", NULL);
 	menuTree->SetNodeHelpText(snode, "Create a page from selected parameters");
 
-	snode = menuTree->InsertMenuItem("Create Temp PS ADO Page...", "/File", NULL);
-	menuTree->SetNodeHelpText(snode, "Create an ADO page from a list of selected Power Supplies");
+	snode = menuTree->InsertMenuItem("Create Temp PS RHIC Page...", "/File", NULL);
+	menuTree->SetNodeHelpText(snode, "Create a RHIC page from a list of selected Power Supplies");
 
-	snode = menuTree->InsertMenuItem("Create Temp SLD/CLD Page...", "/File", NULL);
-	menuTree->SetNodeHelpText(snode, "Create an SLD/CLD page from selected devices");
+	snode = menuTree->InsertMenuItem("Create Temp AGS Page...", "/File", NULL);
+	menuTree->SetNodeHelpText(snode, "Create an AGS page from selected devices");
 
 	snode = menuTree->InsertMenuItem("----", "/File", NULL);
 	menuTree->SetNodeType(snode, MenuSeparatorType);
@@ -90,6 +90,9 @@ MenuTree* CreateMenuTree()
 	snode = menuTree->InsertMenuItem("Search...", "/Options", NULL);
 	menuTree->SetNodeHelpText(snode, "This option allows the user to search for a particular\ndevice.  A prompt will ask for a search string, which\ncould be a partial device name.  The result of the search\nwill then be displayed allowing the user to view the device\nin one or more device lists.");
 	menuTree->SetNodeMnemonic(snode, 'S');
+
+	snode = menuTree->InsertMenuItem("Pet Page History", "/Options", NULL);
+	menuTree->SetNodeHelpText(snode, "Brings up a new window allowing you to look at the history\nof when pet pages were loaded by this program or any\nother one.  Searches for particular pages are possible.");
 
 	snode = menuTree->InsertMenuItem("Read Archive Log", "/Options", NULL);
 	menuTree->SetNodeHelpText(snode, "Brings up a separate window allowing the user\nto view the log of archives that have been made\nwith the archiving system.");
