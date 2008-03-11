@@ -1075,6 +1075,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	strcat(s, ADO_DEVICE_LIST);
 	adoWin->LoadFile(s, tree->GenerateNodePathnameWithoutRoot( treeTable->GetNodeSelected() ),
                     get_ppm_user());
+        bool anError = false;
         if (adoWin->CreateOK())
           {
             if (type == PET_HYBRID_WINDOW && !adoWin->IsManaged() )
@@ -1097,13 +1098,13 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
                 SetStandardCursor();
                 SetMessage("Could Not Load Device List");
                 DeleteWindow(adoWin);
+                anError = true;
                 //                return;
               }
             else
               {
                 // we were loading a device page into an existing window
                 // restore to its original path
-                bool anError = false;
                 if( adoWindowPath != NULL)
                   {
                     DirTree* tree = (DirTree*)treeTable->GetTree();
@@ -1145,13 +1146,13 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
                     DisplayError("Problem restoring original device list.");
                     anError = true;
                   }
-                if (anError)
-                  {
-                    delete [] ldWindowPath;
-                    delete [] adoWindowPath;
-                    SetStandardCursor();
-                    return;
-                  }
+              }
+            if (anError)
+              {
+                delete [] ldWindowPath;
+                delete [] adoWindowPath;
+                SetStandardCursor();
+                return;
               }
           }
         delete [] ldWindowPath;
