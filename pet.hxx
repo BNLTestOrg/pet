@@ -1,16 +1,16 @@
-#include <UI/UIWindow.hxx>			// for UIMainWindow class
-#include <UI/UIMenu.hxx>			// for UIPulldownMenu class
+#include <UI/UIWindow.hxx>              // for UIMainWindow class
+#include <UI/UIMenu.hxx>                // for UIPulldownMenu class
 #include <UI/UICollection.hxx>			// for UIMessageArea class
-#include <UI/UIList.hxx>			// for UIEnumList class
-#include <UI/UIEditor.hxx>			// for UIEditorWindow class
-#include <UI/UIPopups.hxx>			// for UILabelPopup class
-#include <UIDevice/UICombineTree.hxx>           // for UICombineTree class
+#include <UI/UIList.hxx>                // for UIEnumList class
+#include <UI/UIEditor.hxx>              // for UIEditorWindow class
+#include <UI/UIPopups.hxx>              // for UILabelPopup class
+#include <UIDevice/UICombineTree.hxx>   // for UICombineTree class
 #include <UIAgs/UIAGSControls.hxx>		// for UIDeviceList and UIDevicesFromController classes
 #include <agsPage/AgsPage.hxx>			// for AgsPage and AgsPageWindow classes
 #include <agsPage/UISearchDeviceList.hxx>	// for UISearchDeviceList class
 #include <agsPage/genCldLib.hxx>		// for UICldObjectWindow class
-#include <UI/UIHelp.hxx>			// for UIHelpMenu class
-#include <petss/UIHistoryPopup.hxx>             // for UIHistoryPopup class
+#include <UI/UIHelp.hxx>                // for UIHelpMenu class
+#include <UIUtils/UIHistoryPopup.hxx>   // for UIHistoryPopup class
 
 enum PET_WINDOW_TYPE {PET_LD_WINDOW, PET_CLD_WINDOW, PET_ADO_WINDOW, PET_HYBRID_WINDOW, PET_UNKNOWN_WINDOW};
 
