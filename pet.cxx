@@ -1205,6 +1205,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       AddWindow(ldWin);
       if (supportKnobPanel)
 	ldWin->SupportKnobPanel(knobPanel);
+      // determine whether or not we should enable the delay channel editor
+      ldWin->EnableDelayChannelMenu();
       ldWin->Show();
       ldWin->UpdateContinuous();
       LoadPageList(ldWin);
