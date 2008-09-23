@@ -116,6 +116,8 @@ protected:
   void SS_Create_PS_RHIC_Page();
   void SS_Create_AGS_Page();
   void SS_Quit();
+  // return 0 if cancel, 1 if quit, 2 if quit with dialog
+  int ConfirmQuit();
   void SP_Find();
   void SP_New();
   void SP_Show();
@@ -130,6 +132,7 @@ protected:
   void SO_CLDs();
   void SO_CLD_Events();
   void SO_Load_DDF();
+  void SO_Flash_Pages(bool flash = true);
   void Exit();
 
   // helper routines
@@ -186,10 +189,14 @@ public:
   // pulldown menu
   void SetSingleDeviceListMode();
 
+  // flash the ppm menu when quitting pet program
+  void Flash(bool flash);
+
 protected:
   char*		listString;	// string to display in device page list
   const StdNode*	pageNode;	// the node in the machine tree
   char*		devListPath;	// the path to the current device list
+  long  flashTimerId;
 
   void CreateWidgets(AGS_PAGE_MODE mode);
 
