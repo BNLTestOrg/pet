@@ -42,6 +42,7 @@ static PetWindow*       activeAdoWin = NULL;
 static PetWindow*       singlePetWin = NULL;
 static PetEventReceiver petEventReceiver;
 static unsigned long    dumpElogAndExitTimerId = 0;
+static unsigned long    flashTimerId = 0;
 static const char* wname;
 
 static void clean_up(int st)
@@ -1207,6 +1208,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	ldWin->SupportKnobPanel(knobPanel);
       // determine whether or not we should enable the delay channel editor
       ldWin->EnableDelayChannelMenu();
+      ldWin->EnablePPMBufferMenu();
       ldWin->Show();
       ldWin->UpdateContinuous();
       LoadPageList(ldWin);
@@ -1320,6 +1322,12 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
         else if(!strcmp(data->namesSelected[1], "Reload DDF..."))
           {     SO_Load_DDF();
           }
+        else if(!strcmp(data->namesSelected[1], "Flash Pages"))
+          {
+            SO_Flash_Pages();
+            // start the timer to flash the windows for four seconds
+            flashTimerId = application->EnableTimerEvent(4000);
+          }
 	}
     }
   else if (event == UIMessage)
@@ -1341,6 +1349,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
           exit(0);
         } else
           SetMessage("Unable to find window for elog dump");
+      } else if (application->GetTimerId() == flashTimerId) {
+        SO_Flash_Pages(false);
+        flashTimerId = 0;
       }
     }
   // otherwise, pass event to base class
@@ -1841,12 +1852,12 @@ void SSMainWindow::SS_New()
 				adoWinToEdit->EditBuiltInEditor();
 			}
 		} else {
-			if (editDeviceList->IsNewType()) {
-	  			SSPageWindow* pageWin = new SSPageWindow(this, "pageWindow");
-	  			pageWin->EditBuiltInEditor(editDeviceList->GetPath());
-	  			// do the following to prepare for when the editing of the new file is complete
- 	  			AddListWindow(pageWin);
-  				MachineTree* machTree = treeTable->GetMachineTree();
+                  if (editDeviceList->IsNewType()) {
+                    SSPageWindow* pageWin = new SSPageWindow(this, "pageWindow");
+                    pageWin->EditBuiltInEditor(editDeviceList->GetPath());
+                    // do the following to prepare for when the editing of the new file is complete
+                    AddListWindow(pageWin);
+                    MachineTree* machTree = treeTable->GetMachineTree();
      	    	const char* rootPath = machTree->GetRootPath();
      	    	const StdNode* rootNode = machTree->GetRootNode();
      	    	const char* rootName = rootNode->Name();
@@ -1968,7 +1979,6 @@ void SSMainWindow::SS_Create_AGS_Page()
   SetWorkingCursor();
   SSPageWindow* pageWin = new SSPageWindow(this, "pageWindow");
   char name[64];
-  pageWin->AddEventReceiver(this);
   activeLdWin = pageWin;
   pageWin->CreateAgsPage(name);
   pageWin->SetListString(name);
@@ -1981,20 +1991,68 @@ void SSMainWindow::SS_Create_AGS_Page()
   SetStandardCursor();
 }
 
+// only confirm the quit if the user is MCR and if Multiple Instances are running 
+// and at least one page is displayed
+int SSMainWindow::ConfirmQuit()
+{
+  // check number of pet windows
+  if (GetNumWindows() == 0)
+    return 2; // quit with dialog
+
+  // check user name
+   char* loginName = getenv("LOGNAME");
+   if (strcmp(loginName, "mcr"))
+     return 2; // quit with dialog
+
+  // check the number of pet processes running
+   int nprocesses = 0;
+   char line[1024];
+   FILE* fp = popen("ps -ef | grep pet | grep -v grep", "r");
+   if (fp != NULL) {
+     while (fgets(line, 1024, fp) != NULL)
+       nprocesses++;
+     pclose(fp);
+   }
+
+   if (nprocesses == 1)
+     return 2; // quit with dialog
+
+  SO_Flash_Pages();
+
+  UILabelPopup popup(this, "confirmPopup", NULL, "Yes", "No");
+  popup.SetLabel("Exit ", application->Name(), "?\n\nAll flashing pet pages will be closed.");
+  if (popup.Wait() == 1)
+    // yes
+    return 1; // quit without dialog
+
+  SO_Flash_Pages(false);
+  return 0; // cancel quit
+}
+
 void SSMainWindow::SS_Quit()
 {
+//   if (ConfirmQuit() == false)
+//     return;
+
   clean_up(0);
 }
 
 void SSMainWindow::Exit()
 {
-  // first put up an exit confirmation
-  UILabelPopup popup(this, "exitPopup", NULL, "Yes", "No");
-  popup.SetLabel("Exit ", application->Name(), "? Are you sure?");
-  if(popup.Wait() == 1)	// Yes selected
-    {
-      clean_up(0);
-    }
+  int retval = ConfirmQuit();
+  if (retval == 0)
+    return;
+  else if (retval == 1)
+    clean_up(0);
+  else if (retval == 2) {
+    // first put up an exit confirmation
+    UILabelPopup popup(this, "exitPopup", NULL, "Yes", "No");
+    popup.SetLabel("Exit ", application->Name(), "? Are you sure?");
+    if(popup.Wait() == 1)	// Yes selected
+      {
+        clean_up(0);
+      }
+  }
 }
 
 void SSMainWindow::SP_Find()
@@ -2300,6 +2358,32 @@ void SSMainWindow::SO_Load_DDF()
   SetMessage(msg);
 }
 
+void SSMainWindow::SO_Flash_Pages(bool flash)
+{
+  SSPageWindow* ldWin;
+  PetWindow* adoWin;
+  UIWindow* win;
+
+  int numWins = GetNumWindows();
+  for (int i=1; i<=numWins; i++){
+    win = GetWindow(i);
+    ldWin = NULL;
+    adoWin = NULL;
+    if (WindowType(win) == PET_LD_WINDOW || WindowType(win) == PET_CLD_WINDOW)
+      ldWin = (SSPageWindow*) win;
+    else
+      adoWin = (PetWindow*) win;
+    
+    if (adoWin) {
+      adoWin->Show();
+      adoWin->Flash(flash);
+    } else {
+      ldWin->Show();
+      ldWin->Flash(flash);
+    }
+  }
+}
+
 void SSMainWindow::ShowCldEditor(const char* devname, int ppmuser)
 {
   // create a new SSCldWindow
@@ -2469,6 +2553,7 @@ void SSPageWindow::Initialize()
   listString = NULL;
   devListPath = NULL;
   pageNode = NULL;
+  flashTimerId = 0L;
 
   // setup this window to receive events from the main window for icon events
   parent->AddEventReceiver(this);
@@ -2681,7 +2766,25 @@ void SSPageWindow::HandleEvent(const UIObject* object, UIEvent event)
       else
 	AgsPageWindow::HandleEvent(object, event);
     }
-
+  else if(object == application && event == UITimer)
+    {
+      if (application->GetTimerId() == flashTimerId) {
+        if (page->MaxPPMUsers()>1) {
+          if (menubar->GetBackgroundColor() == ppmMenu->GetPPMColor())
+            menubar->SetBackgroundColor(ppmMenu->GetPPMFgColor());
+          else
+            ppmMenu->SetPPMUser(page->GetPPMUser());
+        } else {
+          if (menubar->GetBackgroundColor() == menubar->ConvertColor("white"))
+            ppmMenu->SetPPMUser(0);
+          else
+            menubar->SetBackgroundColor("white");
+        }
+        
+        // restart the timer
+        flashTimerId = application->EnableTimerEvent(500);
+      }
+    }
   // let base class handle it
   else
     AgsPageWindow::HandleEvent(object, event);
@@ -2837,6 +2940,28 @@ void SSPageWindow::SetSingleDeviceListMode()
 	    }
 	}
     }
+}
+
+void SSPageWindow::Flash(bool flash)
+{
+  if (flash) {
+    // start a timer to flash the ppm menu
+    if (flashTimerId > 0L)
+      // already one running
+      return;
+    // make sure we are setup to receive events
+    application->AddEventReceiver(this);
+
+    flashTimerId = application->EnableTimerEvent(500);
+  } else {
+    // cancel the timer and set the ppm menu back to normal
+    application->DisableTimerEvent(flashTimerId);
+    flashTimerId = 0L;
+    if (page->MaxPPMUsers()>1)
+      ppmMenu->SetPPMUser(page->GetPPMUser());
+    else
+      ppmMenu->SetPPMUser(0);    
+  }
 }
 
 /////////////////// SSCldWindow Class ////////////////////////////////////
