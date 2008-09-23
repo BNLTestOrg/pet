@@ -120,5 +120,10 @@ MenuTree* CreateMenuTree()
 
 	snode = menuTree->InsertMenuItem("Reload DDF...", "/Options", NULL);
 
+	snode = menuTree->InsertMenuItem("----", "/Options", NULL);
+	menuTree->SetNodeType(snode, MenuSeparatorType);
+
+        snode = menuTree->InsertMenuItem("Flash Pages", "/Options", NULL);
+
 	return menuTree;
 }
