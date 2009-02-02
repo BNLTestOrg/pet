@@ -42,7 +42,6 @@ static PetWindow*       activeAdoWin = NULL;
 static PetWindow*       singlePetWin = NULL;
 static PetEventReceiver petEventReceiver;
 static unsigned long    dumpElogAndExitTimerId = 0;
-static unsigned long    flashTimerId = 0;
 static const char* wname;
 
 static void clean_up(int st)
@@ -416,6 +415,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   editDeviceList = NULL;
   _creatingPageInTree = false;
   _historyPopup = NULL;
+  _totalFlashTimerId = 0L;
   
   // resources
   static const char* defaults[] = {
@@ -1324,9 +1324,13 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
           }
         else if(!strcmp(data->namesSelected[1], "Flash Pages"))
           {
-            SO_Flash_Pages();
+            if (_totalFlashTimerId > 0L)
+              {
+                application->DisableTimerEvent(_totalFlashTimerId);
+              }
             // start the timer to flash the windows for four seconds
-            flashTimerId = application->EnableTimerEvent(4000);
+            _totalFlashTimerId = application->EnableTimerEvent(4000);
+            SO_Flash_Pages();
           }
 	}
     }
@@ -1349,9 +1353,11 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
           exit(0);
         } else
           SetMessage("Unable to find window for elog dump");
-      } else if (application->GetTimerId() == flashTimerId) {
+      }
+      else if (application->GetTimerId() == _totalFlashTimerId) {
+        // stop the flashing of the pages
         SO_Flash_Pages(false);
-        flashTimerId = 0;
+        _totalFlashTimerId = 0L;
       }
     }
   // otherwise, pass event to base class
@@ -2026,6 +2032,13 @@ int SSMainWindow::ConfirmQuit()
     return 1; // quit without dialog
 
   SO_Flash_Pages(false);
+
+  if (_totalFlashTimerId > 0L && application != NULL)
+    {
+      application->DisableTimerEvent(_totalFlashTimerId);
+      _totalFlashTimerId = 0L;
+    }
+
   return 0; // cancel quit
 }
 
@@ -2360,26 +2373,45 @@ void SSMainWindow::SO_Load_DDF()
 
 void SSMainWindow::SO_Flash_Pages(bool flash)
 {
-  SSPageWindow* ldWin;
-  PetWindow* adoWin;
-  UIWindow* win;
+  SSPageWindow* ldWin = NULL;
+  SSCldWindow* cldWin = NULL;
+  PetWindow* adoWin = NULL;
+  UIWindow* win = NULL;
 
   int numWins = GetNumWindows();
   for (int i=1; i<=numWins; i++){
     win = GetWindow(i);
     ldWin = NULL;
     adoWin = NULL;
-    if (WindowType(win) == PET_LD_WINDOW || WindowType(win) == PET_CLD_WINDOW)
-      ldWin = (SSPageWindow*) win;
-    else
-      adoWin = (PetWindow*) win;
+    cldWin = NULL;
+    if (win != NULL)
+      {
+        switch (WindowType(win))
+          {
+          case PET_LD_WINDOW:
+            ldWin = (SSPageWindow*) win;
+            break;
+          case PET_CLD_WINDOW:
+            cldWin = (SSCldWindow*) win;
+            break;
+          case PET_ADO_WINDOW:
+            adoWin = (PetWindow*) win;
+            break;
+          default:
+            // do nothing - flash not supported
+            break;
+          }
+      }
     
     if (adoWin) {
       adoWin->Show();
       adoWin->Flash(flash);
-    } else {
+    } else if (ldWin) {
       ldWin->Show();
       ldWin->Flash(flash);
+    } else {
+      cldWin->Show();
+      cldWin->Flash(flash);
     }
   }
 }
@@ -2546,6 +2578,12 @@ SSPageWindow::~SSPageWindow()
   if(devListPath != NULL)
     free(devListPath);
   parent->RemoveEventReceiver(this);
+  if (application)
+    {
+      application->RemoveEventReceiver(this);
+      if (flashTimerId > 0L)
+        application->DisableTimerEvent(flashTimerId);
+    }
 }
 
 void SSPageWindow::Initialize()
@@ -2947,20 +2985,24 @@ void SSPageWindow::Flash(bool flash)
   if (flash) {
     // start a timer to flash the ppm menu
     if (flashTimerId > 0L)
-      // already one running
-      return;
+      {
+        // already one running
+        return;
+      }
     // make sure we are setup to receive events
     application->AddEventReceiver(this);
-
     flashTimerId = application->EnableTimerEvent(500);
   } else {
     // cancel the timer and set the ppm menu back to normal
-    application->DisableTimerEvent(flashTimerId);
+    if (flashTimerId > 0L)
+      {
+        application->DisableTimerEvent(flashTimerId);
+      }
     flashTimerId = 0L;
     if (page->MaxPPMUsers()>1)
       ppmMenu->SetPPMUser(page->GetPPMUser());
     else
-      ppmMenu->SetPPMUser(0);    
+      ppmMenu->SetPPMUser(0);
   }
 }
 
@@ -2980,11 +3022,18 @@ SSCldWindow::~SSCldWindow()
   if(listString != NULL)
     delete [] listString;
   parent->RemoveEventReceiver(this);
+  if (application)
+    {
+      application->RemoveEventReceiver(this);
+      if (flashTimerId > 0L)
+        application->DisableTimerEvent(flashTimerId);
+    }
 }
 
 void SSCldWindow::Initialize()
 {
   listString = NULL;
+  flashTimerId = 0L;
 
   // setup this window to receive events from the main window for icon events
   parent->AddEventReceiver(this);
@@ -3029,6 +3078,25 @@ void SSCldWindow::HandleEvent(const UIObject* object, UIEvent event)
     StopContinuousUpdate();
   else if(object == window && event == UIMap)		// now out of an icon state
     StartContinuousUpdate();
+  else if (object == application && event == UITimer)
+    {
+      if (application->GetTimerId() == flashTimerId) {
+        if (MaxPPMUsers()>1) {
+          if (menubar->GetBackgroundColor() == ppmMenu->GetPPMColor())
+            menubar->SetBackgroundColor(ppmMenu->GetPPMFgColor());
+          else
+            ppmMenu->SetPPMUser(GetCldPPM());
+        } else {
+          if (menubar->GetBackgroundColor() == menubar->ConvertColor("white"))
+            ppmMenu->SetPPMUser(0);
+          else
+            menubar->SetBackgroundColor("white");
+        }
+        
+        // restart the timer
+        flashTimerId = application->EnableTimerEvent(500);
+      }
+    }
   else
     UICldObjectWindow::HandleEvent(object, event);
 }
@@ -3059,6 +3127,32 @@ void SSCldWindow::SetSingleDeviceListMode()
     }
 }
 
+void SSCldWindow::Flash(bool flash)
+{
+  if (flash) {
+    // start a timer to flash the ppm menu
+    if (flashTimerId > 0L)
+      {
+        // already one running
+        return;
+      }
+    // make sure we are setup to receive events
+    application->AddEventReceiver(this);
+    flashTimerId = application->EnableTimerEvent(500);
+  } else {
+    // cancel the timer and set the ppm menu back to normal
+    if (flashTimerId > 0L)
+      {
+        application->DisableTimerEvent(flashTimerId);
+      }
+    flashTimerId = 0L;
+    if (MaxPPMUsers()>1)
+      ppmMenu->SetPPMUser(GetCldPPM());
+    else
+      ppmMenu->SetPPMUser(0);
+  }
+}
+
 /////// C++ Helper Routines ////////////////////
 const char* GetLeafName(const char* deviceListPath)
 {
@@ -3076,6 +3170,3 @@ const char* GetLeafName(const char* deviceListPath)
   else
     return deviceListPath;
 }
-
-
-
