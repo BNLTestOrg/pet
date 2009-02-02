@@ -91,6 +91,7 @@ protected:
   UICreateDeviceList*           editDeviceList;
   bool                          _creatingPageInTree;
   UIHistoryPopup*               _historyPopup;
+  unsigned long                 _totalFlashTimerId; // to timeout flashing after 4 seconds.
   
   // set the window position for a newly created window
   void SetWindowPos(UIWindow* newWin, UIWindow* currWin = NULL);
@@ -189,14 +190,14 @@ public:
   // pulldown menu
   void SetSingleDeviceListMode();
 
-  // flash the ppm menu when quitting pet program
+  // flash the ppm menu when quitting pet program or at user request
   void Flash(bool flash);
 
 protected:
   char*		listString;	// string to display in device page list
   const StdNode*	pageNode;	// the node in the machine tree
   char*		devListPath;	// the path to the current device list
-  long  flashTimerId;
+  unsigned long flashTimerId;   // to continuously flash every 500 msec.
 
   void CreateWidgets(AGS_PAGE_MODE mode);
 
@@ -238,8 +239,12 @@ public:
   // pulldown menu
   void SetSingleDeviceListMode();
 
+  // flash the ppm menu when quitting pet program or at user request
+  void Flash(bool flash);
+
 protected:
   char*		listString;	// string to display in device page list
+  unsigned long flashTimerId;   // to continuously flash every 500 msec.
 
   void CreateWidgets(UIBoolean dialogWin);
 private:
