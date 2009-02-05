@@ -22,6 +22,7 @@
 #include <agsPage/KnobPanel.hxx>		// for supporting a knob panel
 #include <UIUtils/UIPPM.hxx>
 #include <cdevCns/cdevCns.hxx>
+#include <cns/cnsRequest.hxx>                   // to tutn on cache flushing
 #include <setHist/SetStorage.hxx>               // to turn on storage of ADO/LD sets
 #include "MenuTree.cxx"
 
@@ -93,6 +94,9 @@ int main(int argc, char *argv[])
 
   // set up the CNS as the source for names
   cdevCnsInit();
+
+  // refresh cns cache regularly
+  CnsRequest::cacheTimeLimitSet();
 
   cdevSystem& defSystem = cdevSystem::defaultSystem();
   defSystem.autoErrorOff();
