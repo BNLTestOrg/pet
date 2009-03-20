@@ -80,6 +80,7 @@ int main(int argc, char *argv[])
   argList.AddString("-elog");           // when used with -printToElog, the name of the elog, else the default
   argList.AddString("-printTogif");     // used with -single or -file to print pet page to a gif file after data acquisition, then exit
   argList.AddNumber("-ppm");            // start pet with the specified user
+  argList.AddString("-showDevice");     // makes the specified name visible when page is opened
 
   // initialize the application
   application  = new UIApplication(argc, argv, &argList);
@@ -263,6 +264,12 @@ int main(int argc, char *argv[])
 	
 
 
+        if (argList.IsPresent("-showDevice")) {
+          if (type == PET_LD_WINDOW)
+            activeLdWin->ShowDeviceSubstring(argList.String("-showDevice"));
+          else
+            singlePetWin->ShowSubString(argList.String("-showDevice"));
+        }
         singlePetWin->Show();
         break;
       }
@@ -2549,6 +2556,10 @@ void SSMainWindow::ShowSingleDeviceList(const char* deviceListPath)
 
   pageWin->SetListString();
   pageWin->SetSingleDeviceListMode();
+
+  if (argList.IsPresent("-showDevice")) {
+    pageWin->ShowDeviceSubstring(argList.String("-showDevice"));
+  }
 
   // make sure the window is visible
   pageWin->Show();
