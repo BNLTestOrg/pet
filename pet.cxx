@@ -52,13 +52,6 @@ static void clean_up(int st)
   exit(st);
 }
 
-// poll the CDEV services to catch any async data from CDEV servers
-static void CDEV_poll(void*, unsigned long*)
-{
-  cdevSystem::defaultSystem().poll();
-  GlobalAsyncHandler()->RegisterTimer(100, CDEV_poll, NULL);
-}
-
 // prevent cdev errors from being printed to std out
 void errorHandler(int severity, char* text, cdevRequestObject* obj)
 {
@@ -111,10 +104,6 @@ int main(int argc, char *argv[])
 
   if (argList.IsPresent("-ppm"))
     set_ppm_user(argList.Value("-ppm"));
-
-  // 10Hz timer event for polling cdev - needed to handle asyncs from CDEV servers
-  // this is commented out for now until Gpm starts getting built with shared object libraries
-  GlobalAsyncHandler()->RegisterTimer(100, CDEV_poll, NULL);
 
   // create the mainWindow
   if (mainWindow == NULL) {
