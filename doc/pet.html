@@ -36,7 +36,7 @@ Parameters in the C-AD Controls System.<br>
     </tr>
     <tr>
       <th align="left">Last Modified&nbsp;</th>
-      <td align="center">11/15/06&nbsp;</td>
+      <td align="center">09/22/09&nbsp;</td>
       <td>Seth Nemesure&nbsp;</td>
       <td><a href="mailto:seth@bnl.gov">seth@bnl.gov</a></td>
     </tr>
@@ -52,7 +52,8 @@ Parameters in the C-AD Controls System.<br>
   <ul>
     <li> <a href="#GettingHelp">Getting Help</a></li>
     <li> <a href="#SelectingADeviceList">Selecting a Device List</a></li>
-    <li> <a href="#UsingMultipleDevicePages">Using Multiple Device Pages</a></li>
+    <li> <a href="#UsingMultipleDevicePages">Using Multiple Device
+Pages</a></li>
     <li> <a href="#SettingAPpmUser">Setting a PPM User</a></li>
   </ul>
   <li> <a href="#TheDevicePageWindow">The Device Page Window</a></li>
@@ -85,6 +86,7 @@ Parameters in the C-AD Controls System.<br>
       <li><a href="#LoadAnArchiveIntoTheBuffer">Load an Archive into
 the Buffer</a></li>
       <li><a href="#SendTheBuffer">Send the Buffer</a></li>
+      <li><a href="#GlobalSend">Global Send Operation</a></li>
       <li><a href="#petFile">Pet File Format for ADOs</a><br>
       </li>
       <ul>
@@ -168,7 +170,8 @@ Parameters. Groups of devices have been pre-packaged into Device Lists,
 which can be selected from a tree of device lists called the Machine
 Tree. Once a device list is selected, the devices within it and their
 associated control points can be viewed and edited.&nbsp; These lists
-(along with the layout of the screen for ADO style pages) are defined in
+(along with the layout of the screen for ADO style pages) are defined
+in
 a pet file that usually has a .pet as the file extension.&nbsp; See <a
  href="#petFile">ADO pet File</a> for a description of the syntax for
 creating ADO style pages.&nbsp; SLD/CLD style pages are more structured
@@ -178,7 +181,8 @@ line).<br>
 the summer of 2003 pet served purely RHIC style devices (ado's).&nbsp;
 There existed a separate program (SpreadSheet) that was responsible for
 AGS devices in the control system.&nbsp; SpreadSheet began as a
-character-based program on VAX systems in the early 80's.&nbsp; It moved
+character-based program on VAX systems in the early 80's.&nbsp; It
+moved
 to Apollo workstations in the late 80's and was improved many times
 through the early 90's. In 1995, the program was converted to run under
 a more generic UNIX environment using X Windows. In 1997, the program
@@ -199,7 +203,8 @@ fly using the standard PS selection tools</li>
   <li> added a Save As option to pet page File menu that allows one to
 save a newly created pet page as a pet file or to change the name of an
 existing file</li>
-  <li> enhanced the default placement on the screen of newly created pet
+  <li> enhanced the default placement on the screen of newly created
+pet
 windows</li>
 </ul>
 <b>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; April 24, 2000 (Bartosz Frak)</b>
@@ -212,7 +217,8 @@ time.</li>
 vs. one of the parameters on the X Axis.</li>
     <li> Snapshot Chart - plots time instances of the selected
 parameters vs. the time.</li>
-    <li> Array Plot - plots indexed array values against other arrays or
+    <li> Array Plot - plots indexed array values against other arrays
+or
 vs. its index. (That is the original graph from the Pet)</li>
   </ul>
 2. Merged changes implemented to support better async handling. Pet
@@ -241,7 +247,7 @@ popup model.</li>
   <li> reworked the ADO description popup to allow a user to view and
 edit an ADO description</li>
   <p><b>June 8, 1999</b> </p>
-  <p>Release of May 7 commissioning version.  Graphics options now
+  <p>Release of May 7 commissioning version. Graphics options now
 available in released version of SpreadSheet. </p>
   <p><b>May 7, 1999</b> </p>
   <p>New version in commissioning corrects a bug in communications
@@ -253,12 +259,13 @@ Options</a> section of this document ), this version also includes some
 software library changes that will be used in the future to support
 'read only mode' and extensions to communications protocols. </p>
   <p><b>February 25, 1999</b> </p>
-  <p>Release of January 8 version.  This new release should not affect
+  <p>Release of January 8 version. This new release should not affect
 most users. You still need to run the commissioning version to get
 graphics options. </p>
   <p><b>February 17, 1999</b> </p>
-  <p>New commissioning version with graphics support.   Read the <a
- href="#GraphicsOptions">Graphics Options</a> section of this document. </p>
+  <p>New commissioning version with graphics support. Read the <a
+ href="#GraphicsOptions">Graphics Options</a> section of this document.
+  </p>
   <p><b>January 8, 1999</b> </p>
   <p>New commissioning version with improvements in Tandem knob panel
 support. </p>
@@ -316,7 +323,8 @@ Parameter errors when modifying setpoints
     <dl>
       <dl>
 The user will now have a message displayed that the value was possibly
-out of range and the old setpoint value restored if a value is sent down
+out of range and the old setpoint value restored if a value is sent
+down
 that causes a problem with the parametric device. Note that this can
 only be accomplished if the SpreadSheet sld (.CTL) of the parametric
 device is on, causing the function to be sent down immediately on a
@@ -335,7 +343,8 @@ Printing a cld window
     <dl>
       <dl>
 The user can now print out the visible portion or the entire table of a
-cld window. The user can select from the device list portion (top table)
+cld window. The user can select from the device list portion (top
+table)
 or the cld table (bottom table). If the cld table is printed, the cld
 name and path (if available) will be displayed on the printout.
       </dl>
@@ -383,7 +392,8 @@ The application now makes use of the cns (Controls Name Server) when
 loading device lists and cld windows. If the cns is not running, the
 application will continually attempt to reconnect to the cns when
 loading device lists and cld windows. If the application appears to be
-slower than usual when loading device lists, the state of the cns should
+slower than usual when loading device lists, the state of the cns
+should
 be confirmed via StartUp. If the cns is not running, it should be
 restarted.
       </dl>
@@ -409,16 +419,20 @@ on device pages will be stored in the buffer in a manner similar to
 slds. The buffer contents will be filled in for clds as well as slds.
 The string '***' is used to indicate that setpoints are held in the
 buffer for clds. In order to view the setpoints of the cld buffer,
-simply press the 3rd mouse button (right button). Pressing the 2nd mouse
+simply press the 3rd mouse button (right button). Pressing the 2nd
+mouse
 button (middle button) will send the cld buffer. </p>
     <p>Results of loading the buffer and sending the buffer are now
 maintained and may be viewed. A simple first pass before sending the
-buffer to ensure devices have data will be made. Any device with missing
-data will cause a warning to be displayed, prior to the send (if doing a
+buffer to ensure devices have data will be made. Any device with
+missing
+data will cause a warning to be displayed, prior to the send (if doing
+a
 global send buffer). </p>
     <p>The following logic inconsistencies were corrected: </p>
     <p>Many inconsistencies on loading the buffer were corrected.
-Buffers are now filled in properly and locked when switching PPM users. </p>
+Buffers are now filled in properly and locked when switching PPM users.
+    </p>
     <p>The following bug fixes were made: </p>
     <p>When loading an archive into a device list, if an sld appeared
 multiple times, only the first occurrence would have a value filled in
@@ -430,7 +444,8 @@ be compared incorrectly (the values would be equivalent, but colored
 yellow). The buffer will now be equivalent (with no yellow color
 displayed). </p>
     <p>When loading the buffer from an archive, a loadArchiveWindow is
-displayed. If the window was displayed when the page window (device list
+displayed. If the window was displayed when the page window (device
+list
 window) was closed, the application would crash. This problem has now
 been corrected.</p>
   </blockquote>
@@ -445,13 +460,15 @@ to crash. </p>
 changed. This was an oversight of the AgsPage (device list stand-alone
 and top of a CldWindow). The command can now be sent if and only if a
 report was received that contains setpoints for the cld. Please note:
-the cld buffer is ignored at the present time. The buffer specifications
+the cld buffer is ignored at the present time. The buffer
+specifications
 for a cld are being investigated. </p>
     <p>An error on loading a device list in a new window would cause a
 blank space to be placed in the window list (bottom of main SpreadSheet
 window). Selecting the blank space would cause a device list window to
 be displayed with no devices. On an error creating the new window (e.g.
-no devices in list), the window will no longer be created, and the blank
+no devices in list), the window will no longer be created, and the
+blank
 space will not appear in the list. </p>
     <p>A crash was caused during the sending of an sld command. This
 was caused by improper message handling by the AgsPage table. The table
@@ -467,12 +484,15 @@ bugs:
 to crash occasionally, after a device page was reloaded. This was a
 problem in the table and has been corrected. </p>
     <p>The table used to select device lists would scroll and display a
-blank screen on rare instances. This was due to a problem with the table
+blank screen on rare instances. This was due to a problem with the
+table
 resizing. This was noticed mostly at Tandem and has been fixed. </p>
     <p>The parameters would not fill in with data that should have been
-obtained from the database. The phenomenon occurred on the first attempt
+obtained from the database. The phenomenon occurred on the first
+attempt
 to get data only. This only occurred if the database had not yet been
-accessed by other methods in the application (e.g. parameters would fill
+accessed by other methods in the application (e.g. parameters would
+fill
 in immediately if a device description were first requested). A problem
 in the database communication tools was corrected to address this.</p>
   </blockquote>
@@ -480,7 +500,8 @@ in the database communication tools was corrected to address this.</p>
   <blockquote>New version released. This version corrects the loading
 of cld archives, caused by improper archive formats that were saved. A
 problem loading archives from the default database (caused by improper
-default connection) was corrected. Archive headers are now obtained from
+default connection) was corrected. Archive headers are now obtained
+from
 the Sybase database, and no longer from the Archive database server
 (this was an oversight that was caught and corrected quickly).
     <p>An enhancement was also made that now centers any cld window
@@ -494,9 +515,11 @@ cld device archive information is not contained within the archive.</p>
   <b>September 17, 1997</b>
   <blockquote>New version released. This version provides new archive
 support for CLDs. The archive headers are obtained from a SYBASE
-database. Archives that are selected from the database are now stored by
+database. Archives that are selected from the database are now stored
+by
 run. The user can select the desired run (HIP/HEP YR) from which the
-archives are desired. CLD nudge values are now stored in the database as
+archives are desired. CLD nudge values are now stored in the database
+as
 well.</blockquote>
   <b>March 31, 1997</b>
   <blockquote>New version in program commissioning. This version
@@ -607,7 +630,8 @@ window<br>
   <h2> <a name="SECTION1"></a>The Main Window</h2>
 pet has a main window which is used to set or retrieve information that
 is global to the program. It is also used to spawn child (device page)
-windows which contain devices from a selected device list. There is only
+windows which contain devices from a selected device list. There is
+only
 one main window, but there can be many device pages.
   <p><img src="MainWindow.gif" align="right"> The main window has four
 areas. From top to bottom these are: </p>
@@ -644,12 +668,14 @@ machine tree. Initially, the top level of the machine tree (Ags,
 Booster, etc.) is displayed. Clicking on one of the items causes that
 section to expand one level.
   <p>The column of arrows on the left indicates the expansion states of
-the associated sections of the tree. If an item has a left-facing arrow,
+the associated sections of the tree. If an item has a left-facing
+arrow,
 it means that this section has a sublevel that is not currently being
 viewed. If there is a down-facing arrow, the sublevel is being
 displayed. If no arrow exists, then there is no sublevel for that item.
 That is, this node is a leaf node. Clicking on an arrow causes that
-section to expand or contract depending on whether the arrow is pointing
+section to expand or contract depending on whether the arrow is
+pointing
 left or down. </p>
   <p>Leaf nodes are the ones that contain displayable lists of devices.
 The purpose of the machine tree selector is to allow you the capability
@@ -672,8 +698,10 @@ the machine tree has been modified so that each possible choice has a
 unique first uppercase character. Selecting this letter on the keyboard
 will select that entry. </p>
   <p>For example, at the top level of the machine tree we see Ags,
-Booster, Controllers, Linac, Other, SEB, and Tandem. The first uppercase
-character in each of these items (A B C L O S T) is unique. Pressing one
+Booster, Controllers, Linac, Other, SEB, and Tandem. The first
+uppercase
+character in each of these items (A B C L O S T) is unique. Pressing
+one
 of these characters will select the associated item in the selector.
 Pressing L, for example, is like clicking on Linac. The Linac section
 then expands showing its set of possibilities (Instrumentation,
@@ -683,18 +711,21 @@ through the tree. So, for example, pressing LIT from the top level of
 the machine tree is like selecting Linac -&gt; Instrumentation -&gt;
 beam_Transformers. </p>
   <p>Note that you must hit the RETURN key to replace the current
-device page. Hitting the F1 key, instead, causes a new device page to be
+device page. Hitting the F1 key, instead, causes a new device page to
+be
 created. </p>
   <p>Some other items of note about selecting device lists: </p>
   <ul>
     <li> You can go from one part of the machine tree to any other
 visible part of the tree by clicking on the section you are interested
 in.</li>
-    <li> In a few, seldom-used cases, there is no uppercase character to
+    <li> In a few, seldom-used cases, there is no uppercase character
+to
 select. In these cases, you can use the up or down arrows on the
 keyboard to get to the item of interest.</li>
     <li> Choosing the Find menu option from the Page menu causes the
-machine tree to revert back to its initial state with just the top-level
+machine tree to revert back to its initial state with just the
+top-level
 items showing. A keyboard accelerator (Ctrl + F), can also be used for
 this purpose.</li>
   </ul>
@@ -715,7 +746,8 @@ pages to be closed after a confirmation. Closing a device page using
 either of the Close menu items on the device page will also cause it to
 be deleted from the Device Pages list. </p>
   <p>Choosing Hide from the Page menu takes the device page off the
-screen, but keeps its image in memory. It can be shown again by clicking
+screen, but keeps its image in memory. It can be shown again by
+clicking
 on the name in the device page list. </p>
   <p>The device pages are initially displayed next to the main window
 either on the top or bottom of the screen depending on the location of
@@ -724,17 +756,21 @@ window and can be moved or resized as desired. </p>
   <p>A device page window cannot be iconified independently. It can,
 however, be taken off the screen by choosing Hide from the Page menu.
 The main window and all device page windows are iconified together into
-a single icon labeled control using the icon button on the main window. </p>
+a single icon labeled control using the icon button on the main window.
+  </p>
   <p><a href="#TableOfContents">Back to Table of Contents</a> </p>
   <h4> <a name="SettingAPpmUser"></a>Setting a PPM User</h4>
 The main window is used to set the default PPM user for the program.
-This default determines the PPM user for newly created device pages, but
+This default determines the PPM user for newly created device pages,
+but
 it does not affect existing device pages. To set the default PPM user,
 choose Default PPM User from the Setup menu on the main window. The
-default PPM user is displayed on the main window just below the menubar.
- <p>Each device page can have a different PPM user. To change the PPM
+default PPM user is displayed on the main window just below the
+menubar.
+  <p>Each device page can have a different PPM user. To change the PPM
 user for a particular device page, choose Set PPM User from the Page
-menu. This will cause the page to reload, displaying information for the
+menu. This will cause the page to reload, displaying information for
+the
 selected PPM user. The PPM user for a device page is displayed in the
 window's title area. </p>
   <p>The devices on a device page are color-coded to reflect their PPM
@@ -752,8 +788,10 @@ PPM User 8 - gray</blockquote>
   <a href="#TableOfContents">Back to Table of Contents</a>
   <h2> <a name="TheDevicePageWindow"></a>The Device Page Window</h2>
 There are two types of device page windows that can be opened.&nbsp;
-These are discussed below.&nbsp; The first is the ADO style window which
-is used to display ADO devices and the other is the SLD/CLD style window
+These are discussed below.&nbsp; The first is the ADO style window
+which
+is used to display ADO devices and the other is the SLD/CLD style
+window
 which is used to display SLDs and CLDs.&nbsp; It is at this point where
 the merger of the old SpreadSheet program and the old pet program
 ends.&nbsp; Each of these style windows can only display devices for
@@ -801,13 +839,15 @@ various parts of the picture to go to the definitions.&nbsp;<map
  usemap="#PetWindow.map" height="474" width="650"> </p>
 <h4 style="margin-left: 40px;"> <a name="PetTable"></a>ADO Table</h4>
 <div style="margin-left: 40px;"> The look and content of the ado table
-is defined by the pet file that is loaded. This is where the information
+is defined by the pet file that is loaded. This is where the
+information
 from the control system is displayed and changed. </div>
 <h4 style="margin-left: 40px;"> <a name="AdoNameCell"></a>ADO Name Cell</h4>
 <div style="margin-left: 40px;"> The ADO name cell is always in the
 first column of the table. It displays the name of the ADO for that
 line. This cell is never editable. Clicking mouse button 1 in this cell
-moves the cursor to this cell. Mouse button 2 does nothing. Mouse button
+moves the cursor to this cell. Mouse button 2 does nothing. Mouse
+button
 3 brings up the ADO Configuration Parameters dialog box. Here is an
 example: </div>
 <center><img src="AdoPopup.gif"></center>
@@ -831,14 +871,16 @@ are a few things that can be done to a Parameter cell. </div>
 <ul>
   <li> Change cell's edibility by using the <b>Format</b> menu options.</li>
   <li> Type values into the cell.</li>
-  <li> Change multiple cells values on a page by using the shift key.  All parameters
-      with the same name but from different instances of the ado can be globally
-      set this way.
+  <li> Change multiple cells values on a page by using the shift key.
+All parameters with the same name but from different instances of the
+ado can be globally set this way. </li>
   <li> Apply filters to asynchronous data reports for a cell using
 options in the <b>Data</b> menu. The <b>Apply Filter to Table...</b>
 option brings up a popup for selecting the type of asynchronous data
-filter to apply to all parameters in the pet table. The <b>Apply Filter
-to Cell...</b> menu item brings up a popup window for selecting a filter
+filter to apply to all parameters in the pet table. The <b>Apply
+Filter
+to Cell...</b> menu item brings up a popup window for selecting a
+filter
 for the currently selected cell:</li>
   <center><img src="FilterPopup.gif"></center>
   <li> Mouse Button actions:</li>
@@ -855,14 +897,16 @@ asynchronous data filter, if any, is currently applied to the parameter.</li>
 <center><img src="ParamPopup.gif"></center>
 <p style="margin-left: 40px;">Parameter cells are immediately sent to
 the ADO when a value is entered.&nbsp; The only exception is for button
-cells.&nbsp; These turn yellow and await a confirmation by either double
+cells.&nbsp; These turn yellow and await a confirmation by either
+double
 clicking the button or middle clicking. <br>
 </p>
 <h3 style="margin-left: 40px;"> <a name="PetInformationBar"></a>Pet
 Information Bar</h3>
 <div style="margin-left: 40px;"> The information bar displays cell
 information and network activity. </div>
-<h4 style="margin-left: 40px;"> <a name="CellActivity"></a>Cell Activity</h4>
+<h4 style="margin-left: 40px;"> <a name="CellActivity"></a>Cell
+Activity</h4>
 <div style="margin-left: 40px;"> The cell activity icon displays a
 running dog that changes whenever async data is received for the
 parameter of the currently highlighted cell. </div>
@@ -894,7 +938,8 @@ item. Nudge values can then be restored to their current setting the
 next time the page is loaded/reloaded rather then the value that it had
 when the page was initially opened. This option is applicable for only
 those parameters which support this property. </div>
-<h4 style="margin-left: 40px;"> <a name="PageActivity"></a>Page Activity</h4>
+<h4 style="margin-left: 40px;"> <a name="PageActivity"></a>Page
+Activity</h4>
 <div style="margin-left: 40px;"> This area displays the number of async
 data replies received for the whole page. The number can be reset to 0
 by clicking mouse button 1 in this area. </div>
@@ -906,12 +951,14 @@ on this area. </div>
 <p> </p>
 <hr width="100%">
 <h3 style="margin-left: 40px;"> <a name="PetGraph"></a>Pet Graph</h3>
-<div style="margin-left: 40px;"> Pet supports now GPM plotting tools, to
+<div style="margin-left: 40px;"> Pet supports now GPM plotting tools,
+to
 which access is located under the Tools menu item. Pressing Ctrl+G or
 selecting <b>Tools-&gt;New</b> Graph item will bring up a Graph
 Selection Dialog (see screenshot below), where the user is presented
 with four graph style options: </div>
-<blockquote> <li> Strip Chart Graph - plots the selected data values
+<blockquote>
+  <li> Strip Chart Graph - plots the selected data values
 against the time.</li>
   <li> Correlation Graph - plots one or more parameters on the Y axis
 vs. one of the parameters on the X Axis.</li>
@@ -931,10 +978,12 @@ list. Only plottable parameters can be selected, therefore selecting an
 Array Plot option and trying to add a scalar value to the <i>Y</i> or <i>X
 Axis</i> list will not work. If all of the desired parameters have been
 selected, pressing the <i>Apply</i> or <i>OK</i> button will display
-show the graph window (Note: if there is no new data incoming for all of
+show the graph window (Note: if there is no new data incoming for all
+of
 the selected parameters, the graph area will not update until a fresh
 data value is available to plot). For more info on the GPM plots please
-see the <a href="http://www.cadops.bnl.gov/Controls/doc/Gpm/Gpm4.0.html">online
+see the <a
+ href="http://www.cadops.bnl.gov/Controls/doc/Gpm/Gpm4.0.html">online
 GPM manual.</a></div>
 <p> </p>
 <h3 style="margin-left: 40px;"> <a name="BufferTable"></a>Buffer Table</h3>
@@ -950,7 +999,8 @@ from Current') or loaded from an archive (see <a
 section below).&nbsp; The values in the buffer table may be sent to the
 pet table by selecting the values with the middle mouse button, or by
 using the 'Buffer/Send' menu option (see <a href="#SendTheBuffer">Send
-the buffer</a> section below).&nbsp; The cells in the buffer table may be
+the buffer</a> section below).&nbsp; The cells in the buffer table may
+be
 edited. <br>
 </div>
 <div style="margin-left: 40px;"> The cells in the buffer table will
@@ -964,9 +1014,11 @@ black text.&nbsp; (At this point, no special coloring is done for cells
 that already have colors associated with them.&nbsp; If this becomes
 necessary, please contact a member of the Controls' Group to indicate
 that the buffer cell coloring is not sufficient for all cases.)&nbsp;
-The buffer area allows the user to modify multiple cells before applying
+The buffer area allows the user to modify multiple cells before
+applying
 the changes to hardware.&nbsp; Values can be sent to hardware one at a
-time with a middle click over the cell or all at once through the buffer
+time with a middle click over the cell or all at once through the
+buffer
 menu option "send edited values".&nbsp; Changes to the buffer data that
 have not been sent can be undone by selecting one of the undo options
 from the Buffer menu.<br>
@@ -974,14 +1026,17 @@ from the Buffer menu.<br>
 <h3 style="margin-left: 40px;"> <a name="SaveAnArchive"></a>Save an
 archive</h3>
 <div style="margin-left: 40px;"> This option provides a mechanism for a
-user to make an archive (store settings and measurements) of the devices
+user to make an archive (store settings and measurements) of the
+devices
 on this page.&nbsp; The user may save an archive by selecting the
 'File/Save Archive...' menu option.&nbsp; The save/restore tools are
-used to store the settings and measurements on the page.&nbsp; A user is
+used to store the settings and measurements on the page.&nbsp; A user
+is
 prompted with a name for which to save the archive.&nbsp; At present,
 every archive made MUST have a unique name provided.&nbsp; If an
 existing name is used, the user will be prompted with the options of
-overwrite the existing archive (which will cause it to be deleted and no
+overwrite the existing archive (which will cause it to be deleted and
+no
 longer available) or entering a new name.&nbsp;&nbsp; The user also has
 the option of entering comments to be stored with the archive. <br>
 </div>
@@ -990,7 +1045,8 @@ the option of entering comments to be stored with the archive. <br>
 an archive into the buffer</h3>
 <div style="margin-left: 40px;"> The user may load an archive into the
 buffer by selecting the 'Buffer/Load from Archive...' option.&nbsp; The
-user will be presented with a list of archives that have been stored for
+user will be presented with a list of archives that have been stored
+for
 the pet page they are currently accessing.&nbsp; The user may load the
 archive into the buffer by selecting the OK button(which will cause the
 window to disappear after the buffer is loaded), or by selecting the
@@ -1009,11 +1065,39 @@ pet ado table and have the values immediately sent down to
 hardware.&nbsp; The user makes their selection by selecting the desired
 button option ('Send from buffer to pet ado table', 'Send directly to
 hardware') when prompted.<br>
-<br>
+&nbsp;
+</div>
+<h3 style="margin-left: 40px;"> <a name="GlobalSend"></a>Global Send</h3>
+<div style="margin-left: 40px;"> An option is available to send a
+global command. The global send acts on all parameters with the same
+name that may be from other
+instances of the same ADO class. This means that it also can be used to
+send a value for multiple ppm users with one command. To use the global
+send feature the shift key must be used in conjunction with the normal
+action used to send
+a value. For menu cells this would be the left mouse click, for other
+cell types
+it would be a middle mouse click or pressing the return key. When the
+shift key
+is used a popup is displayed with all instances of the same parameter
+from the active pet page. At that point the user has the opportunity to
+apply the value
+in the current cell to all other instances or pick and choose
+individual cells on
+the page that share the same parameter (property) name. If there is
+only one
+instance of a given parameter on the active pet page the shift key will
+work the
+same as the regular send command.<br>
+</div>
+<div style="margin-left: 40px;">
+<div style="margin-left: 40px;"><br>
+</div>
 <h2> <a name="petFile"></a>ADO page File Format</h2>
 Pet is controlled by loading a file that defines the look of the
 screen. The pet ado file contains two sections, the parameter section
-and the attribute section. The parameter section defines what parameters
+and the attribute section. The parameter section defines what
+parameters
 pet can control, and the attribute section changes the appearance of
 these parameters.
 <h2> <a name="param"></a>Parameter Section</h2>
@@ -1053,11 +1137,13 @@ other cells of the row in the order in which they are listed in the
 file. Property names should appear as parameter:property (see example
 below).
 <p>If an ADO name is NOT followed by a list of parameters, the
-parameter list is acquired by searching the following sources. The first
+parameter list is acquired by searching the following sources. The
+first
 source found is used to generate the list. </p>
 <ol>
   <li> the cell Template attribute</li>
-  <li> If the ADO on the previous line is of the same class, its list of
+  <li> If the ADO on the previous line is of the same class, its list
+of
 properties and attributes are used</li>
   <li> the default template for this ADO class</li>
   <li> all of the settings and measurements for this ADO are used</li>
@@ -1161,9 +1247,12 @@ creating the Attribute Section: </p>
   <li> End the section with the line <b>END ATTRIBUTES</b>.</li>
   <li> Each attribute should contain three parts:</li>
   <br>
-cell(s) designation, resource, and value. <li> Cell designations should
-look like <b>RnCm</b> where n is a number from 0 to the last row, and m
-is a number from 0 to the last column. A value of <b>R0Cm</b> means that
+cell(s) designation, resource, and value.
+  <li> Cell designations should
+look like <b>RnCm</b> where n is a number from 0 to the last row, and
+m
+is a number from 0 to the last column. A value of <b>R0Cm</b> means
+that
 the attribute applies to all cells in column m. A value of <b>RnC0</b>
 means that the attribute applies to all cells in row n. A value of <b>R0C0</b>
 means that the attribute applies to all cells in the table.</li>
@@ -1509,7 +1598,7 @@ characters.</li>
       <td>string (9)</td>
       <td>none</td>
       <td>Launch a process when cell is selected</td>
-    </tr> 
+    </tr>
     <tr>
       <td>monitor</td>
       <td>T</td>
@@ -1529,9 +1618,9 @@ characters.</li>
       <td>T</td>
       <td>string (11)</td>
       <td>square</td>
-      <td>used with monitor attribute only.  Defines layout of
-      monitors in pet window</td>
-    </tr>    
+      <td>used with monitor attribute only. Defines layout of monitors
+in pet window</td>
+    </tr>
     <tr>
       <td colspan="5">
       <ol>
@@ -1544,8 +1633,8 @@ button - pushbutton cell&nbsp; <br>
 label -non editable cell&nbsp; <br>
 blank -blank cell with no border&nbsp; <br>
 column -column cell with border only on right&nbsp; <br>
-row - row cell with border only on bottom&nbsp; <li>
--misc-fixed-medium-r-normal--20-140-100-100-c-100-iso8859-1</li>
+row - row cell with border only on bottom&nbsp;
+        <li>-misc-fixed-medium-r-normal--20-140-100-100-c-100-iso8859-1</li>
         <li> a string with three possible values (case insensitive):
 left, center, right</li>
         <li> reverse video: titleForeground = background,
@@ -1553,32 +1642,31 @@ titleBackground = foreground</li>
         <li> The filter types can be <b>skipFactor</b>, <b>minInterval</b>,<b>minChange</b>,
 or <b>outOfTol</b>. All filters except "outOfTol" must also have the
 filterArg attribute set. There are no default values for these filters.</li>
-        <li>The format for value is device:parameter:property where property is optional.
-  If no property is specified the alarmLevel property is used.  Note that legal values
-are 0 through 8.  This is important when using a property other than alarmLevel.  Values
-greater than 8 or less than 0 will result in no change to the cell color.  monAlarmParam
+        <li>The format for value is device:parameter:property where
+property is optional. If no property is specified the alarmLevel
+property is used. Note that legal values
+are 0 through 8. This is important when using a property other than
+alarmLevel. Values
+greater than 8 or less than 0 will result in no change to the cell
+color. monAlarmParam
 and monAlarmState should be used exclusively.</li>
         <li>Specify the default path to use when opening the file
-        browser popup.  <b>Note: ADO Parameter Type MUST be a String</b></li>
-        <li>Specify the command to be executed formatted as if running from the
-        command line.  The command will automatically be executed in
-        the background. <b>Note: The Text in the Launch Cell Must Be
-        Quoted.  Example:</b> <br>
-        <i>"Launch Gpm"; launch:/usr/controls/bin/Gpm</i><br>
-        <b>Will add a cell with the text "Launch Gpm".  When the cell is
-        selected, Gpm will be launched.</b>
-        </li>
-        <li> Specify monitor files using the gpm path
-        (eg. Scratch/myMon.mon) or using absolute path
-        (eg. /home/cfsb/mcr/myMon.mon).<br>Multiple monitors can be
-        entered for a single attribute as long as they are separated
-        by commas.
-        </li>
-        <li>
-        Set attribute to "horizontal" for a horizontal layout of
-        multiple monitors or to "vertical"<br>for a vertical layout of
-        monitors.  The default is "square".
-        </li>
+browser popup. <b>Note: ADO Parameter Type MUST be a String</b></li>
+        <li>Specify the command to be executed formatted as if running
+from the command line. The command will automatically be executed in
+the background. <b>Note: The Text in the Launch Cell Must Be Quoted.
+Example:</b> <br>
+          <i>"Launch Gpm"; launch:/usr/controls/bin/Gpm</i><br>
+          <b>Will add a cell with the text "Launch Gpm". When the cell
+is selected, Gpm will be launched.</b> </li>
+        <li> Specify monitor files using the gpm path (eg.
+Scratch/myMon.mon) or using absolute path (eg.
+/home/cfsb/mcr/myMon.mon).<br>
+Multiple monitors can be entered for a single attribute as long as they
+are separated by commas. </li>
+        <li> Set attribute to "horizontal" for a horizontal layout of
+multiple monitors or to "vertical"<br>
+for a vertical layout of monitors. The default is "square". </li>
       </ol>
       </td>
     </tr>
@@ -1592,24 +1680,7 @@ Notes:
   <li> strings for color values can be found in /usr/lib/X11/rgb.txt</li>
 </ol>
 <h3> <a name="attribExamples"></a>Attribute Examples</h3>
-<pre>BEGIN ATTRIBUTES<br>! change the table foreground and background colors<br>R0C0.foreground: firebrick<br>R0C0.background: white<br>! change the foreground color for quoted text<br>R0C0.labelForeground: DarkGreen<br>! change the color for an individual cell<br>R3C4.foreground: cyan<br>R3C4.background: gray50<br>! change the size of the table<br>R0C0.visibleRows: 6<br>R0C0.visibleColumns: 5<br>! make a particular cell editable<br>R3C3.editable: true<br>! change the font for the table<br>R0C0.font: 9x15bold<br>! change the width of column 4<br>R0C4.width: 5<br>! force a cell to display in 3 decimal places<br>R6C4.formatString: %.3f<br>! set limits in what can be entered into a cell<br>R5C3.min: 0<br>R5C3.max: 200<br>! here's another way to put a string in a cell<br>R4C5.string: BPM Gain
-! use the alarmLevel property of the parameters in each cell of column 2 to determine color of cell
-R0C2.monAlarmState: true
-! in row 4, column 2 use the value property of the specified device:parameter to determine cell color
-R4C2.monAlarmParam: device:param:value
-! in row 4, column 3 use the alarmLevel property of the specified device:parameter to determine cell color
-R4C3.monAlarmParam: device:param
-! specify that row 5, column 2 use a file browser to update the ado property 
-R5C2.fileBrowser: /operations/app_store/config
-! have row 5, column 3 launch LogView
-R5C3.launch: /usr/controls/bin/LogView -file /home/cfsb/mcr/MyLogViewFile
-! add some gpm monitors to the pet page
-R0C0.monitor: Scratch/petTest.mon,Scratch/striptest.mon,Scratch/table.mon
-! add some monitors in separate windows
-R0C0.monitorWindow: Scratch/petTest.mon, Booster/BoosterCycles.mon
-! set the layout of the monitors in the pet window to vertically aligned
-R0C0.monitorLayout:vertical
-<br>END ATTRIBUTES</pre>
+<pre>BEGIN ATTRIBUTES<br>! change the table foreground and background colors<br>R0C0.foreground: firebrick<br>R0C0.background: white<br>! change the foreground color for quoted text<br>R0C0.labelForeground: DarkGreen<br>! change the color for an individual cell<br>R3C4.foreground: cyan<br>R3C4.background: gray50<br>! change the size of the table<br>R0C0.visibleRows: 6<br>R0C0.visibleColumns: 5<br>! make a particular cell editable<br>R3C3.editable: true<br>! change the font for the table<br>R0C0.font: 9x15bold<br>! change the width of column 4<br>R0C4.width: 5<br>! force a cell to display in 3 decimal places<br>R6C4.formatString: %.3f<br>! set limits in what can be entered into a cell<br>R5C3.min: 0<br>R5C3.max: 200<br>! here's another way to put a string in a cell<br>R4C5.string: BPM Gain<br>! use the alarmLevel property of the parameters in each cell of column 2 to determine color of cell<br>R0C2.monAlarmState: true<br>! in row 4, column 2 use the value property of the specified device:parameter to determine cell color<br>R4C2.monAlarmParam: device:param:value<br>! in row 4, column 3 use the alarmLevel property of the specified device:parameter to determine cell color<br>R4C3.monAlarmParam: device:param<br>! specify that row 5, column 2 use a file browser to update the ado property <br>R5C2.fileBrowser: /operations/app_store/config<br>! have row 5, column 3 launch LogView<br>R5C3.launch: /usr/controls/bin/LogView -file /home/cfsb/mcr/MyLogViewFile<br>! add some gpm monitors to the pet page<br>R0C0.monitor: Scratch/petTest.mon,Scratch/striptest.mon,Scratch/table.mon<br>! add some monitors in separate windows<br>R0C0.monitorWindow: Scratch/petTest.mon, Booster/BoosterCycles.mon<br>! set the layout of the monitors in the pet window to vertically aligned<br>R0C0.monitorLayout:vertical<br><br>END ATTRIBUTES</pre>
 <a href="#TableOfContents">Back to Table of Contents</a>
 <p> </p>
 <hr width="100%">
@@ -1618,7 +1689,8 @@ Attributes can be specified in line with the parameters. The format of
 a parameter with attributes takes this form:
 <blockquote>adoName, param1;attr1:val1;attr2:val2, param2</blockquote>
 The attributes <b>attr1:val1</b> and <b>attr2:val2</b> are applied to
-the cell containing param1 in this example. The attribute can be applied
+the cell containing param1 in this example. The attribute can be
+applied
 to the row, column or table by adding a prefix and a decimal point to
 the attribute name. The prefixes are:
 <ul>
@@ -1653,31 +1725,15 @@ Here is a screen snapshot of a pet window and the pet file that created
 it. Note that the C preprocessor is used here also.
 <p><img src="pet1.gif" style="height: 598px; width: 556px;" title=""
  alt=""> </p>
-<pre>!USECPP<br>! flag pet to use the c preprocessor (needs to be the first line)<br>! normal line<br>simple.test, "menuM", menuM
-! change the back ground of a cell<br>simple.test, "longM";bg:green, longM
-! change background and foreground<br>simple.test, "doubleM", doubleM; bg:green; fg:red
-! change bg of a whole row<br>simple.test;R.bg:green, "longArrayM", longArrayM
-! add a blank line (normal blank lines are ignored when using CPP)<br>!BLANK
-! this is a trick to get a blank line with attributes<br>;R.bg:green<br>!BLANK
-!<br>! use the c preprocessor to define a variable
-#define ADO simple.test<br>!<br>! use the new variable<br>ADO, "commandC", commandC
-ADO, "menuS", menuS<br>ADO, "ucharS", ucharS<br>simple.test, "charS", charS
-simple.test, "longS", longS<br>simple.test, "floatS", floatS
-simple.test, "doubleS", doubleS;formatString:%.3g<br>simple.test, "stringS", stringS
-simple.test, "longArrayS", longArrayS<br>!BLANK<br>simple.test, "varArrayS", varArrayS
-simple.test, "alarmModeS", alarmModeS;monAlarmState:true
-simple.test, "sinM", sinM;monAlarmParam:simple.test:shortS:value
-! you can still use an attribute section
-BEGIN ATTRIBUTES
-R8C1.bg:green
-END ATTRIBUTES</pre>
+<pre>!USECPP<br>! flag pet to use the c preprocessor (needs to be the first line)<br>! normal line<br>simple.test, "menuM", menuM<br>! change the back ground of a cell<br>simple.test, "longM";bg:green, longM<br>! change background and foreground<br>simple.test, "doubleM", doubleM; bg:green; fg:red<br>! change bg of a whole row<br>simple.test;R.bg:green, "longArrayM", longArrayM<br>! add a blank line (normal blank lines are ignored when using CPP)<br>!BLANK<br>! this is a trick to get a blank line with attributes<br>;R.bg:green<br>!BLANK<br>!<br>! use the c preprocessor to define a variable<br>#define ADO simple.test<br>!<br>! use the new variable<br>ADO, "commandC", commandC<br>ADO, "menuS", menuS<br>ADO, "ucharS", ucharS<br>simple.test, "charS", charS<br>simple.test, "longS", longS<br>simple.test, "floatS", floatS<br>simple.test, "doubleS", doubleS;formatString:%.3g<br>simple.test, "stringS", stringS<br>simple.test, "longArrayS", longArrayS<br>!BLANK<br>simple.test, "varArrayS", varArrayS<br>simple.test, "alarmModeS", alarmModeS;monAlarmState:true<br>simple.test, "sinM", sinM;monAlarmParam:simple.test:shortS:value<br>! you can still use an attribute section<br>BEGIN ATTRIBUTES<br>R8C1.bg:green<br>END ATTRIBUTES</pre>
 <a href="#TableOfContents">Back to Table of Contents</a></div>
 <h2 style="margin-left: 40px;"><a name="SLDPages"></a>SLD/CLD Style Page<br>
 </h2>
 <ul>
 Each device page allows the user to view and/or edit the devices from a
 single device list. The window contains a menubuar and pulldown menu
-system at the top, a table containing information for the devices in the
+system at the top, a table containing information for the devices in
+the
 device list, and a message area at the bottom.
   <center><img src="DeviceWindowBSLC.gif"></center>
 For information on the pulldown menu items, see the section titled <a
@@ -1695,7 +1751,8 @@ area on the device page window. The device table displays the following
 information when the page is in <b>Operational Mode</b>: </p>
   <blockquote>
     <dl>
-      <dt> <b>Device Name</b> - the name of the SLD, CLD, MetaDevice or
+      <dt> <b>Device Name</b> - the name of the SLD, CLD, MetaDevice
+or
 Parameter.</dt>
       <p><br>
 Non-PPM device names appear in black. PPM device names appear in a
@@ -1704,11 +1761,13 @@ color determined by the device pages PPM user number (see <a
       <p>Clicking on the device name with the right mouse button brings
 up a popup which displays information about the device. The description
 is editable (see <a href="#EditingDevices">Editing Devices</a> below).
-You can leave this popup up and click on a different device name to view
+You can leave this popup up and click on a different device name to
+view
 the description for another device on this page. </p>
       <p>For cld devices, clicking on the device name with the middle
 mouse button will cause a cld editing window to be displayed. (An
-attempt will be made at creating a cld window. A report must be received
+attempt will be made at creating a cld window. A report must be
+received
 for the attempt to be successful.) See <a href="#WorkingWithClds">Working
 with CLDs</a> for more information. </p>
       <dt> <b>Indicator</b> - the status of a device report.</dt>
@@ -1726,7 +1785,8 @@ colored black.&nbsp;</td>
             <tr>
               <td valign="top">+&nbsp;</td>
               <td>Good report was received. It is not the first report
-received with its cycle number. This will occur for non-PPM devices when
+received with its cycle number. This will occur for non-PPM devices
+when
 more than one PPM user is active.&nbsp;</td>
             </tr>
             <tr>
@@ -1749,17 +1809,20 @@ controller is not.&nbsp;</td>
       <dt> <b>Measmnt</b> - the device measurement.</dt>
       <p><br>
 If the device has a true measurement, the cell is filled in with the
-measurement value obtained from the station. If there is no measurement,
+measurement value obtained from the station. If there is no
+measurement,
 but there is a setpoint, the cell is filled in with the setpoint
 readback from the controller. If there is neither a measurement or a
 setpoint, the cell appears blank. </p>
       <p>If the device has a measurement, the value received is checked
-against the tolerance limits for the device. If the measurement value is
+against the tolerance limits for the device. If the measurement value
+is
 outside of these limits, there is a range error. If the measurement is
 being watched for errors by the station, this value will appear in red
 on pet. If it is not being watched, it will appear gold. As a special
 case, if no tolerance values have been set up for the device, and the
-device is not being watched, the measurement appears in its normal black
+device is not being watched, the measurement appears in its normal
+black
 color. The tolerance limits are determined as follows from the device
 tolerance information stored in the database and from the current
 setpoint value: </p>
@@ -1769,12 +1832,14 @@ min = setpoint - setpoint * tolerance - tolerance_offset</blockquote>
 For cld devices, if a report is received that has a measurement for the
 cld, the string '***' will be displayed. The user may view the
 measurements by clicking on the device name with the middle mouse
-button, or by clicking on the '***' with the middle mouse button. <dt> <b>Units</b>
+button, or by clicking on the '***' with the middle mouse button. <dt>
+        <b>Units</b>
 - the units for the device stored in the database.</dt>
       <dt> <b>Setpt</b> - the device setpoint.</dt>
       <p><br>
 If the device has a setpoint, the cell is filled in with the setpoint
-value obtained from the station. If the device does not have a setpoint,
+value obtained from the station. If the device does not have a
+setpoint,
 the cell appears blank. </p>
       <p>See the section <a href="#EditingDevices">Editing Devices</a>
 below for information on changing setpoints. </p>
@@ -1818,14 +1883,16 @@ below for information on editing commands. </p>
       <dt> <b>Buffer</b> - a storage area for device setpoints.</dt>
       <p><br>
 If the device has a setpoint, this cell is filled in with the value
-obtained from the initial report from the device. If the buffer cell has
+obtained from the initial report from the device. If the buffer cell
+has
 a normal background color, the buffer and setpoint values agree. If the
 background color is different (by default, gold), then the values
 disagree. </p>
       <p>For cld devices, if a report is received that has a setpoint
 for the cld, the values will be held in the buffer and the string '***'
 will be displayed. The user may send the cld buffer by clicking on the
-'***' using the middle mouse button. The user may view the setpoints and
+'***' using the middle mouse button. The user may view the setpoints
+and
 buffer by clicking on the '***' using the third mouse button (right
 button). Clicking the third mouse button on a second cld with the
 setpoint/buffer display already visible will cause the display to be
@@ -1835,16 +1902,20 @@ for further information on the buffer. </p>
       <dt> <b>BC1 thru BC3</b> - a storage area for device commands.</dt>
       <p><br>
 If the device has commands, one or more of these cells are filled in
-with the values obtained from the initial report from the device. If the
-buffer cell has a normal background color, the buffer and command values
-agree. If the background color is different (by default, gold), then the
+with the values obtained from the initial report from the device. If
+the
+buffer cell has a normal background color, the buffer and command
+values
+agree. If the background color is different (by default, gold), then
+the
 values disagree. </p>
       <p>See the section <a href="#UsingTheBuffer">Using the Buffer</a>
 for further information on the buffer. </p>
       <dt> <b>S1 thru S16</b> - statuses 1 thru 16 for the device.</dt>
       <p><br>
 If a status exists, its current value from the station appears in one
-of the status columns. If the status indicates an error condition and it
+of the status columns. If the status indicates an error condition and
+it
 is being watched by the station, it appears in red. If the status is in
 error and it is not being watched, it appears in gold. Otherwise it
 appears in black. </p>
@@ -1922,7 +1993,8 @@ station.</p>
 This section discusses methods for directly editing SLD setpoints, SLD
 &amp; CLD commands, and device descriptions. Setpoints and commands can
 also be edited using device nudging and buffer manipulation. For
-information on these methods, see the sections titled <a href="#Nudging">Nudging</a>
+information on these methods, see the sections titled <a
+ href="#Nudging">Nudging</a>
 and <a href="#UsingTheBuffer">Using the Buffer</a> below.
   <p>Setpoints are edited using a three step process: </p>
   <blockquote>
@@ -1934,7 +2006,8 @@ cell.</dd>
       <dt> <b>2. Edit the value.</b></dt>
       <dd> Once the cell is highlighted, begin typing the new value.
 There is no need to erase the previous value. You can enter the new
-value using either the standard keyboard or the numeric keypad. Once you
+value using either the standard keyboard or the numeric keypad. Once
+you
 begin entering a value, the cell color will change. This indicates that
 a new value exists in this cell, but it has not yet been sent.</dd>
       <dt> <b>3. Send the value.</b></dt>
@@ -1948,7 +2021,8 @@ Commands can be edited using either the mouse or the keyboard. To edit
 commands using the mouse, click on the command cell with the 1st mouse
 button. A menu of possible commands will then appear under the command
 cell. Click on the command that you wish to send. This causes the
-selected command to be displayed AND the command to be sent to hardware.
+selected command to be displayed AND the command to be sent to
+hardware.
 If you decide not to select a new command, move the cursor out of the
 command menu and release the button. To re-send a command, click on it
 with the middle mouse button.
@@ -1956,11 +2030,14 @@ with the middle mouse button.
 with the right mouse button. This will cause the device information
 popup to appear. Alternate ways to make this popup appear are to
 highlight the device, then choose Description from the Device menu or
-type Ctrl + D from the keyboard. Once the popup appears, edit the device
-description, then click on the Save button to store the new description.
+type Ctrl + D from the keyboard. Once the popup appears, edit the
+device
+description, then click on the Save button to store the new
+description.
 If you click the Revert button, the description is re-read from the
 device database. This description field word wraps, so there is no need
-to hit the RETURN key. You are limited to 256 characters. If you attempt
+to hit the RETURN key. You are limited to 256 characters. If you
+attempt
 to enter more than that, the system will beep each time you hit a key. </p>
   <center><img src="DeviceDesc.gif"></center>
   <h4> <a name="Nudging"></a>Nudging (Increment/Decrement)</h4>
@@ -1974,12 +2051,14 @@ moved up or down when the user increments or decrements it. When the
 device page first appears, the initial values for the nudge cells are
 taken from those in storage for the devices on that page. If a value is
 not stored, ten times the least count value is used instead. The least
-count for a device is the minimum change in a device setpoint allowed by
+count for a device is the minimum change in a device setpoint allowed
+by
 the device hardware. </p>
   <p>There are a few ways to nudge a setpoint. The most common is to
 click the 1st mouse button on the nudge cell to decrement the setpoint
 value, and the 3rd mouse button to increment the value. A second way is
-to highlight the setpoint cell that you wish to nudge, then press the F1
+to highlight the setpoint cell that you wish to nudge, then press the
+F1
 key to decrement and the F2 key to increment its value. A third way is
 to choose Decrement or Increment from the Setpoint menu. </p>
   <p>To edit a nudge value, click on the nudge value with the middle
@@ -1990,7 +2069,8 @@ enter a new value into the popup that appears. </p>
   <p><a href="#TableOfContents">Back to Table of Contents</a> </p>
   <h4> <a name="UsingTheBuffer"></a>Using the Buffer</h4>
 The buffer is initially loaded from the first device reports that are
-received for the devices on the device page. After that, the contents of
+received for the devices on the device page. After that, the contents
+of
 the buffer is under user control. Reports are no longer placed in the
 buffer if any of the following occur: a) any menu option loading the
 buffer is used, e.g. load from current, load from temp, or load from
@@ -2009,7 +2089,8 @@ until you explicitly send it. </p>
 individual device, click on the buffer setpoint cell with the middle
 mouse button or choose Send Device from the Buffer menu. To send the
 buffer to hardware for all devices on the device page, choose Send...
-from the Buffer menu or type Ctrl + S. You will see a confirmation popup
+from the Buffer menu or type Ctrl + S. You will see a confirmation
+popup
 before the buffer contents are sent. </p>
   <p>To get a fresh buffer, choose Load from Current from the Buffer
 menu. This copies the contents of the real setpoint and command columns
@@ -2033,7 +2114,8 @@ you wish to store temporarily. You should not depend on this file being
 there because it will be overwritten by the next user that saves Temp
 for this device page. </p>
   <p>Choosing Save Temp. File from the Buffer menu, or typing Ctrl + T,
-causes the Temp file to be written from the setpoints and commands shown
+causes the Temp file to be written from the setpoints and commands
+shown
 on the device page. </p>
   <p>To load the buffer from the current Temp file, choose Load from
 Temp from the buffer menu. To make these settings the current hardware
@@ -2041,7 +2123,8 @@ settings, you must then send the buffer by choosing Send... from the
 Buffer menu. </p>
   <p>After loading or sending the buffer, a user will receive a message
 in the message area about the status of the load or send. The user may
-view the results of the load or send by selecting the menu options 'View
+view the results of the load or send by selecting the menu options
+'View
 Load Buffer Results...' and 'View Send Buffer Results...' from the
 Buffer menu. If any devices fail to be loaded, or encounter a problem
 during the send of the buffer, the user can view this information by
@@ -2055,7 +2138,8 @@ cancelling the operation. </p>
 &nbsp; </p>
   <h4> <a name="GraphicsOptions"></a>Graphics Options</h4>
 Graphics options are newly available in pet ( in commissioning version
-of 2/17/99 ).&nbsp;&nbsp; The Graphics menu on each device page includes
+of 2/17/99 ).&nbsp;&nbsp; The Graphics menu on each device page
+includes
 the options listed below.&nbsp;&nbsp; The graphs are produced using the
 Monitor tools that are used in the new release of Gpm4.0.&nbsp;&nbsp;
 Read the <a href="http:/Controls/doc/Gpm/Gpm.html">Gpm documentation</a>
@@ -2098,7 +2182,8 @@ Correlation graphs can plot mutiple parameters along the Y axis versus
 one parameter along the X&nbsp;axis.&nbsp;&nbsp; If a device has both a
 measurement and a setpoint, its measurement is plotted on the Y axis
 versus the setpoint on the X&nbsp;axis.&nbsp;&nbsp; If the first device
-you select has only a setpoint or only a measurement, that quantity will
+you select has only a setpoint or only a measurement, that quantity
+will
 become the X axis variable for the correlation graph.&nbsp; You will
 need to make an additional selection for the Y axis.&nbsp; The Edit
 Monitor option in the graph Setup menu lets you adjust the X axis cell
@@ -2114,7 +2199,8 @@ CLDs... from the Options menu on the main window. </p>
   <p>A second method for viewing/editing CLD information is by clicking
 on the name of a CLD on a Device Page using the middle mouse button.
 CLDs that are good candidates for viewing measurements and
-viewing/editing setpoints typically have asterisks in the measurement or
+viewing/editing setpoints typically have asterisks in the measurement
+or
 setpoint columns, indicating that measurements or setpoints exist for
 the CLD (clicking on the asterisks using the middle mouse button will
 also make a new CLDWindow). A new CLDWindow will present the
@@ -2122,10 +2208,12 @@ measurements and/or setpoints to the user for a CLD. Commands for the
 CLD may be edited in a device list that accompanies the CLD setpoints,
 and statuses may be viewed as well. </p>
   <p>To edit CLD events on the AGS or Booster time lines, choose Set
-CLD Events... (note that selecting these by controller will bring up the
+CLD Events... (note that selecting these by controller will bring up
+the
 same editing tool) from the Options menu on the main window. The
 advantage to using Set CLD Events... is that only time-line controllers
-will be presented in the list. Select a time line to work with, and then
+will be presented in the list. Select a time line to work with, and
+then
 select a device on that time line. A CLDWindow will appear for the user
 to enter times and/or modify commands. </p>
   <p>For additional information about CLDs, please refer to <a
@@ -2152,14 +2240,17 @@ associated member devices update. </p>
 increments/decrements that were made on the nudge field. This, along
 with the buffer values for the devices that are controlled, is an
 indication of how far you have moved the metadevice since the device
-page first appeared. The Buffer cell holds the starting accumulation (0)
+page first appeared. The Buffer cell holds the starting accumulation
+(0)
 and can be used to reset the metadevice back to its initial setting by
 sending the buffer for the metadevice. This parallels the use of the
 buffer for SLDs. </p>
   <p>Clicking on the meta device name with the right mouse button
 brings up the Meta Device Editor. This editor allows you to view or
-modify the definition of the meta device. It also allows you to test the
-changes you have made to the meta device. For further information on the
+modify the definition of the meta device. It also allows you to test
+the
+changes you have made to the meta device. For further information on
+the
 Meta Device Editor, choose Show Help Document from the Help menu in the
 editor window. </p>
   <center><img src="MetaDevice.gif"></center>
@@ -2174,13 +2265,15 @@ parameters. Also, parameters do not have statuses.
 initially designed to create functions that would eventually be sent to
 hardware. More recently, functions are created and edited with the
 FunctionEditor or using function editor tools in application programs.
-However, many of the older functions are still created using parameters.
+However, many of the older functions are still created using
+parameters.
 This is still the primary use of parameters, but there is nothing
 inherent in the parameter design that prevents them from being used for
 other purposes. </p>
   <p>pet displays parameters in the same basic format as SLDs are
 displayed. The setpoint and command fields look and behave the same as
-for SLDs. Parameter data is retrieved from the database on a timer every
+for SLDs. Parameter data is retrieved from the database on a timer
+every
 10 seconds. The indicator column # signs change with each update.
 Editing parameters is done the same way as editing SLDs. Sending out a
 new setpoint or command updates that field in the database and may send
@@ -2205,12 +2298,14 @@ will be placed in the indicator column and the user may knob the
 setpoint. Once the page is made inactive, the knob panel is disabled. </p>
   <p>There may be two knob files present in the directory containing
 the device list. If this is the case, the page menu will be modified to
-allow the user to switch between the two knob files. If the primary knob
+allow the user to switch between the two knob files. If the primary
+knob
 file (.knob) is found, it will be used by default. If only the seconday
 knob file is found (.knob1), it will be used. </p>
   <p>A user may maintain multiple pages to be knobbed on the terminal
 at one time. As the user switches between the pages, the user will be
-able to determine, both through the knob panel LCD display, and the knob
+able to determine, both through the knob panel LCD display, and the
+knob
 numbers present in the indicator column, which page is currently
 supported by the knob panel. </p>
   <p>As a user modifies the setpoint through the use of a knob, the
@@ -2274,18 +2369,22 @@ selected SLDs, CLDs and parameters<br>
     <dt> <b><u>Page</u></b></dt>
     <dl>
       <dt> <b>Find</b></dt>
-      <dd> Clears the machine tree keyboard selection area, readying the
+      <dd> Clears the machine tree keyboard selection area, readying
+the
 program for a new selection either using the mouse or the keyboard.</dd>
       <dt> <b>New</b></dt>
-      <dd> If a leaf node is selected on the machine tree table, creates
-a new device page for that node. This does the same thing as clicking on
+      <dd> If a leaf node is selected on the machine tree table,
+creates
+a new device page for that node. This does the same thing as clicking
+on
 the node with the 2nd mouse button.</dd>
       <dt> <b>Show</b></dt>
       <dd> Brings the currently selected page to the front and makes it
 visible if not already.</dd>
       <dt> <b>Hide</b></dt>
       <dd> Hide (make invisible) the currently selected page in the
-list. This takes the page off the screen, but leaves it in the list. You
+list. This takes the page off the screen, but leaves it in the list.
+You
 can then show it by choosing the Show menu item.</dd>
       <dt> <b>Close</b></dt>
       <dd> Closes the currently selected device page</dd>
@@ -2301,11 +2400,13 @@ device. A prompt will ask for a search string, which could be a partial
 device name. The result of the search will then be displayed allowing
 the user to view the device in one or more device lists.</dd>
       <dt> <b>Read Archive Log</b></dt>
-      <dd> Brings up a separate window allowing the user to view the log
+      <dd> Brings up a separate window allowing the user to view the
+log
 of archives that have been made with the archiving system.</dd>
       <dt> <b>SLDs via Controller...<br>
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; </b>Brings up a window with a
-list of controllers allowing the user to select from this list and bring
+list of controllers allowing the user to select from this list and
+bring
 up all SLDs running on that controller.<br>
         <b>CLDs...</b></dt>
       <dd> Brings up a 'cld window' allowing the user to set values
@@ -2375,7 +2476,8 @@ ADO in the current cell.&nbsp; This can also be brought up by clicking
 on an ADO name with the right mouse button.</dd>
       <dt> <b>Show All Parameters...</b></dt>
       <dd> Brings up a new ado window showing all of the parameters
-within the ADO in the current cell.&nbsp; This can also be brought up by
+within the ADO in the current cell.&nbsp; This can also be brought up
+by
 clicking on the ADO name with the middle mouse button.</dd>
     </dl>
     <dt> <b><u>Data</u></b></dt>
@@ -2399,7 +2501,8 @@ given by the next menu item.</dd>
       <dd> Specify the frequency for continuous updating. Current value
 in parentheses.</dd>
       <dt> <b>Apply Filter to Table...</b></dt>
-      <dd> Specify a filter for the entire table to be used in receiving
+      <dd> Specify a filter for the entire table to be used in
+receiving
 data asynchronously.</dd>
       <dt> <b>Apply Filter to Cell...</b></dt>
       <dd> Specify a filter for selected cell to be used in receiving
@@ -2492,7 +2595,8 @@ mouse button over the menu item.
     <dt> <b><u>Page</u></b></dt>
     <dl>
       <dt> <b>Operational Mode</b></dt>
-      <dd> Selecting this items causes the program to display only those
+      <dd> Selecting this items causes the program to display only
+those
 columns that are useful for operations.</dd>
       <dt> <b>Engineering Mode</b></dt>
       <dd> Selecting this items causes the program to display all
@@ -2519,10 +2623,12 @@ List on the main pet window.</dd>
     <dt> <b><u>Device</u></b></dt>
     <dl>
       <dt> <b>Description...</b></dt>
-      <dd> Allows the user to view and edit database description for the
+      <dd> Allows the user to view and edit database description for
+the
 current device as well as view the ddf details.</dd>
       <dt> <b>Show All PPM Users</b></dt>
-      <dd> Brings up a separate window displaying the current device for
+      <dd> Brings up a separate window displaying the current device
+for
 all PPM users.</dd>
       <dt> <b>Show CLD Editor</b></dt>
       <dd> Brings up a new window which let the user view and/or edit
@@ -2581,13 +2687,15 @@ temp. file in the system for each device list.</dd>
 command columns.</dd>
       <dt> <b>Load from Temp. File</b></dt>
       <dd> Loads the buffer columns from setpoint and command data
-stored in the temp. file. There is one temp. file in the system for each
+stored in the temp. file. There is one temp. file in the system for
+each
 device list.</dd>
       <dt> <b>Load from Archive...</b></dt>
       <dd> Loads the buffer columns from data stored in a user selected
 archive file.</dd>
       <dt> <b>Load Global Command...</b></dt>
-      <dd> Loads a command into one of the buffer command fields for all
+      <dd> Loads a command into one of the buffer command fields for
+all
 devices on this device page.</dd>
       <dt> <b>Load Global Setpoint...</b></dt>
       <dd> Loads a setpoint into the buffer for all devices on this
@@ -2630,19 +2738,23 @@ Operations group and should only be changed by a member of that group.</blockquo
 and the old Apollo version of SpreadSheet?</b>
   <ul>
     <li> The new pet operates with a Main Window and one or many Device
-Pages. The main window always displays the Machine Tree, allowing you to
+Pages. The main window always displays the Machine Tree, allowing you
+to
 select a new device list at any time. The selected devices will then
 replace the devices in the current device page if the list is selected
-with the 1st mouse button, or be included in a newly created device page
+with the 1st mouse button, or be included in a newly created device
+page
 if the list is selected with the 2nd mouse button. As many device pages
 can be created as desired.</li>
     <li> Each device page contains an entire device list in a scrolling
 table. The window can be resized to display more or fewer devices from
 the list. Blank lines in the device_list file, which were used to
-signify page breaks, are now seen as blank rows in the table. The window
+signify page breaks, are now seen as blank rows in the table. The
+window
 scrolls and can be resized horizontally as well to view different
 columns. Initially the device page comes up in Operational Mode,
-displaying only measurement, setpoint, command, status, nudge and buffer
+displaying only measurement, setpoint, command, status, nudge and
+buffer
 columns. To see additional columns, choose Engineering Mode from the
 Page menu.</li>
     <li> Each newly created device page inherits the PPM user from the
@@ -2652,29 +2764,37 @@ desired. All devices on a device page use the same PPM user, but each
 device page can have a different PPM user. The same device list can be
 displayed for different PPM users on different device pages.</li>
     <li> Editing of SLD setpoints is done right in the cell. First
-highlight the cell by clicking on it or by using the keyboard arrow keys
+highlight the cell by clicking on it or by using the keyboard arrow
+keys
 to move to it. Then type in the new value. Hitting the RETURN or ENTER
-key on the keyboard or clicking on the cell with the middle mouse button
+key on the keyboard or clicking on the cell with the middle mouse
+button
 sends down the value.</li>
-    <li> Commands are edited via a cell menu. Click on the cell with the
+    <li> Commands are edited via a cell menu. Click on the cell with
+the
 left mouse button to see the list of possible commands and make a
 selection. The command is sent down immediately upon selection.</li>
-    <li> A new Nudge column appears next to the Setpoint column. This is
+    <li> A new Nudge column appears next to the Setpoint column. This
+is
 the value used to increment or decrement the associated setpoint.
 Clicking on the nudge cell with the 1st mouse button performs a
 decrement, while clicking with the 3rd mouse button performs an
 increment. A click with the middle mouse button brings up a popup for
-editing the value. A Nudge menu allows you to edit all nudge values on a
+editing the value. A Nudge menu allows you to edit all nudge values on
+a
 device page. The menu also has options for saving the current value or
 values to the permanent storage so that they can be used as initial
 values the next time this device list is opened.</li>
     <li> As with other AGS X Window programs, the right mouse button is
-used to get help or retrieve additional information about an item on the
+used to get help or retrieve additional information about an item on
+the
 user interface. Each menu item has right mouse button help (press and
-hold the right mouse button over the item). Pressing the right button on
+hold the right mouse button over the item). Pressing the right button
+on
 a device name will cause device information to be displayed. The device
 description can be edited here.</li>
-    <li> The Buffer columns have behavior similar to the old SpreadSheet
+    <li> The Buffer columns have behavior similar to the old
+SpreadSheet
 except that these columns are now editable. This permits, for example,
 loading new device settings for a number of devices and sending these
 new values to hardware simultaneously.</li>
@@ -2688,15 +2808,18 @@ by clicking on a CLD name within a displayed device list. See <a
   <dl>
     <dt> <b>SLD</b></dt>
     <dd> Simple Logical Device. One of the basic data structures of the
-AGS Control system, an SLD consists of zero or one setpoint, zero or one
+AGS Control system, an SLD consists of zero or one setpoint, zero or
+one
 measurement, up to 8 commands and up to 16 statuses.</dd>
     <dt> <a name="WhatIsCLD"></a><b>CLD</b></dt>
-    <dd> Complex Logical Device. One of the basic data structures of the
+    <dd> Complex Logical Device. One of the basic data structures of
+the
 AGS Control system, a CLD consists of any number of setpoints, any
-number of measurements, up to 8 commands and up to 16 statuses. See also <a
- href="#WorkingWithClds">Working with CLDs</a>.</dd>
+number of measurements, up to 8 commands and up to 16 statuses. See
+also <a href="#WorkingWithClds">Working with CLDs</a>.</dd>
     <dt> <b>Parameter</b></dt>
-    <dd> A parameter is similar to an SLD in that it contains a setpoint
+    <dd> A parameter is similar to an SLD in that it contains a
+setpoint
 and one or more command fields. However, it differs in a few important
 ways. First, parameters are not stored in hardware like SLDs, they are
 stored in the database. There are no controllers or stations associated
@@ -2706,15 +2829,16 @@ with parameters. Also, parameters do not have statuses. See also <a
     <dd> Meta devices are special devices which can control many other
 devices (SLDs, CLDs, or Parameters). How these devices are linked is
 stored in the database. Each metadevice has a name and an associated
-function, which it applies to each of its meta member devices. See also <a
- href="#WorkingWithMetaDevices">Working with MetaDevices</a>.</dd>
+function, which it applies to each of its meta member devices. See also
+      <a href="#WorkingWithMetaDevices">Working with MetaDevices</a>.</dd>
     <dt> <b>Nudge</b></dt>
     <dd> Moving a setpoint up or down by a fixed amount. The amount of
 movement is called the nudge value. It is usually a small percentage of
 the setpoint value. See also <a href="#Nudging">Nudging
 (Increment/Decrement)</a>.</dd>
     <dt> <b>Buffer</b></dt>
-    <dd> An area on a device page which can be used to buffer a setpoint
+    <dd> An area on a device page which can be used to buffer a
+setpoint
 and up to 3 commands. When the page is loaded it holds the initial
 values for devices on that page. Buffer values can be reloaded from
 various places or send directly to hardware. See also <a
