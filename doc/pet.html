@@ -1600,23 +1600,36 @@ characters.</li>
       <td>Launch a process when cell is selected</td>
     </tr>
     <tr>
+      <td style="vertical-align: top;">launchMenu<br>
+      </td>
+      <td style="vertical-align: top;">L<br>
+      </td>
+      <td style="vertical-align: top;">string (10)<br>
+      </td>
+      <td style="vertical-align: top;">none<br>
+      </td>
+      <td style="vertical-align: top;">Launch a process associated with
+a menu selection<br>
+      </td>
+    </tr>
+    <tr>
       <td>monitor</td>
       <td>T</td>
-      <td>string (10)</td>
+      <td>string (11)</td>
       <td>none</td>
       <td>Display gpm style monitor inside the pet window</td>
     </tr>
     <tr>
       <td>monitorWindow</td>
       <td>T</td>
-      <td>string (10)</td>
+      <td>string (11)</td>
       <td>none</td>
       <td>Display gpm style monitor in it's own window</td>
     </tr>
     <tr>
       <td>monitorLayout</td>
       <td>T</td>
-      <td>string (11)</td>
+      <td>string (12)</td>
       <td>square</td>
       <td>used with monitor attribute only. Defines layout of monitors
 in pet window</td>
@@ -1652,13 +1665,34 @@ color. monAlarmParam
 and monAlarmState should be used exclusively.</li>
         <li>Specify the default path to use when opening the file
 browser popup. <b>Note: ADO Parameter Type MUST be a String</b></li>
-        <li>Specify the command to be executed formatted as if running
+        <li><a name="LAUNCH"></a>Specify the command to be executed
+formatted as if running
 from the command line. The command will automatically be executed in
 the background. <b>Note: The Text in the Launch Cell Must Be Quoted.
 Example:</b> <br>
           <i>"Launch Gpm"; launch:/usr/controls/bin/Gpm</i><br>
           <b>Will add a cell with the text "Launch Gpm". When the cell
-is selected, Gpm will be launched.</b> </li>
+is selected, Gpm will be launched.</b></li>
+        <li><b><span style="font-weight: bold;"><span
+ style="font-weight: bold;"></span></span></b>Works similarly to the
+Launch attribute (see <a href="#LAUNCH">Launch attribute</a>
+description above) except that it allows the user to create a menu of
+launch items for a single cell.&nbsp;&nbsp; Here is an example of how
+this attribute could be setup for a cell.&nbsp;<br>
+          <span style="font-style: italic;">"Launcher";launchMenu:Gpm
+/usr/controls/bin/Gpm | myPet pet -s
+~/pet/myPet.pet | xterm /usr/bin/xterm</span><br>
+In this example "Launcher" will appear in the cell on the pet page
+serving as the title of the menu.&nbsp; Any time a selection is made
+from this menu the selection will revert back to the title.&nbsp;
+"launchMenu" is the attribute type that is being created (just like any
+other attribute).&nbsp; Following are pairs of menu names along with
+the command to execute.&nbsp; Each pair is separated by the '|'
+character.&nbsp; Blank spaces before and after this character are
+ignored.&nbsp; The only restriction is that the menu names can not have
+blank spaces.&nbsp; The first blank encountered is used as the
+seperator between the menu-command pair.<br>
+        </li>
         <li> Specify monitor files using the gpm path (eg.
 Scratch/myMon.mon) or using absolute path (eg.
 /home/cfsb/mcr/myMon.mon).<br>
@@ -1680,7 +1714,8 @@ Notes:
   <li> strings for color values can be found in /usr/lib/X11/rgb.txt</li>
 </ol>
 <h3> <a name="attribExamples"></a>Attribute Examples</h3>
-<pre>BEGIN ATTRIBUTES<br>! change the table foreground and background colors<br>R0C0.foreground: firebrick<br>R0C0.background: white<br>! change the foreground color for quoted text<br>R0C0.labelForeground: DarkGreen<br>! change the color for an individual cell<br>R3C4.foreground: cyan<br>R3C4.background: gray50<br>! change the size of the table<br>R0C0.visibleRows: 6<br>R0C0.visibleColumns: 5<br>! make a particular cell editable<br>R3C3.editable: true<br>! change the font for the table<br>R0C0.font: 9x15bold<br>! change the width of column 4<br>R0C4.width: 5<br>! force a cell to display in 3 decimal places<br>R6C4.formatString: %.3f<br>! set limits in what can be entered into a cell<br>R5C3.min: 0<br>R5C3.max: 200<br>! here's another way to put a string in a cell<br>R4C5.string: BPM Gain<br>! use the alarmLevel property of the parameters in each cell of column 2 to determine color of cell<br>R0C2.monAlarmState: true<br>! in row 4, column 2 use the value property of the specified device:parameter to determine cell color<br>R4C2.monAlarmParam: device:param:value<br>! in row 4, column 3 use the alarmLevel property of the specified device:parameter to determine cell color<br>R4C3.monAlarmParam: device:param<br>! specify that row 5, column 2 use a file browser to update the ado property <br>R5C2.fileBrowser: /operations/app_store/config<br>! have row 5, column 3 launch LogView<br>R5C3.launch: /usr/controls/bin/LogView -file /home/cfsb/mcr/MyLogViewFile<br>! add some gpm monitors to the pet page<br>R0C0.monitor: Scratch/petTest.mon,Scratch/striptest.mon,Scratch/table.mon<br>! add some monitors in separate windows<br>R0C0.monitorWindow: Scratch/petTest.mon, Booster/BoosterCycles.mon<br>! set the layout of the monitors in the pet window to vertically aligned<br>R0C0.monitorLayout:vertical<br><br>END ATTRIBUTES</pre>
+<pre>BEGIN ATTRIBUTES<br>! change the table foreground and background colors<br>R0C0.foreground: firebrick<br>R0C0.background: white<br>! change the foreground color for quoted text<br>R0C0.labelForeground: DarkGreen<br>! change the color for an individual cell<br>R3C4.foreground: cyan<br>R3C4.background: gray50<br>! change the size of the table<br>R0C0.visibleRows: 6<br>R0C0.visibleColumns: 5<br>! make a particular cell editable<br>R3C3.editable: true<br>! change the font for the table<br>R0C0.font: 9x15bold<br>! change the width of column 4<br>R0C4.width: 5<br>! force a cell to display in 3 decimal places<br>R6C4.formatString: %.3f<br>! set limits in what can be entered into a cell<br>R5C3.min: 0<br>R5C3.max: 200<br>! here's another way to put a string in a cell<br>R4C5.string: BPM Gain<br>! use the alarmLevel property of the parameters in each cell of column 2 to determine color of cell<br>R0C2.monAlarmState: true<br>! in row 4, column 2 use the value property of the specified device:parameter to determine cell color<br>R4C2.monAlarmParam: device:param:value<br>! in row 4, column 3 use the alarmLevel property of the specified device:parameter to determine cell color<br>R4C3.monAlarmParam: device:param<br>! specify that row 5, column 2 use a file browser to update the ado property <br>R5C2.fileBrowser: /operations/app_store/config<br>! have row 5, column 3 launch LogView<br>R5C3.launch: /usr/controls/bin/LogView -file /home/cfsb/mcr/MyLogViewFile<br>! have row 5, column 4 be a launch menu with Gpm, pet and an xterm as the menu items.  The<br>! title of this cell will be whatever text was added into row 5, column 4.<br>R5C4.launchMenu<span
+ style="font-style: italic;">:Gpm /usr/controls/bin/Gpm | myPet pet -s ~/pet/myPet.pet | xterm /usr/bin/xterm</span><br>! add some gpm monitors to the pet page<br>R0C0.monitor: Scratch/petTest.mon,Scratch/striptest.mon,Scratch/table.mon<br>! add some monitors in separate windows<br>R0C0.monitorWindow: Scratch/petTest.mon, Booster/BoosterCycles.mon<br>! set the layout of the monitors in the pet window to vertically aligned<br>R0C0.monitorLayout:vertical<br><br>END ATTRIBUTES</pre>
 <a href="#TableOfContents">Back to Table of Contents</a>
 <p> </p>
 <hr width="100%">
