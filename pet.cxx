@@ -220,8 +220,10 @@ int main(int argc, char *argv[])
         
         if (singlePetWin == NULL){
           singlePetWin = new PetWindow(application, "petWindow");
-          if (mainWindow)
+          if (mainWindow) {
             mainWindow->AddListWindow(singlePetWin);
+            singlePetWin->GetPetPage()->AddEventReceiver(mainWindow);
+          }
         }
         singlePetWin->LoadFile(file);
         singlePetWin->ChangePath(path);
@@ -887,12 +889,18 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       tree->GenerateFullNodePathname(selectedNode, s);
       strcat(s, "/");
       PET_WINDOW_TYPE type = WindowType(s);
+
+      // independently look for medm screens (.adl extension) and launch these if found.
+      bool foundmedm = checkForMedmPage(s);
+
       if (type == PET_UNKNOWN_WINDOW)
         {
-          // give an error message - no file found!
-          RingBell();
-          SetMessage("No ld or ado device list found.");
-          return;
+    	  if (foundmedm == false) {
+             // give an error message - no file found!
+			 RingBell();
+		   	 SetMessage("No ld or ado device list found.");
+			 return;
+    	  }
         }
       SetWorkingCursor();
       // in case we have an error - loading a window - let's remember the window we are replacing!
@@ -1169,6 +1177,20 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     {
       SetMessage("");
       SP_Show();
+    }
+  // user is launching a new pet page from within another pet page
+  else if(event == UIEvent9)
+    {
+      PetPage* page = (PetPage*) object;
+      const char* path = page->LaunchPetPagePath();
+      int retval = treeTable->SelectNodePath(path);
+      if (retval != 0) {
+        // handle error
+        SetMessage("Unable to load page");
+      } else {
+        treeTable->LoadTreeTable();
+        HandleEvent(treeTable, UITableBtn2Down);  // simulate a select event
+      }
     }
     // user canceled creating permanent page in the tree
   else if(event == UIEvent6)
@@ -1588,6 +1610,37 @@ PET_WINDOW_TYPE SSMainWindow::WindowType(const char* path)
   }
 
   return PET_UNKNOWN_WINDOW;
+}
+
+bool SSMainWindow::checkForMedmPage(const char* path)
+{
+	bool exists = false;
+	string cmd = "medm_cdev -x ";
+	  if (strstr(path, ".adl")) {
+		  exists = true;
+		  cmd += path;
+		  cmd += " &";
+	  } else {
+		  char fname[512];
+		   strcpy(fname, path);
+		   if (!strstr(path, "device_list")) {
+		     strcat(fname, "/");
+		     strcat(fname, "device_list.adl");
+		   } else
+		     strcat(fname, ".adl");
+
+
+		   exists = UIFileExists(fname);
+		   if (exists) {
+			   cmd += fname;
+			   cmd += " &";
+			   exists = true;
+		   }
+	  }
+    if (exists)
+    	system(cmd.c_str());
+
+    return exists;
 }
 
 void SSMainWindow::DeleteListWindow(UIWindow* window)
