@@ -56,6 +56,8 @@ public:
   PET_WINDOW_TYPE WindowType(UIWindow* window);
   PET_WINDOW_TYPE WindowType(const char* path);
 
+  bool checkForMedmPage(const char* path);
+
   // add an already created device page or CLD window to the list
   void AddListWindow(UIWindow* window);
 
