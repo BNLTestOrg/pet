@@ -527,6 +527,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   // add the table which displays the machine tree
   // put this in last so that it is the one that grows when the window is resized
   treeTable = new UIMachineTreeTable(this, "treeTable");
+  treeTable->GetTable()->ColumnAutoResize(2);
   treeTable->AttachTo(ppmLabel, this, pageList, this);
   treeTable->EnableEvent(UITableBtn2Down);
   treeTable->EnableEvent(UIAccept);
