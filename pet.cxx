@@ -1894,7 +1894,7 @@ void SSMainWindow::SS_New()
 		// create a new pet window and use it's edit method to modify the new file
 		const char* type = editDeviceList->GetDeviceType();
 		if (!strcmp(type, "ado")) {
-			if (editDeviceList->IsNewType()) {
+			if (editDeviceList->IsNewType() || adoWinToEdit == NULL) {
 				// creating new file
 	  			PetWindow* petWin = new PetWindow(this, "petWindow");
 	   	        activeAdoWin = petWin;
@@ -1937,8 +1937,12 @@ void SSMainWindow::SS_New()
 	  			activeLdWin = pageWin;
 			} else {
 				// editing existing file
-				ldWinToEdit->EditBuiltInEditor();
-			}
+		    if (ldWinToEdit == NULL) {
+		      SetMessage("No LD Window open to Edit");
+		      return;
+		    }
+		    ldWinToEdit->EditBuiltInEditor();
+		  }
 		}
 	}
 }
