@@ -2467,7 +2467,7 @@ void SSMainWindow::SO_Flash_Pages(bool flash)
     } else if (ldWin) {
       ldWin->Show();
       ldWin->Flash(flash);
-    } else {
+    } else if (cldWin) {
       cldWin->Show();
       cldWin->Flash(flash);
     }
