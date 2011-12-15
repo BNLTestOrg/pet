@@ -24,6 +24,7 @@
 #include <cdevCns/cdevCns.hxx>
 #include <cns/cnsRequest.hxx>                   // to tutn on cache flushing
 #include <setHist/SetStorage.hxx>               // to turn on storage of ADO/LD sets
+#include <MsgLog/MessageLogger.hxx>
 #include "MenuTree.cxx"
 
 using namespace std;
@@ -85,6 +86,9 @@ int main(int argc, char *argv[])
   signal(SIGTERM,clean_up);
   signal(SIGSTOP,clean_up);
 
+  // create a message logger
+  FileMsgLogger* myLogger = new FileMsgLogger("pet");
+  myLogger->setSingleLineOutput( true );
 
   // set up the CNS as the source for names
   cdevCnsInit();
