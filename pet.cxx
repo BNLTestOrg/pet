@@ -143,6 +143,13 @@ int main(int argc, char *argv[])
   if(argList.IsPresent("-file") || argList.IsPresent("-single")){
 
     const char* fname = argList.UntaggedItem(0);
+    if (fname == NULL) {
+      char* arg = "-single";
+      if (argList.IsPresent("-file"))
+          arg = "-file";
+      fprintf(stderr, "pet file name required with %s arg\n", arg);
+      exit(0);
+    }
     type = mainWindow->WindowType(fname);
     switch (type) {
     case PET_ADO_WINDOW:
