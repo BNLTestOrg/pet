@@ -1,16 +1,28 @@
 #!/bin/csh
 #
-# adoPet <ado name>
+# adoPet <ado name> [<ppmuser>] [<pet template>]
+#
+# Example:
+#           adoPet es2-q4-ps 1 defaultPopup.pett
+#
+set ppm = 0
+set template = ""
 #
 # get the ado name
 if ($#argv < 1) then
-	echo -n "ado name? ppm"
+	echo -n "ado name? "
 	set ado=($<)
 else
 	set ado="$argv[1]"
-	if ($#argv == 2) then
+
+	# look for optional ppm user
+	if ($#argv > 1) then
 	  set ppm="$argv[2]"
-	else set ppm = 0
+	endif
+
+	# and optional pet template 
+	if ($#argv > 2) then
+	  set template=";template:$argv[3]"
 	endif
 	
 endif
@@ -35,6 +47,7 @@ echo -n ' "ado class","' >> /tmp/${ado}.ado ; echo -n $cnsline[2] >> /tmp/${ado}
 echo ' ' >> /tmp/${ado}.ado
 #
 # show the page
-echo $ado >> /tmp/${ado}.ado
+echo ${ado}$template >> /tmp/${ado}.ado
+
 pet -s /tmp/${ado}.ado -ppm ${ppm}
 
