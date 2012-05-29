@@ -1,0 +1,40 @@
+#!/bin/csh
+#
+# adoPet <ado name>
+#
+# get the ado name
+if ($#argv < 1) then
+	echo -n "ado name? ppm"
+	set ado=($<)
+else
+	set ado="$argv[1]"
+	if ($#argv == 2) then
+	  set ppm="$argv[2]"
+	else set ppm = 0
+	endif
+	
+endif
+
+#
+# is it in cns?
+set cnsline = `cnslookup $ado | grep ADO`
+if ( $status != 0 ) then
+    echo "$ado is not an ADO that is listed in cns"
+    exit 1
+endif
+#
+# remove any old tmp device list
+\rm /tmp/${ado}.ado >& /dev/null
+# 
+# put some info at top of the page
+touch /tmp/${ado}.ado
+echo -n ' "system name","' >> /tmp/${ado}.ado ; echo -n $cnsline[7] >> /tmp/${ado}.ado ; echo '"' >> /tmp/${ado}.ado
+echo -n ' "generic name","' >> /tmp/${ado}.ado ; echo -n $cnsline[3] >> /tmp/${ado}.ado ; echo '"' >> /tmp/${ado}.ado
+echo -n ' "server name","' >> /tmp/${ado}.ado ; echo -n $cnsline[4] >> /tmp/${ado}.ado ; echo '"' >> /tmp/${ado}.ado
+echo -n ' "ado class","' >> /tmp/${ado}.ado ; echo -n $cnsline[2] >> /tmp/${ado}.ado ; echo '"' >> /tmp/${ado}.ado
+echo ' ' >> /tmp/${ado}.ado
+#
+# show the page
+echo $ado >> /tmp/${ado}.ado
+pet -s /tmp/${ado}.ado -ppm ${ppm}
+
