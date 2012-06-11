@@ -2447,6 +2447,7 @@ void SSMainWindow::SO_Flash_Pages(bool flash)
   PetWindow* adoWin = NULL;
   UIWindow* win = NULL;
 
+  int ws = GetWorkspace();
   int numWins = GetNumWindows();
   for (int i=1; i<=numWins; i++){
     win = GetWindow(i);
@@ -2473,12 +2474,15 @@ void SSMainWindow::SO_Flash_Pages(bool flash)
       }
     
     if (adoWin) {
+      adoWin->SetWorkspace(ws);
       adoWin->Show();
       adoWin->Flash(flash);
     } else if (ldWin) {
+      ldWin->SetWorkspace(ws);
       ldWin->Show();
       ldWin->Flash(flash);
     } else if (cldWin) {
+      cldWin->SetWorkspace(ws);
       cldWin->Show();
       cldWin->Flash(flash);
     }
