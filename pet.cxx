@@ -25,6 +25,7 @@
 #include <cns/cnsRequest.hxx>                   // to tutn on cache flushing
 #include <setHist/SetStorage.hxx>               // to turn on storage of ADO/LD sets
 #include <MsgLog/MessageLogger.hxx>
+#include <utils/AppContext.hxx>
 #include "MenuTree.cxx"
 
 using namespace std;
@@ -428,6 +429,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   editDeviceList = NULL;
   _creatingPageInTree = false;
   _historyPopup = NULL;
+  _recentPopup = NULL;
   _totalFlashTimerId = 0L;
   
   // resources
@@ -862,19 +864,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     if(path == NULL || time == 0)
       return;
     long selection = _historyPopup->GetSelection();
-    if(selection == 1) { // Show pet page
-      char treePath[1024];
-      strcpy(treePath, "/acop/");
-      strcat(treePath, path);
-      char* cptr = strstr(treePath, "/device_list");
-      if(cptr)
-        *cptr = 0;
-      else
-        return;  // not a pet page that can be loaded
-      treeTable->SelectNodePath(treePath);
-      treeTable->LoadTreeTable();
-      HandleEvent(treeTable, UISelect);  // simulate a select event
-    }
+    if(selection == 1)
+      OpenFile(path);
   }
   // user made a leaf selection from the machine tree table
   else if(object == treeTable)
@@ -1295,6 +1286,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 	else if(!strcmp(data->namesSelected[1], "Open..."))
 	  {     SS_Open();
 	  }
+  else if(!strcmp(data->namesSelected[1], "Open Favorite..."))
+    {     SS_OpenFavorite();
+    }
 	else if(!strcmp(data->namesSelected[1], "Default PPM User..."))
 	  {	SS_Default_PPM_User();
 	  }
@@ -1985,6 +1979,55 @@ void SSMainWindow::SS_Open()
   petWin->Show();
   LoadPageList(petWin);
   SetStandardCursor();
+}
+
+void SSMainWindow::OpenFile(const char* filePath)
+{
+  char treePath[1024];
+  strcpy(treePath, "/acop/");
+  strcat(treePath, filePath);
+  char* cptr = strstr(treePath, "/device_list");
+  if(cptr)
+    *cptr = 0;
+  else
+    return;  // not a pet page that can be opened
+  treeTable->SelectNodePath(treePath);
+  treeTable->LoadTreeTable();
+  HandleEvent(treeTable, UISelect);  // simulate a select event
+}
+
+void SSMainWindow::SS_OpenFavorite()
+{
+  if(_recentPopup == NULL) {
+    _recentPopup = new UIRecentHistoryPopup(this, "recentPopup");
+    const char* userName = GlobalAppContext()->getUnlockName();
+    if(userName == NULL || userName[0] == 0)
+      userName = GlobalAppContext()->getLoginName();
+    _recentPopup->SetUserName(userName);
+    _recentPopup->SetLabel("The list below shows the favorite pet pages displayed by user ID = ", userName, ".\n",
+                           "To load one, select it and click the Show button.  Or double-click the item.");
+    _recentPopup->SetTitle("Pet Page Favorites");
+  }
+  int retval = _recentPopup->LoadTable();
+  if(retval < 0) {       // a problem
+    RingBell();
+    UILabelPopup popup(this, "errorPopup", "Could not load information from the database.\nAborting.", "OK");
+    popup.Wait();
+    return;
+  }
+  else if(retval == 0) { // nothing to load
+    RingBell();
+    UILabelPopup popup(this, "errorPopup", "You have no recent file usage for the current run.\nAborting.", "OK");
+    popup.Wait();
+    return;
+  }
+  retval = _recentPopup->Wait();
+  if(retval == 2)  // Close
+    return;
+
+  // attempt to open the file and display its contents
+  const char* filePath = _recentPopup->GetSelectedFile();
+  OpenFile(filePath);
 }
 
 void SSMainWindow::SS_Set_Host()
