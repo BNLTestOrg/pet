@@ -21,6 +21,10 @@ MenuTree* CreateMenuTree()
 	menuTree->SetNodeMnemonic(snode, 'O');
 	menuTree->SetNodeAccelerator(snode, "Ctrl+O");
 
+	snode = menuTree->InsertMenuItem("Open Favorite...", "/File", NULL);
+	menuTree->SetNodeHelpText(snode, "Brings up a new window showing those pet pages that you have\ndisplayed most frequently during the current run.  You can then\nselect one from the list for display.");
+	menuTree->SetNodeAccelerator(snode, "Ctrl+F");
+
 	snode = menuTree->InsertMenuItem("----", "/File", NULL);
 	menuTree->SetNodeType(snode, MenuSeparatorType);
 
@@ -55,7 +59,6 @@ MenuTree* CreateMenuTree()
 	snode = menuTree->InsertMenuItem("Find", "/Page", NULL);
 	menuTree->SetNodeHelpText(snode, "Clears the machine tree keyboard selection area,\nreadying the program for a new selection either\nusing the mouse or the keyboard.");
 	menuTree->SetNodeMnemonic(snode, 'F');
-	menuTree->SetNodeAccelerator(snode, "Ctrl+F");
 
 	snode = menuTree->InsertMenuItem("New", "/Page", NULL);
 	menuTree->SetNodeHelpText(snode, "If a leaf node is selected on the machine tree\ntable, creates a new device page for that node.\nThis does the same thing as clicking on the\nnode with the 2nd mouse button.");
@@ -123,7 +126,8 @@ MenuTree* CreateMenuTree()
 	snode = menuTree->InsertMenuItem("----", "/Options", NULL);
 	menuTree->SetNodeType(snode, MenuSeparatorType);
 
-        snode = menuTree->InsertMenuItem("Flash Pages", "/Options", NULL);
+	snode = menuTree->InsertMenuItem("Flash Pages", "/Options", NULL);
+	menuTree->SetNodeHelpText(snode, "Raises all open pet pages and temporarily flashes the menu bar");
 
 	return menuTree;
 }
