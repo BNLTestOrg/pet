@@ -93,6 +93,7 @@ protected:
   UICreateDeviceList*           editDeviceList;
   bool                          _creatingPageInTree;
   UIHistoryPopup*               _historyPopup;
+  UIRecentHistoryPopup*         _recentPopup;
   unsigned long                 _totalFlashTimerId; // to timeout flashing after 4 seconds.
   
   // set the window position for a newly created window
@@ -113,6 +114,7 @@ protected:
   // pulldown menu routines
   void SS_New();
   void SS_Open();
+  void SS_OpenFavorite();
   void SS_Set_Host();
   void SS_Default_PPM_User();
   void SS_Create_RHIC_Page();
@@ -145,7 +147,7 @@ protected:
   void           ShowCldEditor(const char* devname, int ppmuser);
   SSPageWindow*  CreateLdWindow();
   PetWindow*     CreateAdoWindow();
-
+  void           OpenFile(const char* filePath);
 };
 
 /////////////////////////////////////////////////////////////////////
