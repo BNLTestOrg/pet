@@ -1,7 +1,7 @@
 "MTRE",3
 797093749,"Wed Apr  5 10:55:49 1995"
-1221853251,"Fri Sep 19 15:40:51 2008"
-48,33,33
+1340131041,"Tue Jun 19 14:37:21 2012"
+48,34,34
 
 "NODE 0"
 "SSmain"
@@ -71,7 +71,7 @@ the Device Pages list."
 "Find"
 7,6,18,-1,-1
 1
-70,"Ctrl+F"
+70,""
 0,0
 "Clears the machine tree keyboard selection area,
 readying the program for a new selection either
@@ -208,7 +208,7 @@ by choosing the Show menu item."
 
 "NODE 22"
 "----"
-22,1,4,23,-1
+22,1,4,33,-1
 6
 0,""
 0,0
@@ -216,7 +216,7 @@ by choosing the Show menu item."
 
 "NODE 23"
 "Open..."
-23,1,22,20,-1
+23,1,33,20,-1
 1
 79,"Ctrl+O"
 0,0
@@ -299,12 +299,14 @@ other one.  Searches for particular pages are possible."
 ""
 
 "NODE 33"
-""
-33,-1,34,-1,-1
+"Open Favorite..."
+33,1,22,23,-1
 1
-0,""
+0,"Ctrl+F"
 0,0
-""
+"Brings up a new window showing those pet pages that you have
+displayed most frequently during the current run.  You can then
+select one from the list for display."
 
 "NODE 34"
 ""
