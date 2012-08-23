@@ -2137,6 +2137,9 @@ int SSMainWindow::ConfirmQuit()
 
   SO_Flash_Pages();
 
+  // need to get back to the main event loop otherwise there is
+  // a possibility that this window will not expose properly
+  // in the current workspace
   UILabelPopup popup(this, "confirmPopup", NULL, "Yes", "No");
   popup.SetLabel("Exit ", application->Name(), "?\n\nAll flashing pet pages will be closed.");
   if (popup.Wait() == 1)
@@ -2491,6 +2494,7 @@ void SSMainWindow::SO_Flash_Pages(bool flash)
   UIWindow* win = NULL;
 
   int ws = GetWorkspace();
+
   int numWins = GetNumWindows();
   for (int i=1; i<=numWins; i++){
     win = GetWindow(i);
@@ -2517,15 +2521,15 @@ void SSMainWindow::SO_Flash_Pages(bool flash)
       }
     
     if (adoWin) {
-      adoWin->SetWorkspace(ws);
+    	adoWin->SetWorkspace(ws); // this should not be necessary but it doesn't work properly otherwise
       adoWin->Show();
       adoWin->Flash(flash);
     } else if (ldWin) {
-      ldWin->SetWorkspace(ws);
+    	ldWin->SetWorkspace(ws); // this should not be necessary but it doesn't work properly otherwise
       ldWin->Show();
       ldWin->Flash(flash);
     } else if (cldWin) {
-      cldWin->SetWorkspace(ws);
+    	cldWin->SetWorkspace(ws); // this should not be necessary but it doesn't work properly otherwise
       cldWin->Show();
       cldWin->Flash(flash);
     }
