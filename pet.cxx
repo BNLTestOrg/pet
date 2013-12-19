@@ -71,11 +71,16 @@ int main(int argc, char *argv[])
   argList.AddSwitch("-single");         // single window mode
   argList.AddSwitch("-file");		// file to open initially
   argList.AddString("-path");		// default path for file open
-  argList.AddSwitch("-printToElog");    // used with -single or -file to print pet page to elog after data acquisition, then exit
-  argList.AddString("-elog");           // when used with -printToElog, the name of the elog, else the default
+  argList.AddSwitch("-printToElog", "Deprecated - use -dumpToElog or -dumpToDefaultElog instead");    // used with -single or -file to print pet page to elog after data acquisition, then exit
+  argList.AddString("-elog", "", "", "Deprecated - use -dumpToElog or -dumpToDefaultElog instead");           // when used with -printToElog, the name of the elog, else the default
   argList.AddString("-printTogif");     // used with -single or -file to print pet page to a gif file after data acquisition, then exit
   argList.AddNumber("-ppm");            // start pet with the specified user
   argList.AddString("-displayName");           // makes the specified name visible when page is opened
+  // the following are redundant but -elog and -printToElog have been kept for backwards compatibility
+  argList.AddString("-dumpToElog", "", "", "dump window image to the specified elog - must use with -single or -file");
+  argList.AddString("-dumpToDefaultElog", "dump window image to the current default elog - must use with -single or -file");
+  argList.AddString("-elogEntryTitle", "", "", "a title to attach to this elog entry - use with -dumpToElog");
+  argList.AddString("-elogAttachToTitle", "", "", "attach image to the entry with this title - use with -dumpToElog");
 
   // initialize the application
   application  = new UIApplication(argc, argv, &argList);
@@ -183,6 +188,9 @@ int main(int argc, char *argv[])
       cout << "-printToElog option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
     else if (argList.IsPresent("-printTogif") && !argList.IsPresent("-device_list"))
       cout << "-printTogif option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
+    else if ((argList.IsPresent("-dumpToElog") || argList.IsPresent("dumpToDefaultElog")) && 
+             (!argList.IsPresent("-device_list") || !argList.IsPresent("-file") || !argList.IsPresent("-single")))
+      cout << "-printToElog option must be used with -single, -file, or -device_list option" << endl;
   }
 
   const char *path = argList.String("-path");
@@ -334,6 +342,26 @@ int main(int argc, char *argv[])
         pt->SetPrintFileName(gifFileName);
       }
     // dump snap shot of the AGS page to the elog and exit
+    if (singleDeviceListOnly)
+      dumpElogAndExitTimerId = application->EnableTimerEvent(1000);
+    else
+      singlePetWin->ElogDumpAndExit();
+  } else if ((argList.IsPresent("-dumpToElog") || argList.IsPresent("-dumpToDefaultElog")) &&
+             (singleWindowMode || singleDeviceListOnly)) {
+    UIPrintTool* printTool = GetPrintTool();
+    const char* elogName = NULL;
+    if(argList.IsPresent("-dumpToElog") )
+      elogName = argList.String("-dumpToElog");
+    
+    printTool->SetPrintOutputType(UIPrintToElog);
+    printTool->SetElogAutoEntry();
+    if(elogName && elogName[0])
+      printTool->SetElogName(elogName);
+    if(argList.IsPresent("-elogEntryTitle") )
+      printTool->SetElogEntryTitle(argList.String("-elogEntryTitle") );
+    else if(argList.IsPresent("-elogAttachToTitle") )
+      printTool->SetElogAttachToTitle(argList.String("-elogAttachToTitle") );
+    // dump snap shot of the page to the elog and exit
     if (singleDeviceListOnly)
       dumpElogAndExitTimerId = application->EnableTimerEvent(1000);
     else
