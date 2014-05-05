@@ -1484,7 +1484,7 @@ int SSMainWindow::LoadDeviceList(SSPageWindow* win, const char* deviceList, shor
   if (!strstr(deviceList, "device_list")){
     strcat(filename, "/");
     strcat(filename, LD_DEVICE_LIST);
-  } else if (!strstr(deviceList, ".ld") && !strstr(deviceList, ".ado")))
+  } else if (!strstr(deviceList, ".ld") && !strstr(deviceList, ".ado"))
     strcat(filename, ".ld");
 
   // load the device list
