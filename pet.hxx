@@ -148,6 +148,7 @@ protected:
   SSPageWindow*  CreateLdWindow();
   PetWindow*     CreateAdoWindow();
   void           OpenFile(const char* filePath);
+  void           ExitAllWindows();
 };
 
 /////////////////////////////////////////////////////////////////////
