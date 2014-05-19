@@ -1586,6 +1586,27 @@ UIWindow* SSMainWindow::FindWindow(const char* file, PET_WINDOW_TYPE wtype)
   return NULL;
 }
 
+void SSMainWindow::ExitAllWindows()
+{
+  UIWindow* win;
+  int numWindows = GetNumWindows();
+  PET_WINDOW_TYPE type;
+  for(int i=0; i<numWindows; i++) {
+    win = GetWindow(i+1);
+    type = WindowType(win);
+    switch (type)
+    {
+      case PET_ADO_WINDOW:
+        ((PetWindow*)win)->TF_Exit();
+        break;
+      case PET_LD_WINDOW:  // currently not supported
+      case PET_CLD_WINDOW: // currently not supported
+      default:
+        break;
+    }
+  }
+}
+
 PET_WINDOW_TYPE SSMainWindow::WindowType(UIWindow* window)
 {
   if (window == NULL || window->ClassName() == NULL)
@@ -2190,6 +2211,7 @@ void SSMainWindow::SS_Quit()
 //   if (ConfirmQuit() == false)
 //     return;
 
+  ExitAllWindows();
   clean_up(0);
 }
 
@@ -2198,14 +2220,17 @@ void SSMainWindow::Exit()
   int retval = ConfirmQuit();
   if (retval == 0)
     return;
-  else if (retval == 1)
+  else if (retval == 1) {
+    ExitAllWindows();
     clean_up(0);
+  }
   else if (retval == 2) {
     // first put up an exit confirmation
     UILabelPopup popup(this, "exitPopup", NULL, "Yes", "No");
     popup.SetLabel("Exit ", application->Name(), "? Are you sure?");
     if(popup.Wait() == 1)	// Yes selected
       {
+        ExitAllWindows();
         clean_up(0);
       }
   }
