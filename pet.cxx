@@ -10,7 +10,6 @@
 #include <utils/utilities.h>			// for set_default_fault_handler()
 #include <archive/archive_lib.h>		// for init_archive_lib_globals() and ARCHIVE_LOG;
 #include <ddf/DeviceDirectory.hxx>		// for DeviceDirectory global object
-#include <dgTools/dg_tools.h>			// for check_connection()
 #include <UIGenerics/UIMenubarTools.hxx>	// for mb_init()
 #include <UIAgs/generic_popups_derived.h>	// for gp_set_ppm _program() _user()
 #include <UIAgs/cld_popup.hxx>			// for cld popups
@@ -62,7 +61,6 @@ void errorHandler(int severity, char* text, cdevRequestObject* obj)
 int main(int argc, char *argv[])
 {
   //set up command line arguments
-  argList.AddString("-host");
   argList.AddString("-db_server");
   argList.AddString("-root");
   argList.AddString("-ddf");
@@ -75,7 +73,7 @@ int main(int argc, char *argv[])
   argList.AddString("-elog", "", "", "Deprecated - use -dumpToElog or -dumpToDefaultElog instead");           // when used with -printToElog, the name of the elog, else the default
   argList.AddString("-printTogif");     // used with -single or -file to print pet page to a gif file after data acquisition, then exit
   argList.AddNumber("-ppm");            // start pet with the specified user
-  argList.AddString("-displayName");           // makes the specified name visible when page is opened
+  argList.AddString("-displayName");    // makes the specified name visible when page is opened
   // the following are redundant but -elog and -printToElog have been kept for backwards compatibility
   argList.AddString("-dumpToElog", "", "", "dump window image to the specified elog - must use with -single or -file");
   argList.AddString("-dumpToDefaultElog", "dump window image to the current default elog - must use with -single or -file");
@@ -188,7 +186,7 @@ int main(int argc, char *argv[])
       cout << "-printToElog option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
     else if (argList.IsPresent("-printTogif") && !argList.IsPresent("-device_list"))
       cout << "-printTogif option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
-    else if ((argList.IsPresent("-dumpToElog") || argList.IsPresent("dumpToDefaultElog")) && 
+    else if ((argList.IsPresent("-dumpToElog") || argList.IsPresent("dumpToDefaultElog")) &&
              (!argList.IsPresent("-device_list") || !argList.IsPresent("-file") || !argList.IsPresent("-single")))
       cout << "-printToElog option must be used with -single, -file, or -device_list option" << endl;
   }
@@ -237,7 +235,7 @@ int main(int argc, char *argv[])
         else {		// no path given
           path = strdup("*.ado");
         }
-        
+
         if (singlePetWin == NULL){
           singlePetWin = new PetWindow(application, "petWindow");
           if (mainWindow) {
@@ -253,7 +251,7 @@ int main(int argc, char *argv[])
           free(path);
         if(tmpFile)
           free(tmpFile);
-        
+
 	// LTH - kludge to check for orphaned pet pages
 #ifdef USE_PET_MERELY_TO_ENUMERATE_ADOS_IN_MACHINE_TREE
 
@@ -266,7 +264,7 @@ int main(int argc, char *argv[])
 	const char *adoName;
 	for(int i = 1; i <= rowsUsed; i++)
 	  for(int j = 1; j <= colsUsed; j++)
-	    
+	
 	    if(adoName = pp->CellGetAdo(i,j))
 	      cout << adoName << endl;
 
@@ -352,7 +350,7 @@ int main(int argc, char *argv[])
     const char* elogName = NULL;
     if(argList.IsPresent("-dumpToElog") )
       elogName = argList.String("-dumpToElog");
-    
+
     printTool->SetPrintOutputType(UIPrintToElog);
     printTool->SetElogAutoEntry();
     if(elogName && elogName[0])
@@ -459,7 +457,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   _historyPopup = NULL;
   _recentPopup = NULL;
   _totalFlashTimerId = 0L;
-  
+
   // resources
   static const char* defaults[] = {
     "*foreground: navy",
@@ -607,10 +605,6 @@ void SSMainWindow::InitArchiveLib()
   MachineTree* mtree = treeTable->GetMachineTree();
   const dir_node_t* root = mtree->GetDirRootNode();
   init_archive_lib_globals(GlobalDdfPointers(), false, 0, -1, table_dummy, (dir_node_t*) root);
-}
-
-void SSMainWindow::InitRelwayServer()
-{
 }
 
 void SSMainWindow::SetMessage(const char* message)
@@ -763,15 +757,15 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
         knobPanel->ThrowAwayKnobInput();
     }
   }
-  
+
   // main window events
   if(object == this && event == UIWindowMenuClose)
     Exit();
-  
+
   // user closing the viewer window used to display archive summary log
   else if(object == viewer && event == UIWindowMenuClose)
     viewer->Hide();
-  
+
   // events from the search popup
   else if(object == searchPopup)
   {
@@ -803,12 +797,12 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       treeTable->SetNodeSelected(selectNode);
       treeTable->LoadTreeTable();
       HandleEvent(treeTable, UITableBtn2Down);
-      
+
       // store a ptr to window so can reload if neccessary
       long selection = pageList->GetSelection();
       if(selection > 0)
         searchPage = this->GetWindow(selection);
-      
+
       // make sure the first device name with the search string is highlighted
       const char* searchStr = searchPopup->GetSearchString();
       if(searchStr != NULL && searchStr[0] != 0 && searchPage != NULL)
@@ -829,20 +823,20 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     else if(event == UIHide)	// the user closed the search popup
       searchPage = NULL;	// don't save this anymore once the popup goes down
   }
-  
+
   // a device page window was made active
   else if(event == UIWindowActive)
   {
     // check to see if sent from one of the device pages
     if( IsWindowInList( (UIWindow*) object) == 0)
       return;
-    
+
     if (activeLdWin != NULL)
     {
       if (supportKnobPanel && activeLdWin != object )
 	((SSPageWindow*) activeLdWin)->ClearTheKnobPanel();
     }
-    
+
     // redisplay the tree table and list
     LoadTable( (UIWindow*) object);
     if( !strcmp( object->ClassName(), "SSPageWindow") )
@@ -857,7 +851,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     }
     LoadPageList( (UIWindow*) object);
   }
-  
+
   // user chose the Close menu item from the window menu of a device page
   else if(event == UIWindowMenuClose)
   {
@@ -1558,8 +1552,8 @@ UIWindow* SSMainWindow::FindWindow(const char* file, PET_WINDOW_TYPE wtype)
     else if (wtype == PET_LD_WINDOW && !strstr(fileName, ".ld"))
       strcat(fileName, ".ld");
   }
-  
-    
+
+
   UIWindow* win;
   int numWindows = GetNumWindows();
   const char* winName;
@@ -1644,7 +1638,7 @@ PET_WINDOW_TYPE SSMainWindow::WindowType(const char* path)
   if (!strstr(path, "device_list")) {
     strcat(ssfile, "/");
     strcat(ssfile, LD_DEVICE_LIST);
-  } else 
+  } else
     strcat(ssfile, ".ld");
 
 
@@ -1878,7 +1872,7 @@ void SSMainWindow::SS_New()
 	
 	// temporarily remember the active windows while the user is preparing to edit
 	// so that we don't lose track of the page to be edited in case the user makes
-	// a different window active before finishing with the edit popup.  
+	// a different window active before finishing with the edit popup.
 	// Note: This is dangerous because the user could exit the active window and
 	// we'd be left with a pointer to deleted memory...
 	PetWindow* adoWinToEdit = activeAdoWin;
@@ -1892,7 +1886,7 @@ void SSMainWindow::SS_New()
 		// Graphical Interface
 		//
 		// when done need to save the file (this will come back as a UIEvent5 event)
-		// 
+		//
 		// The file must be a new file since this option is not available to the user for exising files
 		_creatingPageInTree = true;
 		const char* type = editDeviceList->GetDeviceType();
@@ -1915,7 +1909,7 @@ void SSMainWindow::SS_New()
      	    if (p[strlen(p)-1] == '/') p[strlen(p)-1] = '\0';
      	    activeAdoWin->LoadFile(name, &p[len]);
      	    activeAdoWin->SetListString(UIGetLeafName(p));
- 		    // this forces the pageList to refresh itself with the new tree name rather than the temp name     	    
+ 		    // this forces the pageList to refresh itself with the new tree name rather than the temp name     	
      	    LoadPageList(activeLdWin);
      	    activeAdoWin->SaveVersion(file.c_str());
 		} else {
@@ -1938,7 +1932,7 @@ void SSMainWindow::SS_New()
      	    activeLdWin->LoadFile(name, &p[len]);
      	    activeLdWin->SetDevListPath(p);
      	    activeLdWin->SetListString();
- 		    // this forces the pageList to refresh itself with the new tree name rather than the temp name     	    
+ 		    // this forces the pageList to refresh itself with the new tree name rather than the temp name     	
      	    LoadPageList(activeLdWin);
      	    activeLdWin->SaveVersion(file.c_str());
  		}
@@ -2079,14 +2073,6 @@ void SSMainWindow::SS_OpenFavorite()
   OpenFile(filePath);
 }
 
-void SSMainWindow::SS_Set_Host()
-{
-}
-
-void SSMainWindow::ReconnectToRelway(const char* newHost)
-{
-}
-
 void SSMainWindow::AdjustName(char* devicePath)
 {
   if (devicePath != NULL)
@@ -2158,7 +2144,7 @@ void SSMainWindow::SS_Create_AGS_Page()
   SetStandardCursor();
 }
 
-// only confirm the quit if the user is MCR and if Multiple Instances are running 
+// only confirm the quit if the user is MCR and if Multiple Instances are running
 // and at least one page is displayed
 int SSMainWindow::ConfirmQuit()
 {
@@ -2572,7 +2558,7 @@ void SSMainWindow::SO_Flash_Pages(bool flash)
             break;
           }
       }
-    
+
     if (adoWin) {
     	adoWin->SetWorkspace(ws); // this should not be necessary but it doesn't work properly otherwise
       adoWin->Show();
@@ -2692,7 +2678,7 @@ void SSMainWindow::ShowSingleDeviceList(const char* deviceListPath)
   strcat(deviceList, "/");
   strcat(deviceList, deviceListPath);
 
-  if( LoadDeviceList(pageWin, deviceList) < 0 && 
+  if( LoadDeviceList(pageWin, deviceList) < 0 &&
       LoadDeviceList(pageWin, deviceListPath) < 0)
     {
       RingBell();
@@ -2995,7 +2981,7 @@ void SSPageWindow::HandleEvent(const UIObject* object, UIEvent event)
           else
             menubar->SetBackgroundColor("white");
         }
-        
+
         // restart the timer
         flashTimerId = application->EnableTimerEvent(500);
       }
@@ -3269,7 +3255,7 @@ void SSCldWindow::HandleEvent(const UIObject* object, UIEvent event)
           else
             menubar->SetBackgroundColor("white");
         }
-        
+
         // restart the timer
         flashTimerId = application->EnableTimerEvent(500);
       }
