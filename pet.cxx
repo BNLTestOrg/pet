@@ -49,7 +49,6 @@ static const char* wname;
 static void clean_up(int st)
 {
   if (knobPanel != NULL) delete knobPanel;
-  rpc_udp_cleanup();
   exit(st);
 }
 
@@ -260,17 +259,17 @@ int main(int argc, char *argv[])
 	PetPage *pp = singlePetWin->GetPetPage();
 	int rowsUsed = pp->NumRows();
 	int colsUsed = pp->NumColumns();
-	
+
 	const char *adoName;
 	for(int i = 1; i <= rowsUsed; i++)
 	  for(int j = 1; j <= colsUsed; j++)
-	
+
 	    if(adoName = pp->CellGetAdo(i,j))
 	      cout << adoName << endl;
 
 	exit(0);
 #endif
-	
+
 
 
         if (argList.IsPresent("-displayName")) {
@@ -303,7 +302,6 @@ int main(int argc, char *argv[])
 	{
 	  fprintf(stderr, "Could not init KnobPanel.  Aborting.\n");
 	  delete knobPanel;
-	  rpc_udp_cleanup();
 	  exit(1);
 	}
     }
@@ -604,7 +602,7 @@ void SSMainWindow::InitArchiveLib()
 {
   MachineTree* mtree = treeTable->GetMachineTree();
   const dir_node_t* root = mtree->GetDirRootNode();
-  init_archive_lib_globals(GlobalDdfPointers(), false, 0, -1, table_dummy, (dir_node_t*) root);
+  init_archive_lib_globals(GlobalDdfPointers(), false, 0, -1, 0, (dir_node_t*) root);
 }
 
 void SSMainWindow::SetMessage(const char* message)
@@ -1857,142 +1855,142 @@ void SSMainWindow::LoadTable(const StdNode* node)
 void SSMainWindow::SS_New()
 {
 
-	if (!treeTable->IsLeafNode(treeTable->GetNodeSelected())) {
-		UILabelPopup popup(this, "popup", NULL, "OK");
-		popup.SetLabel("Please Select the Leaf Node\nwhere the file is to be created/edited");
-		popup.Wait();
-		return;
+  if (!treeTable->IsLeafNode(treeTable->GetNodeSelected())) {
+    UILabelPopup popup(this, "popup", NULL, "OK");
+    popup.SetLabel("Please Select the Leaf Node\nwhere the file is to be created/edited");
+    popup.Wait();
+    return;
+  }
+
+  if (editDeviceList == NULL)
+    editDeviceList = new UICreateDeviceList(this, "editDeviceList");
+
+  const char* path = GetSelectedPath();
+  editDeviceList->SetDirectory(path);
+
+  // temporarily remember the active windows while the user is preparing to edit
+  // so that we don't lose track of the page to be edited in case the user makes
+  // a different window active before finishing with the edit popup.
+  // Note: This is dangerous because the user could exit the active window and
+  // we'd be left with a pointer to deleted memory...
+  PetWindow* adoWinToEdit = activeAdoWin;
+  SSPageWindow* ldWinToEdit = activeLdWin;
+
+  int retval = editDeviceList->Wait();
+  if (retval == 3)
+    // cancel
+    return;
+  else if (retval == 2) {
+    // Graphical Interface
+    //
+    // when done need to save the file (this will come back as a UIEvent5 event)
+    //
+    // The file must be a new file since this option is not available to the user for exising files
+    _creatingPageInTree = true;
+    const char* type = editDeviceList->GetDeviceType();
+    if (!strcmp(type, "ado")) {
+      SS_Create_RHIC_Page();
+      // add the window to the window list with it's permanent designation.
+      // Do this by reloading the temp file just created and saved.
+      string path = editDeviceList->GetPath();
+      string file = path;
+      file += editDeviceList->GetDeviceName();
+
+      MachineTree* machTree = treeTable->GetMachineTree();
+      const char* rootPath = machTree->GetRootPath();
+      const StdNode* rootNode = machTree->GetRootNode();
+      const char* rootName = rootNode->Name();
+      int len = strlen(rootPath) + strlen(rootName) + 1;
+      const char* name = file.c_str();
+      char* p = (char*) path.c_str();
+      // remove last '/' in path
+      if (p[strlen(p)-1] == '/') p[strlen(p)-1] = '\0';
+      activeAdoWin->LoadFile(name, &p[len]);
+      activeAdoWin->SetListString(UIGetLeafName(p));
+      // this forces the pageList to refresh itself with the new tree name rather than the temp name
+      LoadPageList(activeLdWin);
+      activeAdoWin->SaveVersion(file.c_str());
+    } else {
+      SS_Create_AGS_Page();
+      // add the window to the window list with it's permanent designation.
+      // Do this by reloading the temp file just created and saved.
+      string path = editDeviceList->GetPath();
+      string file = path;
+      file += editDeviceList->GetDeviceName();
+
+      MachineTree* machTree = treeTable->GetMachineTree();
+      const char* rootPath = machTree->GetRootPath();
+      const StdNode* rootNode = machTree->GetRootNode();
+      const char* rootName = rootNode->Name();
+      int len = strlen(rootPath) + strlen(rootName) + 1;
+      const char* name = file.c_str();
+      char* p = (char*) path.c_str();
+      // remove last '/' in path
+      if (p[strlen(p)-1] == '/') p[strlen(p)-1] = '\0';
+      activeLdWin->LoadFile(name, &p[len]);
+      activeLdWin->SetDevListPath(p);
+      activeLdWin->SetListString();
+      // this forces the pageList to refresh itself with the new tree name rather than the temp name
+      LoadPageList(activeLdWin);
+      activeLdWin->SaveVersion(file.c_str());
+    }
+  } else {
+    // default editor
+    //
+    // create a new pet window and use it's edit method to modify the new file
+    const char* type = editDeviceList->GetDeviceType();
+    if (!strcmp(type, "ado")) {
+      if (editDeviceList->IsNewType() || adoWinToEdit == NULL) {
+	// creating new file
+	PetWindow* petWin = new PetWindow(this, "petWindow");
+	activeAdoWin = petWin;
+	petWin->SetLocalPetWindowCreating(false);
+	AddListWindow(petWin);
+	petWin->GetPetPage()->AddEventReceiver(this);
+	petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
+	// edit the file here
+	petWin->EditBuiltInEditor(editDeviceList->GetPath());
+	string name = editDeviceList->GetPath();
+	petWin->SetTreeRootPath(name.c_str());
+	LoadPageList(petWin);
+      } else {
+	// editing existing file
+	adoWinToEdit->EditBuiltInEditor();
+      }
+    } else {
+      if (editDeviceList->IsNewType()) {
+	SSPageWindow* pageWin = new SSPageWindow(this, "pageWindow");
+	pageWin->EditBuiltInEditor(editDeviceList->GetPath());
+	// do the following to prepare for when the editing of the new file is complete
+	AddListWindow(pageWin);
+	MachineTree* machTree = treeTable->GetMachineTree();
+	const char* rootPath = machTree->GetRootPath();
+	const StdNode* rootNode = machTree->GetRootNode();
+	const char* rootName = rootNode->Name();
+	int len = strlen(rootPath) + strlen(rootName) + 1;
+	string path = editDeviceList->GetPath();
+	string file = path;
+	file += editDeviceList->GetDeviceName();
+	const char* name = file.c_str();
+	char* p = (char*) path.c_str();
+	// remove last '/' in path
+	if (p[strlen(p)-1] == '/') p[strlen(p)-1] = '\0';
+	pageWin->SetDevListPath(p);
+	pageWin->SetListString();
+	if (supportKnobPanel || strstr(type, "knob"))
+	  pageWin->SupportKnobPanel(knobPanel);
+	LoadPageList(pageWin);
+	activeLdWin = pageWin;
+      } else {
+	// editing existing file
+	if (ldWinToEdit == NULL) {
+	  SetMessage("No LD Window open to Edit");
+	  return;
 	}
-	
-	if (editDeviceList == NULL)
-		editDeviceList = new UICreateDeviceList(this, "editDeviceList");
-	
-	const char* path = GetSelectedPath();
-	editDeviceList->SetDirectory(path);
-	
-	// temporarily remember the active windows while the user is preparing to edit
-	// so that we don't lose track of the page to be edited in case the user makes
-	// a different window active before finishing with the edit popup.
-	// Note: This is dangerous because the user could exit the active window and
-	// we'd be left with a pointer to deleted memory...
-	PetWindow* adoWinToEdit = activeAdoWin;
-	SSPageWindow* ldWinToEdit = activeLdWin;
-	
-	int retval = editDeviceList->Wait();
-	if (retval == 3)
-		// cancel
-		return;
-	else if (retval == 2) {
-		// Graphical Interface
-		//
-		// when done need to save the file (this will come back as a UIEvent5 event)
-		//
-		// The file must be a new file since this option is not available to the user for exising files
-		_creatingPageInTree = true;
-		const char* type = editDeviceList->GetDeviceType();
-		if (!strcmp(type, "ado")) {
-			SS_Create_RHIC_Page();
-			// add the window to the window list with it's permanent designation.
-			// Do this by reloading the temp file just created and saved.
-			string path = editDeviceList->GetPath();
-			string file = path;
-			file += editDeviceList->GetDeviceName();
-			
-  			MachineTree* machTree = treeTable->GetMachineTree();
-     	    const char* rootPath = machTree->GetRootPath();
-     	    const StdNode* rootNode = machTree->GetRootNode();
-     	    const char* rootName = rootNode->Name();
-     	    int len = strlen(rootPath) + strlen(rootName) + 1;
-     	    const char* name = file.c_str();	
-     	    char* p = (char*) path.c_str();
-     	    // remove last '/' in path
-     	    if (p[strlen(p)-1] == '/') p[strlen(p)-1] = '\0';
-     	    activeAdoWin->LoadFile(name, &p[len]);
-     	    activeAdoWin->SetListString(UIGetLeafName(p));
- 		    // this forces the pageList to refresh itself with the new tree name rather than the temp name     	
-     	    LoadPageList(activeLdWin);
-     	    activeAdoWin->SaveVersion(file.c_str());
-		} else {
-			SS_Create_AGS_Page();
-			// add the window to the window list with it's permanent designation.
-			// Do this by reloading the temp file just created and saved.
-			string path = editDeviceList->GetPath();
-			string file = path;
-			file += editDeviceList->GetDeviceName();
-			
-  			MachineTree* machTree = treeTable->GetMachineTree();
-     	    const char* rootPath = machTree->GetRootPath();
-     	    const StdNode* rootNode = machTree->GetRootNode();
-     	    const char* rootName = rootNode->Name();
-     	    int len = strlen(rootPath) + strlen(rootName) + 1;
-     	    const char* name = file.c_str();	
-     	    char* p = (char*) path.c_str();
-     	    // remove last '/' in path
-     	    if (p[strlen(p)-1] == '/') p[strlen(p)-1] = '\0';
-     	    activeLdWin->LoadFile(name, &p[len]);
-     	    activeLdWin->SetDevListPath(p);
-     	    activeLdWin->SetListString();
- 		    // this forces the pageList to refresh itself with the new tree name rather than the temp name     	
-     	    LoadPageList(activeLdWin);
-     	    activeLdWin->SaveVersion(file.c_str());
- 		}
-	} else {
-		// default editor
-		//
-		// create a new pet window and use it's edit method to modify the new file
-		const char* type = editDeviceList->GetDeviceType();
-		if (!strcmp(type, "ado")) {
-			if (editDeviceList->IsNewType() || adoWinToEdit == NULL) {
-				// creating new file
-	  			PetWindow* petWin = new PetWindow(this, "petWindow");
-	   	        activeAdoWin = petWin;
-	  			petWin->SetLocalPetWindowCreating(false);
-		  		AddListWindow(petWin);
-	  			petWin->GetPetPage()->AddEventReceiver(this);
-			    petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
-			    // edit the file here
-			    petWin->EditBuiltInEditor(editDeviceList->GetPath());
-	  			string name = editDeviceList->GetPath();
-	  			petWin->SetTreeRootPath(name.c_str());
-	   	        LoadPageList(petWin);
-			} else {
-				// editing existing file
-				adoWinToEdit->EditBuiltInEditor();
-			}
-		} else {
-                  if (editDeviceList->IsNewType()) {
-                    SSPageWindow* pageWin = new SSPageWindow(this, "pageWindow");
-                    pageWin->EditBuiltInEditor(editDeviceList->GetPath());
-                    // do the following to prepare for when the editing of the new file is complete
-                    AddListWindow(pageWin);
-                    MachineTree* machTree = treeTable->GetMachineTree();
-     	    	const char* rootPath = machTree->GetRootPath();
-     	    	const StdNode* rootNode = machTree->GetRootNode();
-     	    	const char* rootName = rootNode->Name();
-     	    	int len = strlen(rootPath) + strlen(rootName) + 1;
-				string path = editDeviceList->GetPath();
-				string file = path;
-				file += editDeviceList->GetDeviceName();
-     	    	const char* name = file.c_str();	
-     	    	char* p = (char*) path.c_str();
-     	    	// remove last '/' in path
-     	    	if (p[strlen(p)-1] == '/') p[strlen(p)-1] = '\0';
-    	   	    pageWin->SetDevListPath(p);
-     	    	pageWin->SetListString();
-	  			if (supportKnobPanel || strstr(type, "knob"))
-	    			pageWin->SupportKnobPanel(knobPanel);
-	  			LoadPageList(pageWin);
-	  			activeLdWin = pageWin;
-			} else {
-				// editing existing file
-		    if (ldWinToEdit == NULL) {
-		      SetMessage("No LD Window open to Edit");
-		      return;
-		    }
-		    ldWinToEdit->EditBuiltInEditor();
-		  }
-		}
-	}
+	ldWinToEdit->EditBuiltInEditor();
+      }
+    }
+  }
 }
 
 void SSMainWindow::SS_Open()
