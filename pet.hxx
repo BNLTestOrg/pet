@@ -71,8 +71,6 @@ public:
   // initialize the archive lib tools
   void InitArchiveLib();
 
-  // intialize relway server
-  void InitRelwayServer();
 protected:
   UIMenubar*			menubar;
   UIPulldownMenu*	       	pulldownMenu;
@@ -95,15 +93,12 @@ protected:
   UIHistoryPopup*               _historyPopup;
   UIRecentHistoryPopup*         _recentPopup;
   unsigned long                 _totalFlashTimerId; // to timeout flashing after 4 seconds.
-  
+
   // set the window position for a newly created window
   void SetWindowPos(UIWindow* newWin, UIWindow* currWin = NULL);
 
   // set the label for displaying PPM user name using process PPM user
   void SetPPMLabel();
-
-  // reconnect to a new relway server
-  void ReconnectToRelway(const char* newHost = NULL);
 
   // remove the device_list ending of the file name
   void AdjustName(char* devicePath);
