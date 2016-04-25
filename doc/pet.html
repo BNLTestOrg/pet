@@ -36,9 +36,9 @@ Parameters in the C-AD Controls System.<br>
     </tr>
     <tr>
       <th align="left">Last Modified&nbsp;</th>
-      <td align="center">09/22/09&nbsp;</td>
-      <td>Seth Nemesure&nbsp;</td>
-      <td><a href="mailto:seth@bnl.gov">seth@bnl.gov</a></td>
+      <td align="center">04/25/16&nbsp;</td>
+      <td>Enrique Schuhmacher&nbsp;</td>
+      <td><a href="mailto:eschuhmacher@bnl.gov">eschuhmacher@bnl.gov</a></td>
     </tr>
   </tbody>
 </table>
@@ -1539,6 +1539,13 @@ characters.</li>
       <td>a text string to display in cell</td>
     </tr>
     <tr>
+      <td>ppm</td>
+      <td>L</td>
+      <td>string/integer</td>
+      <td>(14)</td>
+      <td>set a ppm user</td>
+    </tr>
+    <tr>
       <td>filter</td>
       <td>T,C,R,L</td>
       <td>string</td>
@@ -1721,6 +1728,20 @@ are separated by commas. </li>
         <li> Set attribute to "horizontal" for a horizontal layout of
 multiple monitors or to "vertical"<br>
 for a vertical layout of monitors. The default is "square". </li>
+        <li> A valid ppmUser or  a string with the following possible values (case insensitive):
+            <br>            <br>
+        BOOSTER_USER_FOR_NSRL&nbsp; <br>
+BOOSTER_USER_FOR_AGS&nbsp; <br>
+TANDEM_USER_FOR_NSRL&nbsp; <br>
+TANDEM_USER_FOR_AGS&nbsp; <br>
+LINAC_USER_FOR_NSRL&nbsp; <br>
+LINAC_USER_FOR_AGS&nbsp; <br>
+EBIS_USER_FOR_NSRL&nbsp; <br>
+EBIS_USER_FOR_AGS&nbsp; <br>
+EBIS_USER_FOR_BOOSTER&nbsp; <br>
+AGS_USER_FOR_RHIC&nbsp; 
+
+        </li>
       </ol>
       </td>
     </tr>
