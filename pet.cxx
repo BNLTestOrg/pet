@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
   argList.AddSwitch("-printToElog", "Deprecated - use -dumpToElog or -dumpToDefaultElog instead");    // used with -single or -file to print pet page to elog after data acquisition, then exit
   argList.AddString("-elog", "", "", "Deprecated - use -dumpToElog or -dumpToDefaultElog instead");           // when used with -printToElog, the name of the elog, else the default
   argList.AddString("-printTogif");     // used with -single or -file to print pet page to a gif file after data acquisition, then exit
-  argList.AddNumber("-ppm");            // start pet with the specified user
+  argList.AddString("-ppm");            // start pet with the specified user
   argList.AddString("-displayName");    // makes the specified name visible when page is opened
   // the following are redundant but -elog and -printToElog have been kept for backwards compatibility
   argList.AddString("-dumpToElog", "", "", "dump window image to the specified elog - must use with -single or -file");
@@ -109,8 +109,67 @@ int main(int argc, char *argv[])
   if( argList.IsPresent("-knob") ) wname = "KnobPanel";
   else wname = "pet";
 
-  if (argList.IsPresent("-ppm"))
-    set_ppm_user(argList.Value("-ppm"));
+  if (argList.IsPresent("-ppm")) {
+      IORequest* ioreq = new IORequest();
+      
+      char* system = "injSpec.super"; 
+      int ppmValue =0;
+      if(!strcmp(argList.String("-ppm"), "BOOSTER_USER_FOR_NSRL")) {
+          int id = ioreq->addEntry(system, "boosterPpmUserForNsrlM");
+          IOData d;
+          int result = ioreq->get(id, &d);
+          ppmValue = atoi(d.stringVal());
+      } else if(!strcmp(argList.String("-ppm"), "BOOSTER_USER_FOR_AGS")) {
+          int id = ioreq->addEntry(system, "boosterPpmUserForAgsM");
+          IOData d;
+          int result = ioreq->get(id, &d);
+          ppmValue = atoi(d.stringVal());
+      } else if(!strcmp(argList.String("-ppm"), "TANDEM_USER_FOR_NSRL")) {
+          int id = ioreq->addEntry(system, "tandemPpmUserForNsrlM");
+          IOData d;
+          int result = ioreq->get(id, &d);
+          ppmValue = atoi(d.stringVal());
+      } else if(!strcmp(argList.String("-ppm"), "TANDEM_USER_FOR_AGS")) {
+          int id = ioreq->addEntry(system,"tandemPpmUserForAgsM");
+          IOData d;
+          int result = ioreq->get(id, &d);
+          ppmValue = atoi(d.stringVal());
+      } else if(!strcmp(argList.String("-ppm"), "LINAC_USER_FOR_NSRL")) {
+          int id = ioreq->addEntry(system,"linacPpmUserForNsrlM");
+          IOData d;
+          int result = ioreq->get(id, &d);
+          ppmValue = atoi(d.stringVal());
+      } else if(!strcmp(argList.String("-ppm"), "LINAC_USER_FOR_AGS")) {
+          int id = ioreq->addEntry(system,"linacPpmUserForAgsM");
+          IOData d;
+          int result = ioreq->get(id, &d);
+          ppmValue = atoi(d.stringVal());
+      } else if(!strcmp(argList.String("-ppm"), "EBIS_USER_FOR_NSRL")) {
+          int id = ioreq->addEntry(system,"ebisPpmUserForNsrlM");
+          IOData d;
+          int result = ioreq->get(id, &d);
+          ppmValue = atoi(d.stringVal());
+      } else if(!strcmp(argList.String("-ppm"), "EBIS_USER_FOR_AGS")) {
+          int id = ioreq->addEntry(system,"ebisPpmUserForAgsM");
+          IOData d;
+          int result = ioreq->get(id, &d);
+          ppmValue = atoi(d.stringVal());
+      } else if(!strcmp(argList.String("-ppm"), "EBIS_USER_FOR_BOOSTER")) {
+          int id = ioreq->addEntry(system,"ebisPpmUserForBoosterM");
+          IOData d;
+          int result = ioreq->get(id, &d);
+          ppmValue = atoi(d.stringVal());
+      } else if(!strcmp(argList.String("-ppm"), "AGS_USER_FOR_RHIC")) {
+          int id = ioreq->addEntry(system, "agsPpmUserForRhicS");
+          IOData d;
+          int result = ioreq->get(id, &d);
+          ppmValue = atoi(d.stringVal());
+      } else {
+          ppmValue = atoi(argList.String("-ppm"));
+      }   
+      set_ppm_user(ppmValue);
+      ioreq = NULL;
+  }
 
   // create the mainWindow
   if (mainWindow == NULL) {
