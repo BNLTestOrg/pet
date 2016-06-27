@@ -241,9 +241,9 @@ int main(int argc, char *argv[])
   else{
     // create the main window and its user interface and display it
     if (argList.IsPresent("-printToElog") && !argList.IsPresent("-device_list"))
-      cout << "-printToElog option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
+      cout << "-printToElog option must be used with -single (ado page) option" << endl;
     else if (argList.IsPresent("-printTogif") && !argList.IsPresent("-device_list"))
-      cout << "-printTogif option must be used with -single (ado page) or -device_list (sld/cld page) option" << endl;
+      cout << "-printTogif option must be used with -single (ado page) option" << endl;
     else if ((argList.IsPresent("-dumpToElog") || argList.IsPresent("dumpToDefaultElog")) &&
              (!argList.IsPresent("-device_list") || !argList.IsPresent("-file") || !argList.IsPresent("-single")))
       cout << "-printToElog option must be used with -single, -file, or -device_list option" << endl;
@@ -615,7 +615,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   messageArea->AttachTo(NULL, this, this, this);
 
   // put in the list which shows the device pages shown
-  pageList = new UIScrollingEnumList(this, "pageList", "ADO/SLD/CLD Pages");
+  pageList = new UIScrollingEnumList(this, "pageList", "ADO/CDEV Pages");
   pageList->AttachTo(NULL, this, messageArea, this);
   pageList->SetItemsVisible(1);
   pageList->AddEventReceiver(this);
