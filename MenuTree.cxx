@@ -41,9 +41,6 @@ MenuTree* CreateMenuTree()
 	snode = menuTree->InsertMenuItem("Create Temp PS ADO Page...", "/File", NULL);
 	menuTree->SetNodeHelpText(snode, "Create a RHIC page from a list of selected Power Supplies");
 
-	snode = menuTree->InsertMenuItem("Create Temp SLD/CLD Page...", "/File", NULL);
-	menuTree->SetNodeHelpText(snode, "Create an AGS page from selected devices");
-
 	snode = menuTree->InsertMenuItem("----", "/File", NULL);
 	menuTree->SetNodeType(snode, MenuSeparatorType);
 
@@ -103,25 +100,6 @@ MenuTree* CreateMenuTree()
 
 	snode = menuTree->InsertMenuItem("PPM User Monitor", "/Options", NULL);
 	menuTree->SetNodeHelpText(snode, "Run program that lets you see which ppm users\nand supercycle tables are active and have been\nactive recently.");
-
-	snode = menuTree->InsertMenuItem("----", "/Options", NULL);
-	menuTree->SetNodeType(snode, MenuSeparatorType);
-
-	snode = menuTree->InsertMenuItem("SLDs via Controller...", "/Options", NULL);
-	menuTree->SetNodeHelpText(snode, "Choose a controller and bring up its SLDs on a page.");
-
-	snode = menuTree->InsertMenuItem("CLDs...", "/Options", NULL);
-	menuTree->SetNodeHelpText(snode, "Brings up a 'cld window' allowing the user to set\nvalues and/or view measurements for CLDs.");
-	menuTree->SetNodeMnemonic(snode, 'C');
-
-	snode = menuTree->InsertMenuItem("CLD Events...", "/Options", NULL);
-	menuTree->SetNodeHelpText(snode, "Brings up a 'cld window' allowing the user\nto set timing events for CLDs.");
-	menuTree->SetNodeMnemonic(snode, 'E');
-
-	snode = menuTree->InsertMenuItem("----", "/Options", NULL);
-	menuTree->SetNodeType(snode, MenuSeparatorType);
-
-	snode = menuTree->InsertMenuItem("Reload DDF...", "/Options", NULL);
 
 	snode = menuTree->InsertMenuItem("----", "/Options", NULL);
 	menuTree->SetNodeType(snode, MenuSeparatorType);
