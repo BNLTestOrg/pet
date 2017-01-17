@@ -615,7 +615,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   messageArea->AttachTo(NULL, this, this, this);
 
   // put in the list which shows the device pages shown
-  pageList = new UIScrollingEnumList(this, "pageList", "ADO/CDEV Pages");
+  pageList = new PetScrollingEnumList(this, "pageList", "ADO/CDEV Pages");
   pageList->AttachTo(NULL, this, messageArea, this);
   pageList->SetItemsVisible(1);
   pageList->AddEventReceiver(this);
@@ -781,18 +781,27 @@ void SSMainWindow::LoadPageList(const UIWindow* winSelection)
     pageList->SetSelection(selection);
 
   // make sure all of the items are displayed
-  if(numWins > 1)
+  if(numWins > 0)
     {
-      if(numWins >= 5)
+	  if (pageList->GetDesiredNumVisItems() < 5)
+		  pageList->SetItemsVisible(numWins);
+
+      if(numWins >= pageList->GetDesiredNumVisItems())
 	{
-	  pageList->SetItemsVisible(5);
+	  pageList->SetItemsVisible(pageList->GetDesiredNumVisItems());
 	  pageList->ShowSelection();
 	}
-      else
-	pageList->SetItemsVisible( (short) numWins);
+      else {
+    	  if (pageList->GetDesiredNumVisItems() != 5) // default
+    		  pageList->SetItemsVisible(pageList->GetDesiredNumVisItems());
+    	  else
+    		  pageList->SetItemsVisible( (short) numWins);
+      }
     }
-  else
-    pageList->SetItemsVisible(1);
+  else {
+	  if (pageList->GetDesiredNumVisItems() == 5) // default
+		  pageList->SetItemsVisible(1);
+  }
 
   if (oldNumInList != numWins)
     // only force the resize if the scroll list has changed
@@ -3224,6 +3233,77 @@ void SSPageWindow::Flash(bool flash)
     else
       ppmMenu->SetPPMUser(0);
   }
+}
+
+/////////////////// ScrollingPageList Class //////////////////////////////
+PetScrollingEnumList::PetScrollingEnumList(const UIObject* parent, const char* name, const char* title, const char* items[], UIBoolean create) :
+		UIScrollingEnumList(parent, name, title, items, UIFalse) {
+	Initialize();
+	if (create)
+		CreateWidgets();
+}
+
+void PetScrollingEnumList::Initialize()
+{
+	_desiredNumVisItems = 5;
+}
+
+void PetScrollingEnumList::CreateWidgets()
+{
+	UIScrollingEnumList::CreateWidgets();
+
+	SetMenuItems();
+}
+
+void PetScrollingEnumList::SetMenuItems()
+{
+	if (ListWidget())
+		EnablePopupHelp(ListWidget());
+	const char* items[] = {
+			"Grow",
+			"Shrink",
+			"----",
+			"Copy All",
+			"Copy Selected",
+			"----",
+			"Print All",
+			"Print Selected",
+			NULL
+	};
+
+	SetHelpItems(items);
+	AddEventReceiver(this);
+	EnableEvent(UIMessage);
+}
+
+void PetScrollingEnumList::HandleEvent(const UIObject* object, UIEvent event)
+{
+	if (object == this && event == UIHelp) {
+	    const char* selection = GetHelpSelectionString();
+	    if (!strcmp(selection, "Grow")) {
+	    	  _desiredNumVisItems += 5;
+	    	  SetItemsVisible(_desiredNumVisItems);
+	    } else if (!strcmp(selection, "Shrink")) {
+	    	if (_desiredNumVisItems >= 10)
+	    		_desiredNumVisItems -= 5;
+	    	else {
+	    		long num = GetNumDisplayedItems();
+	    		if (num < _desiredNumVisItems)
+	    			_desiredNumVisItems = num;
+	    		if (_desiredNumVisItems == 0)
+	    			_desiredNumVisItems = 1;
+	    	}
+	    	SetItemsVisible(_desiredNumVisItems);
+	    } else
+	    	UIScrollingEnumList::HandleEvent(object, event);
+	} else
+		UIScrollingEnumList::HandleEvent(object, event);
+}
+
+void PetScrollingEnumList::SetItemsVisible(long num)
+{
+	_desiredNumVisItems = num;
+	UIScrollingEnumList::SetItemsVisible(_desiredNumVisItems);
 }
 
 /////////////////// SSCldWindow Class ////////////////////////////////////
