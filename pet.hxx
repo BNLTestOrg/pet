@@ -17,6 +17,7 @@ enum PET_WINDOW_TYPE {PET_LD_WINDOW, PET_CLD_WINDOW, PET_ADO_WINDOW, PET_HYBRID_
 class SSPageWindow;
 class MenuTree;
 class UICreateDeviceList;
+class PetScrollingEnumList;
 
 class SSMainWindow : public UIMainWindow
 {
@@ -77,7 +78,7 @@ protected:
   UILabel*			ppmLabel;
   UIMessageArea*	       	messageArea;
   UIMachineTreeTable*           treeTable;
-  UIScrollingEnumList*		pageList;
+  PetScrollingEnumList*		pageList;
   UIHelpMenu*			helpMenu;
   UIDevicesFromControllerPopup*	ctrlPopup;
   UIPopupWindow*		devicePopup;
@@ -211,6 +212,28 @@ private:
   void Initialize();
 };
 
+//////////////////////////////////////////////////////////////////////
+class PetScrollingEnumList : public UIScrollingEnumList
+{
+public:
+	PetScrollingEnumList(const UIObject* parent, const char* name, const char* title, const char* items[] = NULL, UIBoolean create = UITrue);
+
+	void SetMenuItems();
+
+	void HandleEvent(const UIObject* object, UIEvent event);
+
+	void SetItemsVisible(long num);
+
+	long GetDesiredNumVisItems() { return _desiredNumVisItems; }
+
+protected:
+	void CreateWidgets();
+
+private:
+	void Initialize();
+
+	long _desiredNumVisItems;
+};
 
 // C++ helper functions
 // given a path to a device list, extract the leaf name
