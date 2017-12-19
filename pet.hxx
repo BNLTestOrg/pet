@@ -216,7 +216,7 @@ private:
 class PetScrollingEnumList : public UIScrollingEnumList
 {
 public:
-	PetScrollingEnumList(const UIObject* parent, const char* name, const char* title, const char* items[] = NULL, UIBoolean create = UITrue);
+	PetScrollingEnumList(const UIObject* parent, const char* name, const char* title = "", const char* items[] = NULL, UIBoolean create = UITrue);
 
 	void SetMenuItems();
 
