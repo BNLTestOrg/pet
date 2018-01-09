@@ -301,7 +301,29 @@ int main(int argc, char *argv[])
             singlePetWin->GetPetPage()->AddEventReceiver(mainWindow);
           }
         }
-        singlePetWin->LoadFile(file);
+
+        // file is *supposed* to be a file but if it is not attempt to take a guess at what
+        // the file might be by looking in the directory that was passed for device_list.ado
+        if (UIIsFile(file) == UIFalse) {
+        	if (UIIsDirectory(file) == UITrue) {
+        		// just append device_list.ado and try that
+        		std::string fname = file;
+        		fname += "/device_list.ado";
+        		if (UIIsFile(fname.c_str()) == UITrue)
+        			singlePetWin->LoadFile(fname.c_str());
+        		else {
+            		// throw an exception
+            		fprintf(stderr, "Argument passed as a pet file name (%s) is a directory\n", file);
+            		exit(1);
+        		}
+        	} else {
+        		// throw an exception
+        		fprintf(stderr, "pet file name provided (%s) is invalid\n", file);
+        		exit(1);
+        	}
+        }
+        else
+        	singlePetWin->LoadFile(file);
         singlePetWin->ChangePath(path);
         if (!argList.IsPresent("-file") && !argList.IsPresent("-single"))
           singlePetWin->SetLocalPetWindowCreating(false);
