@@ -637,6 +637,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   treeTable->AttachTo(ppmLabel, this, pageList, this);
   treeTable->EnableEvent(UITableBtn2Down);
   treeTable->EnableEvent(UIAccept);
+  treeTable->EnableEvent(UIDoubleClick);
   treeTable->AddEventReceiver(this);
 
   MachineTree* machTree = treeTable->GetMachineTree();
@@ -978,7 +979,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     bool adoWinCont = true;
     long numWins = GetNumWindows();
     int petPagePPM = 0; // in case we are loading an already created page and fail and reload it to its initial list
-    if(event == UISelect || event == UIAccept || event == UITableBtn2Down) {
+    if(event == UISelect || event == UIDoubleClick || event == UIAccept || event == UITableBtn2Down) {
       // tree table does not automatically select the node on a button 2down
       if(event == UITableBtn2Down) {
         const StdNode* node = treeTable->GetLastChanged();
@@ -1007,7 +1008,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       // in case we have an error - loading a window - let's remember the window we are replacing!
       char* ldWindowPath = NULL;
       char* adoWindowPath = NULL;
-      if(event == UISelect || event == UIAccept) {	// load current window
+      if(event == UISelect || event == UIDoubleClick || event == UIAccept) {	// load current window
         // do we have a window (or windows) to reload of the right type - otherwise create one
         if(type == PET_LD_WINDOW || type == PET_HYBRID_WINDOW) {
           if(numWins > 0 && activeLdWin && IsWindowInList( (UIWindow*) activeLdWin)) {
