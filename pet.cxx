@@ -562,6 +562,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
     "*metaEditor*defaultPosition: false",
     "*loadArchivePopup*defaultPosition: false",
     "*allUserPopup*defaultPosition: false",
+	"*treeTable*multiClick: 0", // no need to delay when double clicking on a leaf node in the tree - it should behave the same as a single click
     "*loadArchivePopup*arclist.uihelpText: This list contains all archives for the current device page.",
     "*loadArchivePopup*archeader.uihelpText: Displays information pertaining to the selected archive.",
     "*loadArchivePopup*arctoggles*Show timed archives in archive list.uihelpText: "
@@ -638,6 +639,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   treeTable->EnableEvent(UITableBtn2Down);
   treeTable->EnableEvent(UIAccept);
   treeTable->EnableEvent(UIDoubleClick);
+
   treeTable->AddEventReceiver(this);
 
   MachineTree* machTree = treeTable->GetMachineTree();
