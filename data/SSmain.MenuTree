@@ -1,7 +1,7 @@
 "MTRE",3
 797093749,"Wed Apr  5 10:55:49 1995"
-1340131041,"Tue Jun 19 14:37:21 2012"
-48,34,34
+1555509344,"Wed Apr 17 09:55:44 2019"
+48,31,15
 
 "NODE 0"
 "SSmain"
@@ -21,12 +21,14 @@
 the program as a whole."
 
 "NODE 2"
-"----"
-2,11,28,16,-1
-6
+"Find Recently Modified Files..."
+2,32,16,28,-1
+1
 0,""
 0,0
-""
+"Brings up a popup which allows you to search all or part of the pet
+tree for files that have been modified within a certain number of
+days that you enter."
 
 "NODE 3"
 "----"
@@ -49,7 +51,7 @@ It does not affect existing device pages."
 
 "NODE 5"
 "Quit"
-5,1,-1,27,-1
+5,1,-1,12,-1
 1
 81,"Ctrl+Q"
 0,0
@@ -105,7 +107,7 @@ a confirmation."
 
 "NODE 11"
 "Options"
-11,0,-1,6,12
+11,0,-1,6,30
 1
 79,""
 0,0
@@ -113,16 +115,12 @@ a confirmation."
 available to the program as a whole."
 
 "NODE 12"
-"Search..."
-12,11,30,-1,-1
-1
-83,""
+"----"
+12,1,5,32,-1
+6
+0,""
 0,0
-"This option allows the user to search for a particular
-device.  A prompt will ask for a search string, which
-could be a partial device name.  The result of the search
-will then be displayed allowing the user to view the device
-in one or more device lists."
+""
 
 "NODE 13"
 "Read Archive Log"
@@ -136,29 +134,29 @@ with the archiving system."
 
 "NODE 14"
 "----"
-14,11,21,29,-1
+14,11,31,29,-1
 6
 0,""
 0,0
 ""
 
 "NODE 15"
-"CLDs..."
-15,11,16,21,-1
+""
+15,-1,21,-1,-1
 1
-67,""
+0,""
 0,0
-"Brings up a 'cld window' allowing the user to set
-values and/or view measurements for CLDs."
+""
 
 "NODE 16"
-"CLD Events..."
-16,11,2,15,-1
+"Find Checked Out Files..."
+16,32,-1,2,-1
 1
-69,""
+0,""
 0,0
-"Brings up a 'cld window' allowing the user
-to set timing events for CLDs."
+"Brings up a popup allowing you to find checked out files
+in all or part of the pet tree for a given user name. 
+Leave the name blank to find all checked out files."
 
 "NODE 17"
 "----"
@@ -199,12 +197,12 @@ by choosing the Show menu item."
 "Make a new window and select a file"
 
 "NODE 21"
-"SLDs via Controller..."
-21,11,15,14,-1
+""
+21,-1,26,-1,-1
 1
 0,""
 0,0
-"Choose a controller and bring up its SLDs on a page."
+""
 
 "NODE 22"
 "----"
@@ -232,35 +230,37 @@ by choosing the Show menu item."
 
 "NODE 25"
 "Create Temp PS ADO Page..."
-25,1,26,24,-1
+25,1,27,24,-1
 1
 0,""
 0,0
 "Create a RHIC page from a list of selected Power Supplies"
 
 "NODE 26"
-"Create Temp SLD/CLD Page..."
-26,1,27,25,-1
+""
+26,-1,34,-1,-1
 1
 0,""
 0,0
-"Create an AGS page from selected devices"
+""
 
 "NODE 27"
 "----"
-27,1,5,26,-1
+27,1,32,25,-1
 6
 0,""
 0,0
 ""
 
 "NODE 28"
-"Reload DDF..."
-28,11,32,2,-1
+"Find Text in Files..."
+28,32,2,-1,-1
 1
 0,""
 0,0
-""
+"Brings up a popup that will let you search for any
+string within device lists in the pet tree.  You can
+pick a starting point in the tree to narrow your search."
 
 "NODE 29"
 "PPM User Monitor"
@@ -274,7 +274,7 @@ active recently."
 
 "NODE 30"
 "Pet Page History"
-30,11,13,12,-1
+30,11,13,-1,-1
 1
 0,""
 0,0
@@ -284,16 +284,16 @@ other one.  Searches for particular pages are possible."
 
 "NODE 31"
 "Flash Pages"
-31,11,-1,32,-1
+31,11,-1,14,-1
 1
 0,""
 0,0
 "Raises all open pet pages and temporarily flashes the menu bar"
 
 "NODE 32"
-"----"
-32,11,31,28,-1
-6
+"Search pet Tree"
+32,1,12,27,28
+1
 0,""
 0,0
 ""
