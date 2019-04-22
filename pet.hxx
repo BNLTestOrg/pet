@@ -85,8 +85,9 @@ protected:
   UIDeviceList*			deviceList;
   UIBoolean			isIcon;
   UIViewerWindow*		viewer;
-  UISearchDeviceList*		searchPopup;
-  UIWindow*			searchPage;
+  UISearchDeviceList*		_searchPopup;
+  UISearchDeviceList*   _modifiedPopup;
+  UISearchDeviceList*   _checkedOutPopup;
   MenuTree*                     pulldownMenuTree;
   UILabelPopup*                 errFillExistWindowPopup;
   UICreateDeviceList*           editDeviceList;
@@ -116,6 +117,9 @@ protected:
   void SS_Create_RHIC_Page();
   void SS_Create_PS_RHIC_Page();
   void SS_Create_AGS_Page();
+  void SS_FindTextInFiles();
+  void SS_FindRecentlyModifiedFiles();
+  void SS_FindCheckedOutFiles();
   void SS_Quit();
   // return 0 if cancel, 1 if quit, 2 if quit with dialog
   int ConfirmQuit();
