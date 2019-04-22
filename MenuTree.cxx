@@ -44,6 +44,20 @@ MenuTree* CreateMenuTree()
 	snode = menuTree->InsertMenuItem("----", "/File", NULL);
 	menuTree->SetNodeType(snode, MenuSeparatorType);
 
+	snode = menuTree->InsertMenuItem("Search pet Tree", "/File", NULL);
+
+	snode = menuTree->InsertMenuItem("Find Text in Files...", "/File/Search pet Tree", NULL);
+	menuTree->SetNodeHelpText(snode, "Brings up a popup that will let you search for any\nstring within device lists in the pet tree.  You can\npick a starting point in the tree to narrow your search.");
+
+	snode = menuTree->InsertMenuItem("Find Recently Modified Files...", "/File/Search pet Tree", NULL);
+	menuTree->SetNodeHelpText(snode, "Brings up a popup which allows you to search all or part of the pet\ntree for files that have been modified within a certain number of\ndays that you enter.");
+
+	snode = menuTree->InsertMenuItem("Find Checked Out Files...", "/File/Search pet Tree", NULL);
+	menuTree->SetNodeHelpText(snode, "Brings up a popup allowing you to find checked out files\nin all or part of the pet tree for a given user name. \nLeave the name blank to find all checked out files.");
+
+	snode = menuTree->InsertMenuItem("----", "/File", NULL);
+	menuTree->SetNodeType(snode, MenuSeparatorType);
+
 	snode = menuTree->InsertMenuItem("Quit", "/File", NULL);
 	menuTree->SetNodeHelpText(snode, "Select 'Quit' to exit the program immediately.\n\t");
 	menuTree->SetNodeMnemonic(snode, 'Q');
@@ -86,10 +100,6 @@ MenuTree* CreateMenuTree()
 	snode = menuTree->InsertMenuItem("Options", NULL, NULL);
 	menuTree->SetNodeHelpText(snode, "This menu provides miscellaneous options\navailable to the program as a whole.");
 	menuTree->SetNodeMnemonic(snode, 'O');
-
-	snode = menuTree->InsertMenuItem("Search...", "/Options", NULL);
-	menuTree->SetNodeHelpText(snode, "This option allows the user to search for a particular\ndevice.  A prompt will ask for a search string, which\ncould be a partial device name.  The result of the search\nwill then be displayed allowing the user to view the device\nin one or more device lists.");
-	menuTree->SetNodeMnemonic(snode, 'S');
 
 	snode = menuTree->InsertMenuItem("Pet Page History", "/Options", NULL);
 	menuTree->SetNodeHelpText(snode, "Brings up a new window allowing you to look at the history\nof when pet pages were loaded by this program or any\nother one.  Searches for particular pages are possible.");
