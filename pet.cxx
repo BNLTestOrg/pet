@@ -528,8 +528,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   ctrlPopup = NULL;
   devicePopup = NULL;
   viewer = NULL;
-  searchPopup = NULL;
-  searchPage = NULL;
+  _searchPopup = _modifiedPopup = _checkedOutPopup = NULL;
   errFillExistWindowPopup = NULL;
   editDeviceList = NULL;
   _creatingPageInTree = false;
@@ -545,7 +544,6 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
     "*pageWindow*page*uilabelBackground: gray82",
     "*mainWindow*treeTable*foreground: black",
     "*mainWindow*pageList*list*foreground: black",
-    //"*mainWindow.geometry: +0+0",
     "*mainWindow.allowShellResize: true",
     "*mainWindow*treeTable*showHeaders: false",
     "*mainWindow*treeTable*visibleRows: 30",
@@ -845,62 +843,50 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
   else if(object == viewer && event == UIWindowMenuClose)
     viewer->Hide();
 
-  // events from the search popup
-  else if(object == searchPopup)
+  // user wants to load a pet page via one of the search popups
+  else if( (object == _searchPopup || object == _modifiedPopup || object == _checkedOutPopup) && event == UISelect)
   {
-    if(event == UISelect)		// view the selected device list
-    {
-      // get the selected node
-      MachineTree* mtree = treeTable->GetMachineTree();
-      StdNode* rootNode = mtree->GetRootNode();
-      const char* rootPath = mtree->GenerateNodePathname(rootNode);
-      const char* selectString = searchPopup->GetDeviceListSelection();
-      char* nodeName = new char[strlen(rootPath) + strlen(selectString) + 2];
-      strcpy(nodeName, rootPath);
-      strcat(nodeName, "/");
-      strcat(nodeName, selectString);
-      nodeName[strlen(nodeName)-1] = 0;		// get rid of newline at the end
-      StdNode* selectNode = mtree->FindNode(nodeName);
-      delete [] nodeName;
-      if(selectNode == NULL)
-      {
-        RingBell();
-        UILabelPopup popup(this, "searchError", "Can't find selected node in the\nMachine Tree.");
-        popup.Wait();
-        return;
-      }
-      // if this is the first selection, create a new window
-      // otherwise, reload the save search device page window
-      // simulate a button 1 or button 2 down event
-      searchPopup->SetWorkingCursor();
-      treeTable->SetNodeSelected(selectNode);
-      treeTable->LoadTreeTable();
-      HandleEvent(treeTable, UITableBtn2Down);
+    UISearchDeviceList* popup = (UISearchDeviceList*) object;
+    // get the selected node
+    MachineTree* mtree = treeTable->GetMachineTree();
+    StdNode* rootNode = mtree->GetRootNode();
+    const char* rootPath = mtree->GenerateNodePathname(rootNode);
+    const char* selectString = popup->GetDeviceListSelection();
+    char* nodeName = new char[strlen(rootPath) + strlen(selectString) + 2];
+    strcpy(nodeName, rootPath);
+    strcat(nodeName, "/");
+    strcat(nodeName, selectString);
+    nodeName[strlen(nodeName)-1] = 0;   // get rid of newline at the end
+    StdNode* selectNode = mtree->FindNode(nodeName);
+    delete [] nodeName;
+    if(selectNode == NULL) {
+      RingBell();
+      UILabelPopup popup(this, "searchError", "Can't find selected node in the\npet Tree.");
+      popup.Wait();
+      return;
+    }
+    // if this is the first selection, create a new window
+    // otherwise, reload the save search device page window
+    // simulate a button 1 or button 2 down event
+    popup->SetWorkingCursor();
+    treeTable->SetNodeSelected(selectNode);
+    treeTable->LoadTreeTable();
+    HandleEvent(treeTable, UITableBtn2Down);
 
-      // store a ptr to window so can reload if neccessary
+
+    if(object == _searchPopup) { // highlight the first device name with the search string
+      // get the current pet window
+      PetWindow* petWin = NULL;
       long selection = pageList->GetSelection();
       if(selection > 0)
-        searchPage = this->GetWindow(selection);
+        petWin = (PetWindow*) this->GetWindow(selection);
 
-      // make sure the first device name with the search string is highlighted
-      const char* searchStr = searchPopup->GetSearchString();
-      if(searchStr != NULL && searchStr[0] != 0 && searchPage != NULL)
-        switch (WindowType(searchPage))
-        {
-          case PET_LD_WINDOW:
-          case PET_CLD_WINDOW:
-            ((SSPageWindow*) searchPage)->ShowDeviceSubstring(searchStr);
-            break;
-          case PET_ADO_WINDOW:
-            ((PetWindow*) searchPage)->ShowSubString(searchStr);
-            break;
-          default:
-            break;
-        }
-      searchPopup->SetStandardCursor();
+      const char* searchStr = _searchPopup->GetSearchString();
+      if(searchStr != NULL && searchStr[0] != 0 && petWin != NULL) {
+        petWin->ShowSubString(searchStr);
+      }
     }
-    else if(event == UIHide)	// the user closed the search popup
-      searchPage = NULL;	// don't save this anymore once the popup goes down
+    popup->SetStandardCursor();
   }
 
   // a device page window was made active
@@ -1376,93 +1362,99 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
 
   // user made a selection from the pulldown menus
   else if(object == pulldownMenu && event == UISelect)
-    {
-      const UITreeData* data = pulldownMenu->GetTreeData();
-      SetMessage("");
+  {
+    const UITreeData* data = pulldownMenu->GetTreeData();
+    SetMessage("");
 
-      if(!strcmp(data->namesSelected[0], "File"))
-	{if(!strcmp(data->namesSelected[1], "New..."))
-	  {     SS_New();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Open..."))
-	  {     SS_Open();
-	  }
-  else if(!strcmp(data->namesSelected[1], "Open Favorite..."))
-    {     SS_OpenFavorite();
+    if(!strcmp(data->namesSelected[0], "File")) {
+      if(!strcmp(data->namesSelected[1], "New...")) {
+        SS_New();
+      }
+      else if(!strcmp(data->namesSelected[1], "Open...")) {
+        SS_Open();
+      }
+      else if(!strcmp(data->namesSelected[1], "Open Favorite...")) {
+        SS_OpenFavorite();
+      }
+      else if(!strcmp(data->namesSelected[1], "Default PPM User...")) {
+        SS_Default_PPM_User();
+      }
+      else if(!strcmp(data->namesSelected[1], "Create Temp ADO Page...")) {
+        SS_Create_RHIC_Page();
+      }
+      else if(!strcmp(data->namesSelected[1], "Create Temp PS ADO Page...")) {
+        SS_Create_PS_RHIC_Page();
+      }
+      else if(!strcmp(data->namesSelected[1], "Create Temp SLD/CLD Page...")) {
+        SS_Create_AGS_Page();
+      }
+      else if(!strcmp(data->namesSelected[1], "Search pet Tree")) {
+        if(!strcmp(data->namesSelected[2], "Find Text in Files...")) {
+          SS_FindTextInFiles();
+        }
+        else if(!strcmp(data->namesSelected[2], "Find Recently Modified Files...")) {
+          SS_FindRecentlyModifiedFiles();
+        }
+        else if(!strcmp(data->namesSelected[2], "Find Checked Out Files...")) {
+          SS_FindCheckedOutFiles();
+        }
+      }
+      else if(!strcmp(data->namesSelected[1], "Quit")) {
+        SS_Quit();
+      }
     }
-	else if(!strcmp(data->namesSelected[1], "Default PPM User..."))
-	  {	SS_Default_PPM_User();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Create Temp ADO Page..."))
-	  {     SS_Create_RHIC_Page();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Create Temp PS ADO Page..."))
-	  {     SS_Create_PS_RHIC_Page();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Create Temp SLD/CLD Page..."))
-	  {     SS_Create_AGS_Page();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Quit"))
-	  {	SS_Quit();
-	  }
-	}
-      else if(!strcmp(data->namesSelected[0], "Page"))
-	{	if(!strcmp(data->namesSelected[1], "Find"))
-	  {	SP_Find();
-	  }
-	else if(!strcmp(data->namesSelected[1], "New"))
-	  {	SP_New();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Show"))
-	  {	SP_Show();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Hide"))
-	  {	SP_Hide();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Close"))
-	  {	SP_Close();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Close All..."))
-	  {	SP_Close_All();
-	  }
-	}
-      else if(!strcmp(data->namesSelected[0], "Options"))
-	{	if(!strcmp(data->namesSelected[1], "Search..."))
-	  {	SO_Search();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Pet Page History"))
-	  {	SO_Pet_Page_History();
-	  }
-	else if(!strcmp(data->namesSelected[1], "Read Archive Log"))
-	  {	SO_Read_Archive_Log();
-	  }
-	else if(!strcmp(data->namesSelected[1], "SLDs via Controller..."))
-	  {	SO_SLDs();
-	  }
-	else if(!strcmp(data->namesSelected[1], "CLDs..."))
-	  {	SO_CLDs();
-	  }
-	else if(!strcmp(data->namesSelected[1], "CLD Events..."))
-	  {	SO_CLD_Events();
-	  }
-	else if(!strcmp(data->namesSelected[1], "PPM User Monitor"))
-	  {	SO_PpmUserMonitor();
-	  }
-        else if(!strcmp(data->namesSelected[1], "Reload DDF..."))
-          {     SO_Load_DDF();
-          }
-        else if(!strcmp(data->namesSelected[1], "Flash Pages"))
-          {
-            if (_totalFlashTimerId > 0L)
-              {
-                application->DisableTimerEvent(_totalFlashTimerId);
-              }
-            // start the timer to flash the windows for four seconds
-            _totalFlashTimerId = application->EnableTimerEvent(4000);
-            SO_Flash_Pages();
-          }
-	}
+    else if(!strcmp(data->namesSelected[0], "Page")) {
+      if(!strcmp(data->namesSelected[1], "Find")) {
+        SP_Find();
+      }
+      else if(!strcmp(data->namesSelected[1], "New")) {
+        SP_New();
+      }
+      else if(!strcmp(data->namesSelected[1], "Show")) {
+        SP_Show();
+      }
+      else if(!strcmp(data->namesSelected[1], "Hide")) {
+        SP_Hide();
+      }
+      else if(!strcmp(data->namesSelected[1], "Close")) {
+        SP_Close();
+      }
+      else if(!strcmp(data->namesSelected[1], "Close All...")) {
+        SP_Close_All();
+      }
     }
+    else if(!strcmp(data->namesSelected[0], "Options")) {
+      if(!strcmp(data->namesSelected[1], "Pet Page History")) {
+        SO_Pet_Page_History();
+      }
+      else if(!strcmp(data->namesSelected[1], "Read Archive Log")) {
+        SO_Read_Archive_Log();
+      }
+      else if(!strcmp(data->namesSelected[1], "SLDs via Controller...")) {
+        SO_SLDs();
+      }
+      else if(!strcmp(data->namesSelected[1], "CLDs...")) {
+        SO_CLDs();
+      }
+      else if(!strcmp(data->namesSelected[1], "CLD Events...")) {
+        SO_CLD_Events();
+      }
+      else if(!strcmp(data->namesSelected[1], "PPM User Monitor")) {
+        SO_PpmUserMonitor();
+      }
+      else if(!strcmp(data->namesSelected[1], "Reload DDF...")) {
+        SO_Load_DDF();
+      }
+      else if(!strcmp(data->namesSelected[1], "Flash Pages")) {
+        if(_totalFlashTimerId > 0L) {
+          application->DisableTimerEvent(_totalFlashTimerId);
+        }
+        // start the timer to flash the windows for four seconds
+        _totalFlashTimerId = application->EnableTimerEvent(4000);
+        SO_Flash_Pages();
+      }
+    }
+  }
   else if (event == UIMessage)
     {
       // we only want to display messages from objects that are not device_list windows!
@@ -1814,14 +1806,8 @@ void SSMainWindow::RemoveWindow(UIWindow* window)
   // make the window invisible
   window->Hide();
 
-  // if the window was an SSPageWindow, and the window was stored as the searchPage,
-  // set searchPage to NULL prior to deleting the window
   if ( !strcmp(window->ClassName(), "SSPageWindow") || !strcmp(window->ClassName(), "pageWindow"))
   {
-    if ( (SSPageWindow*) searchPage == (SSPageWindow*) window )
-      searchPage=NULL;
-
-    // if knobbing is supported, be sure to clear the knob panel
     if (supportKnobPanel)
     {
       SSPageWindow* tmpWindow = (SSPageWindow*) window;
@@ -2271,6 +2257,42 @@ int SSMainWindow::ConfirmQuit()
   return 0; // cancel quit
 }
 
+void SSMainWindow::SS_FindTextInFiles()
+{
+  // put up for getting user input and making device list selections
+  if(_searchPopup == NULL)
+  {
+    _searchPopup = new UISearchDeviceList(this, "searchPopup", NULL, NULL, SPStringSearch);
+    _searchPopup->AddEventReceiver(this);  // trap the View (UISelect) event from the popup
+  }
+  // display the popup
+  _searchPopup->Show();
+}
+
+void SSMainWindow::SS_FindRecentlyModifiedFiles()
+{
+  // put up for getting user input and making device list selections
+  if(_modifiedPopup == NULL)
+  {
+    _modifiedPopup = new UISearchDeviceList(this, "modifiedPopup", NULL, NULL, SPFilesModified);
+    _modifiedPopup->AddEventReceiver(this);  // trap the View (UISelect) event from the popup
+  }
+  // display the popup
+  _modifiedPopup->Show();
+}
+
+void SSMainWindow::SS_FindCheckedOutFiles()
+{
+  // put up for getting user input and making device list selections
+  if(_checkedOutPopup == NULL)
+  {
+    _checkedOutPopup = new UISearchDeviceList(this, "checkedOutPopup", NULL, NULL, SPFilesCheckedOut);
+    _checkedOutPopup->AddEventReceiver(this);  // trap the View (UISelect) event from the popup
+  }
+  // display the popup
+  _checkedOutPopup->Show();
+}
+
 void SSMainWindow::SS_Quit()
 {
 //   if (ConfirmQuit() == false)
@@ -2389,26 +2411,6 @@ void SSMainWindow::SP_Close_All()
 
   // delete all windows from the list
   DeleteAllWindows();
-}
-
-void SSMainWindow::SO_Search()
-{
-  // put up for getting user input and making device list selections
-  if(searchPopup == NULL)
-    {
-      searchPopup = new UISearchDeviceList(this, "searchPopup");
-      searchPopup->AddEventReceiver(this);	// trap the View (UISelect) event from the popup
-
-      // get the currently selected node and use it as a starting point
-      const StdNode* currentNode = treeTable->GetNodeSelected();
-      if(currentNode != NULL)
-	{
-	  DirTree* dtree = (DirTree*) treeTable->GetTree();
-	  searchPopup->SetStartNode( dtree->GenerateNodePathname(currentNode) );
-	}
-    }
-  // display the popup
-  searchPopup->Show();
 }
 
 void SSMainWindow::SO_Pet_Page_History()
