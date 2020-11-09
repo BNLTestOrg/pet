@@ -1282,6 +1282,21 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       HandleEvent(treeTable, UITableBtn2Down);  // simulate a select event
     }
   }
+  else if(event == UIEvent10) {
+    PetWindow* win = (PetWindow*) GetWindow(pageList->GetSelection());
+    MachineTree* mtree = treeTable->GetMachineTree();
+    StdNode* rootNode = mtree->GetRootNode();
+    const char* rootPath = mtree->GenerateNodePathname(rootNode); // acop
+    const char* selectString = win->GetTreeRootPath(); // "/operations/acop/AGS/Instrumentation/Ipm/Ipm"
+    if (selectString) {
+      const char* nodeName = strstr(selectString, rootPath);
+      if (nodeName) {
+        StdNode* selectNode = mtree->FindNode(nodeName);
+        win->SetPageNode(selectNode);
+        SP_Show();
+      }
+    }
+  }
   // user canceled creating permanent page in the tree
   else if(event == UIEvent6)
   {
