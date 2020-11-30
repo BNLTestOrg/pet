@@ -1287,13 +1287,15 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     MachineTree* mtree = treeTable->GetMachineTree();
     StdNode* rootNode = mtree->GetRootNode();
     const char* rootPath = mtree->GenerateNodePathname(rootNode); // acop
-    const char* selectString = win->GetTreeRootPath(); // "/operations/acop/AGS/Instrumentation/Ipm/Ipm"
-    if (selectString) {
-      const char* nodeName = strstr(selectString, rootPath);
-      if (nodeName) {
-        StdNode* selectNode = mtree->FindNode(nodeName);
-        win->SetPageNode(selectNode);
-        SP_Show();
+    if (win != NULL) {
+      const char* selectString = win->GetTreeRootPath(); // "/operations/acop/AGS/Instrumentation/Ipm/Ipm"
+      if (selectString) {
+        const char* nodeName = strstr(selectString, rootPath);
+        if (nodeName) {
+          StdNode* selectNode = mtree->FindNode(nodeName);
+          win->SetPageNode(selectNode);
+          SP_Show();
+        }
       }
     }
   }
