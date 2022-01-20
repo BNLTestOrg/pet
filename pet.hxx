@@ -99,35 +99,35 @@ class SSMainWindow : public UIMainWindow
   void DisplayError(char* errToDisplay);
 
   // pulldown menu routines
-//  void SS_New();
-//  void SS_Open();
+  void SS_New();
+  void SS_Open();
   void SS_OpenFavorite();
   void SS_Default_PPM_User();
-//  void SS_Create_RHIC_Page();
-//  void SS_Create_PS_RHIC_Page();
+  void SS_Create_RHIC_Page();
+  void SS_Create_PS_RHIC_Page();
   void SS_FindTextInFiles();
   void SS_FindRecentlyModifiedFiles();
   void SS_FindCheckedOutFiles();
   void SS_Quit();
   int ConfirmQuit();
-//  void SP_Find();
-//  void SP_New();
-//  void SP_Show();
-//  void SP_Hide();
-//  void SP_Close();
-//  void SP_Close_All();
+  void SP_Find();
+  void SP_New();
+  void SP_Show();
+  void SP_Hide();
+  void SP_Close();
+  void SP_Close_All();
   void SO_Pet_Page_History();
   void SO_Read_Archive_Log();
   void SO_PpmUserMonitor();
-//  void SO_Flash_Pages(bool flash = true);
+  void SO_Flash_Pages(bool flash = true);
   void Exit();
 
   // helper routines
   const char*    GetSelectedPath();
   const StdNode* GetSelectedNode();
   dir_node_t*    GetSelectedDirNode();
-//  PetWindow*     CreateAdoWindow();
-//  void           OpenFile(const char* filePath);
+  PetWindow*     CreateAdoWindow();
+  void           OpenFile(const char* filePath);
   void           ExitAllWindows();
 };
 
