@@ -9,6 +9,6 @@ NAME = pet
 PROG1 = $(NAME)
 SRCS1 = $(PROG1).cxx
 PRIVATE_HEADERS1 = $(PROG1).hxx petMenu.cxx
-LIBS1 = pet UIQt utils basics cdevCns name UIUtils gpm
+LIBS1 = pet UIQt utils basics cdevCns name UIUtils gpm agsPage
 
 include $(MAKEDIR)/MakeApp.inc
