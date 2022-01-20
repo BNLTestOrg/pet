@@ -33,10 +33,10 @@ using namespace std;
 static UIApplication*	  application;
 static UIArgumentList	  argList;
 static SSMainWindow*	  mainWindow = NULL;
-//static UIBoolean	      singleDeviceListOnly=UIFalse;	// used for loading a single device list only
 static PetWindow*       activeAdoWin = NULL;
 static PetWindow*       singlePetWin = NULL;
-//static unsigned long    dumpElogAndExitTimerId = 0;
+static PetEventReceiver petEventReceiver;
+static unsigned long    dumpElogAndExitTimerId = 0;
 static const char* wname;
 
 static void clean_up(int st)
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
   // clean-up handler
   signal(SIGQUIT,clean_up);
   signal(SIGTERM,clean_up);
-  signal(SIGSTOP,clean_up);
+  //signal(SIGSTOP,clean_up); // valgrind says this signal is uncacheable
 
   // create a message logger
   FileMsgLogger* myLogger = new FileMsgLogger("pet");
@@ -170,139 +170,138 @@ int main(int argc, char *argv[])
   if( strlen( argList.String("-db_server") ) )
     set_data_db_name( (char*) argList.String("-db_server") );
 
-//  // check for single window switch
-//  bool singleWindowMode = false;
-//  PET_WINDOW_TYPE type = PET_UNKNOWN_WINDOW;
-//  if(argList.IsPresent("-file") || argList.IsPresent("-single")) {
-//
-//    const char* fname = argList.UntaggedItem(0);
-//    if (fname == NULL) {
-//      char* arg = "-single";
-//      if (argList.IsPresent("-file"))
-//          arg = "-file";
-//      fprintf(stderr, "pet file name required with %s arg\n", arg);
-//      exit(0);
-//    }
-//    type = mainWindow->WindowType(fname);
-//    switch (type) {
-//    case PET_ADO_WINDOW:
-//      singlePetWin = new PetWindow(application, "petWindow");
-//      singlePetWin->SetLocalPetWindowCreating(true);
-//      singlePetWin->AddEventReceiver(&petEventReceiver);
-//      singlePetWin->GetPetPage()->AddEventReceiver(&petEventReceiver);
-//      singleWindowMode = true;
-//      break;
-//    default:
-//      break;
-//    }
-//  }
-//  else{
-//    // create the main window and its user interface and display it
-//    if (argList.IsPresent("-printToElog") && !argList.IsPresent("-device_list"))
-//      cout << "-printToElog option must be used with -single (ado page) option" << endl;
-//    else if (argList.IsPresent("-printTogif") && !argList.IsPresent("-device_list"))
-//      cout << "-printTogif option must be used with -single (ado page) option" << endl;
-//    else if ((argList.IsPresent("-dumpToElog") || argList.IsPresent("dumpToDefaultElog")) &&
-//             (!argList.IsPresent("-device_list") || !argList.IsPresent("-file") || !argList.IsPresent("-single")))
-//      cout << "-printToElog option must be used with -single, -file, or -device_list option" << endl;
-//  }
-//
-//  const char *path = argList.String("-path");
-//  if(path && strlen(path)) {
-//    char *str = new char[strlen(path) + 10];
-//    sprintf(str, "%s/*.pet", path);
-//    if(singleWindowMode)
-//      singlePetWin->ChangePath(str);
-//    if(str)
-//      delete [] str;
-//  }
-//
-//  // load files that are untagged on the command line
-//  int fileNum;
-//  for(fileNum=0; fileNum<argList.NumUntaggedItems(); fileNum++) {
-//    const char* file = argList.UntaggedItem(fileNum);
-//    if(file && strlen(file)) {
-//      char *tmpFile, *path, *ptr;
-//
-//      type = mainWindow->WindowType(file);
-//      if (type == PET_ADO_WINDOW && (mainWindow->FindWindow(file, PET_ADO_WINDOW)) == NULL) {
-//        tmpFile = strdup(file);
-//        ptr = strrchr(tmpFile, '/');
-//        if(ptr) {
-//          *ptr = '\0';
-//          ptr++;
-//          path = new char[strlen(tmpFile) + 10];
-//          sprintf(path, "%s/*.ado", tmpFile);
-//        }
-//        else {		// no path given
-//          path = strdup("*.ado");
-//        }
-//
-//        if (singlePetWin == NULL){
-//          singlePetWin = new PetWindow(application, "petWindow");
-//          if (mainWindow) {
-//            mainWindow->AddListWindow(singlePetWin);
-//            singlePetWin->GetPetPage()->AddEventReceiver(mainWindow);
-//          }
-//        }
-//
-//        // file is *supposed* to be a file but if it is not attempt to take a guess at what
-//        // the file might be by looking in the directory that was passed for device_list.ado
-//        if (UIIsFile(file) == UIFalse) {
-//          if (UIIsDirectory(file) == UITrue) {
-//            // just append device_list.ado and try that
-//            std::string fname = file;
-//            fname += "/device_list.ado";
-//            if (UIIsFile(fname.c_str()) == UITrue)
-//              singlePetWin->LoadFile(fname.c_str());
-//            else {
-//              // throw an exception
-//              fprintf(stderr, "Argument passed as a pet file name (%s) is a directory\n", file);
-//              exit(1);
-//            }
-//          } else {
-//            // throw an exception
-//            fprintf(stderr, "pet file name provided (%s) is invalid\n", file);
-//            exit(1);
-//          }
-//        }
-//        else
-//          singlePetWin->LoadFile(file);
-//        singlePetWin->ChangePath(path);
-//        if (!argList.IsPresent("-file") && !argList.IsPresent("-single"))
-//          singlePetWin->SetLocalPetWindowCreating(false);
-//        if(path)
-//          free(path);
-//        if(tmpFile)
-//          free(tmpFile);
-//
-//        // LTH - kludge to check for orphaned pet pages
-//#ifdef USE_PET_MERELY_TO_ENUMERATE_ADOS_IN_MACHINE_TREE
-//
-//        if(mainWindow) { cerr << "Use -file or -single option when listing ADO pages" << endl; exit(-1); }
-//
-//        PetPage *pp = singlePetWin->GetPetPage();
-//        int rowsUsed = pp->NumRows();
-//        int colsUsed = pp->NumColumns();
-//
-//        const char *adoName;
-//        for(int i = 1; i <= rowsUsed; i++)
-//          for(int j = 1; j <= colsUsed; j++)
-//
-//            if(adoName = pp->CellGetAdo(i,j))
-//              cout << adoName << endl;
-//
-//        exit(0);
-//#endif
-//
-//        if (argList.IsPresent("-displayName"))
-//          singlePetWin->ShowSubString(argList.String("-displayName"));
-//        singlePetWin->Show();
-//        break;
-//      }
-//    } // if file good
-//  } // for
-//
+  // check for single window switch
+  bool singleWindowMode = false;
+  PET_WINDOW_TYPE type = PET_UNKNOWN_WINDOW;
+  if(argList.IsPresent("-file") || argList.IsPresent("-single")) {
+
+    const char* fname = argList.UntaggedItem(0);
+    if (fname == NULL) {
+      char* arg = "-single";
+      if (argList.IsPresent("-file"))
+          arg = "-file";
+      fprintf(stderr, "pet file name required with %s arg\n", arg);
+      exit(0);
+    }
+    type = mainWindow->WindowType(fname);
+    switch (type) {
+    case PET_ADO_WINDOW:
+    default:
+      singlePetWin = new PetWindow(application, "petWindow");
+      singlePetWin->SetLocalPetWindowCreating(true);
+      singlePetWin->AddEventReceiver(&petEventReceiver);
+      singlePetWin->GetPetPage()->AddEventReceiver(&petEventReceiver);
+      singleWindowMode = true;
+      break;
+    }
+  }
+  else{
+    // create the main window and its user interface and display it
+    if (argList.IsPresent("-printToElog") && !argList.IsPresent("-device_list"))
+      cout << "-printToElog option must be used with -single (ado page) option" << endl;
+    else if (argList.IsPresent("-printTogif") && !argList.IsPresent("-device_list"))
+      cout << "-printTogif option must be used with -single (ado page) option" << endl;
+    else if ((argList.IsPresent("-dumpToElog") || argList.IsPresent("dumpToDefaultElog")) &&
+             (!argList.IsPresent("-device_list") || !argList.IsPresent("-file") || !argList.IsPresent("-single")))
+      cout << "-printToElog option must be used with -single, -file, or -device_list option" << endl;
+  }
+
+  const char *path = argList.String("-path");
+  if(path && strlen(path)) {
+    char *str = new char[strlen(path) + 10];
+    sprintf(str, "%s/*.pet", path);
+    if(singleWindowMode)
+      singlePetWin->ChangePath(str);
+    if(str)
+      delete [] str;
+  }
+
+  // load files that are untagged on the command line
+  int fileNum;
+  for(fileNum=0; fileNum<argList.NumUntaggedItems(); fileNum++) {
+    const char* file = argList.UntaggedItem(fileNum);
+    if(file && strlen(file)) {
+      char *tmpFile, *path, *ptr;
+
+      type = mainWindow->WindowType(file);
+      if (type == PET_ADO_WINDOW && (mainWindow->FindWindow(file, PET_ADO_WINDOW)) == NULL) {
+        tmpFile = strdup(file);
+        ptr = strrchr(tmpFile, '/');
+        if(ptr) {
+          *ptr = '\0';
+          ptr++;
+          path = new char[strlen(tmpFile) + 10];
+          sprintf(path, "%s/*.ado", tmpFile);
+        }
+        else {		// no path given
+          path = strdup("*.ado");
+        }
+
+        if (singlePetWin == NULL){
+          singlePetWin = new PetWindow(application, "petWindow");
+          if (mainWindow) {
+            mainWindow->AddListWindow(singlePetWin);
+            singlePetWin->GetPetPage()->AddEventReceiver(mainWindow);
+          }
+        }
+
+        // file is *supposed* to be a file but if it is not attempt to take a guess at what
+        // the file might be by looking in the directory that was passed for device_list.ado
+        if (UIIsFile(file) == UIFalse) {
+          if (UIIsDirectory(file) == UITrue) {
+            // just append device_list.ado and try that
+            std::string fname = file;
+            fname += "/device_list.ado";
+            if (UIIsFile(fname.c_str()) == UITrue)
+              singlePetWin->LoadFile(fname.c_str());
+            else {
+              // throw an exception
+              fprintf(stderr, "Argument passed as a pet file name (%s) is a directory\n", file);
+              exit(1);
+            }
+          } else {
+            // throw an exception
+            fprintf(stderr, "pet file name provided (%s) is invalid\n", file);
+            exit(1);
+          }
+        }
+        else
+          singlePetWin->LoadFile(file);
+        singlePetWin->ChangePath(path);
+        if (!argList.IsPresent("-file") && !argList.IsPresent("-single"))
+          singlePetWin->SetLocalPetWindowCreating(false);
+        if(path)
+          free(path);
+        if(tmpFile)
+          free(tmpFile);
+
+        // LTH - kludge to check for orphaned pet pages
+#ifdef USE_PET_MERELY_TO_ENUMERATE_ADOS_IN_MACHINE_TREE
+
+        if(mainWindow) { cerr << "Use -file or -single option when listing ADO pages" << endl; exit(-1); }
+
+        PetPage *pp = singlePetWin->GetPetPage();
+        int rowsUsed = pp->NumRows();
+        int colsUsed = pp->NumColumns();
+
+        const char *adoName;
+        for(int i = 1; i <= rowsUsed; i++)
+          for(int j = 1; j <= colsUsed; j++)
+
+            if(adoName = pp->CellGetAdo(i,j))
+              cout << adoName << endl;
+
+        exit(0);
+#endif
+
+        if (argList.IsPresent("-displayName"))
+          singlePetWin->ShowSubString(argList.String("-displayName"));
+        singlePetWin->Show();
+        break;
+      }
+    } // if file good
+  } // for
+
 //  if ( (argList.IsPresent("-printToElog") || argList.IsPresent("-printTogif")) && (singleWindowMode || singleDeviceListOnly)){
 //    UIPrintTool* pt = GetPrintTool();
 //    if (argList.IsPresent("-printToElog"))
@@ -582,59 +581,58 @@ dir_node_t* SSMainWindow::GetSelectedDirNode()
 
 void SSMainWindow::LoadPageList(const UIWindow* winSelection)
 {
-//  // get the list of strings to load
-//  const UIWindow** wins = GetWindows();
-//  long numWins = GetNumWindows();
-//  long oldNumInList = pageList->GetNumDisplayedItems();
-//
-//  const char** items = (const char**) new char*[numWins+1];
-//  long selection = 0;
-//  PetWindow* petWin;
-//  PET_WINDOW_TYPE type;
-//  for(long i=0; i<numWins; i++)
-//  {
-//    type = WindowType((UIWindow*) wins[i]);
-//    switch (type){
-//      case PET_ADO_WINDOW:
-//        petWin = (PetWindow*) wins[i];
-//        items[i] = petWin->GetListString();
-//        break;
-//      default:
-//        break;
-//    }
-//    if(wins[i] == winSelection)
-//      selection = i+1;
-//  }
-//  items[numWins] = NULL;
-//  if(selection == 0 && numWins > 0)
-//    selection = 1;
-//
-//  // load them in the list
-//  pageList->SetItemsNoSelection(items);
-//  if(selection > 0)
-//    pageList->SetSelection(selection);
-//
-//  // make sure all of the items are displayed
-//  if(numWins > 0) {
-//    if (pageList->GetDesiredNumVisItems() < 5)
-//      pageList->SetItemsVisible(numWins);
-//
-//    if(numWins >= pageList->GetDesiredNumVisItems()) {
-//      pageList->SetItemsVisible(pageList->GetDesiredNumVisItems());
-//      pageList->ShowSelection();
-//    }
-//    else {
-//      if (pageList->GetDesiredNumVisItems() != 5) // default
-//        pageList->SetItemsVisible(pageList->GetDesiredNumVisItems());
-//      else
-//        pageList->SetItemsVisible( (short) numWins);
-//    }
-//  }
-//  else {
-//    if (pageList->GetDesiredNumVisItems() == 5) // default
-//      pageList->SetItemsVisible(1);
-//  }
-//  delete [] items;
+  // get the list of strings to load
+  const UIWindow** wins = GetWindows();
+  long numWins = GetNumWindows();
+
+  const char** items = (const char**) new char*[numWins+1];
+  long selection = 0;
+  PetWindow* petWin;
+  PET_WINDOW_TYPE type;
+  for(long i=0; i<numWins; i++)
+  {
+    type = WindowType((UIWindow*) wins[i]);
+    switch (type){
+      case PET_ADO_WINDOW:
+        petWin = (PetWindow*) wins[i];
+        items[i] = petWin->GetListString();
+        break;
+      default:
+        break;
+    }
+    if(wins[i] == winSelection)
+      selection = i+1;
+  }
+  items[numWins] = NULL;
+  if(selection == 0 && numWins > 0)
+    selection = 1;
+
+  // load them in the list
+  pageList->SetItemsNoSelection(items);
+  if(selection > 0)
+    pageList->SetSelection(selection);
+
+  // make sure all of the items are displayed
+  if(numWins > 0) {
+    if (pageList->GetDesiredNumVisItems() < 5)
+      pageList->SetItemsVisible(numWins);
+
+    if(numWins >= pageList->GetDesiredNumVisItems()) {
+      pageList->SetItemsVisible(pageList->GetDesiredNumVisItems());
+      pageList->ShowSelection();
+    }
+    else {
+      if (pageList->GetDesiredNumVisItems() != 5) // default
+        pageList->SetItemsVisible(pageList->GetDesiredNumVisItems());
+      else
+        pageList->SetItemsVisible( (short) numWins);
+    }
+  }
+  else {
+    if (pageList->GetDesiredNumVisItems() == 5) // default
+      pageList->SetItemsVisible(1);
+  }
+  delete [] items;
 }
 
 void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
@@ -677,19 +675,19 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     HandleEvent(treeTable, UITableBtn2Down);
 
 
-//    if(object == _searchPopup) { // highlight the first device name with the search string
-//      // get the current pet window
-//      PetWindow* petWin = NULL;
-//      long selection = pageList->GetSelection();
-//      if(selection > 0)
-//        petWin = (PetWindow*) this->GetWindow(selection);
-//
-//      const char* searchStr = _searchPopup->GetSearchString();
-//      if(searchStr != NULL && searchStr[0] != 0 && petWin != NULL) {
-//        petWin->ShowSubString(searchStr);
-//      }
-//    }
-//    popup->SetStandardCursor();
+    if(object == _searchPopup) { // highlight the first device name with the search string
+      // get the current pet window
+      PetWindow* petWin = NULL;
+      long selection = pageList->GetSelection();
+      if(selection > 0)
+        petWin = (PetWindow*) this->GetWindow(selection);
+
+      const char* searchStr = _searchPopup->GetSearchString();
+      if(searchStr != NULL && searchStr[0] != 0 && petWin != NULL) {
+        petWin->ShowSubString(searchStr);
+      }
+    }
+    popup->SetStandardCursor();
   }
 
   // a device page window was made active
@@ -727,289 +725,286 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     HideListWindow( (UIWindow*) object);
   }
   // user wants to view a selected pet page from the history popup
-//  else if(object == _historyPopup && event == UISelect)
-//  {
-//    const char* path = _historyPopup->GetSelectedFile();
-//    unsigned long time = _historyPopup->GetSelectedTime();
-//    if(path == NULL || time == 0)
-//      return;
-//    long selection = _historyPopup->GetSelection();
-//    if(selection == 1)
-//      OpenFile(path);
-//  }
-//  // user made a leaf selection from the machine tree table
-//  else if(object == treeTable)
-//  {
-//    SetMessage("");
-//    PetWindow* adoWin = NULL;
-//    UIWindow* win;
-//    bool creatAdoWin = false;
-//    bool adoWinCont = true;
-//    long numWins = GetNumWindows();
-//    int petPagePPM = 0; // in case we are loading an already created page and fail and reload it to its initial list
-//    if(event == UISelect || event == UIDoubleClick || event == UIAccept || event == UITableBtn2Down) {
-//      // tree table does not automatically select the node on a button 2down
-//      if(event == UITableBtn2Down) {
-//        const StdNode* node = treeTable->GetLastChanged();
-//        treeTable->SelectRow(node);
-//      }
-//      char s[512];
-//      DirTree* tree = (DirTree*)treeTable->GetTree();
-//      const StdNode* selectedNode = treeTable->GetNodeSelected();
-//      tree->GenerateFullNodePathname(selectedNode, s);
-//      strcat(s, "/");
-//      PET_WINDOW_TYPE type = WindowType(s);
-//
-//      // independently look for medm screens (.adl extension) and launch these if found.
-//      bool foundmedm = checkForMedmPage(s);
-//
-//      if (type == PET_UNKNOWN_WINDOW)
-//      {
-//        if (foundmedm == false) {
-//          SetMessage("No ado device list found.");
-//          return;
-//        }
-//      }
-//      SetWorkingCursor();
-//      // in case we have an error - loading a window - let's remember the window we are replacing!
-//      char* adoWindowPath = NULL;
-//      if(event == UISelect || event == UIDoubleClick || event == UIAccept) {	// load current window
-//        if(type == PET_ADO_WINDOW)
-//        {
-//          if(numWins > 0 && activeAdoWin && IsWindowInList( (UIWindow*) activeAdoWin)) {
-//            adoWin = activeAdoWin;
-//            const char* adoPath = adoWin->GetCurrentFileName();
-//            petPagePPM = adoWin->GetPPMUser();
-//            if (adoPath != NULL)
-//            {
-//              adoWindowPath = new char[strlen(adoPath)+20]; // need space - because will append ending back later!
-//              strcpy(adoWindowPath, adoPath);
-//              // now null terminate the /device_list.ado or /device_list ending away
-//              AdjustName(adoWindowPath);
-//            }
-//          }
-//          else {
-//            creatAdoWin = true;
-//            adoWin = CreateAdoWindow();
-//          }
-//        }
-//      }
-//      else if(event == UITableBtn2Down) {  // create new window(s)
-//        // check to see if a window already exists
-//        if(type == PET_ADO_WINDOW)
-//          adoWin = (PetWindow*) FindWindow(s, PET_ADO_WINDOW);
-//        if(adoWin) {
-//          UILabelPopup popup(this, "popup", "One or more windows are already showing this file.\nDo you really want to create a duplicate?", "No", "Yes");
-//          int retval = popup.Wait();
-//          if(retval == 1) { // No
-//            if(adoWin) {
-//              adoWin->Show();
-//              if(type == PET_ADO_WINDOW)
-//                type = PET_UNKNOWN_WINDOW;
-//            }
-//            if(type == PET_UNKNOWN_WINDOW) { // nothing more to create
-//              SetStandardCursor();
-//              delete [] adoWindowPath;
-//              return;
-//            }
-//          }
-//          else { // Yes - make sure we create new windows
-//            adoWin = NULL;
-//          }
-//        }
-//        if(type == PET_ADO_WINDOW)
-//        {
-//          creatAdoWin = true;
-//          adoWin = CreateAdoWindow();
-//        }
-//      }
-//      // now we have one (or two) windows - load the proper device list(s)
-//      const char* selectPath = treeTable->GetNodePath();
-//      if(selectPath == NULL) {
-//        SetMessage("Can't determine path to device list.");
-//        SetStandardCursor();
-//
-//        // if created a window - delete it - remove it from the list!
-//        if (creatAdoWin) {
-//          if (adoWin)
-//            DeleteWindow(adoWin);
-//        }
-//        delete [] adoWindowPath;
-//        return;
-//      }
-//      SetMessage("Loading device page(s)...");
-//      if(adoWin != NULL) {
-//        char s[512];
-//        DirTree* tree = (DirTree*)treeTable->GetTree();
-//        const StdNode* theNode = tree->GetRootNode();
-//        if (tree->GenerateFullNodePathname(theNode, s) == 0)
-//          adoWin->SetTreeRootPath(s);
-//        tree->GenerateFullNodePathname(treeTable->GetNodeSelected(), s);
-//        strcat(s, "/");
-//        strcat(s, ADO_DEVICE_LIST);
-//        adoWin->LoadFile(s, tree->GenerateNodePathnameWithoutRoot( treeTable->GetNodeSelected() ),
-//                         get_ppm_user());
-//        bool anError = false;
-//        if (adoWin->CreateOK())
-//        {
-//          adoWin->SetPageNode( treeTable->GetNodeSelected() );
-//          adoWin->Show();
-//          LoadPageList(adoWin);
-//          activeAdoWin = adoWin;
-//        }
-//        else
-//        {
-//          if (creatAdoWin)
-//          {
-//            adoWinCont = false;
-//            delete [] adoWindowPath;
-//            adoWindowPath = NULL;
-//            SetStandardCursor();
-//            SetMessage("Could Not Load Device List");
-//            DeleteWindow(adoWin);
-//            anError = true;
-//          }
-//          else
-//          {
-//            // we were loading a device page into an existing window
-//            // restore to its original path
-//            if( adoWindowPath != NULL)
-//            {
-//              DirTree* tree = (DirTree*)treeTable->GetTree();
-//              // the adoWindowPath should not begin with /operations the root of the tree - for this call
-//              StdNode* selectedNode = NULL;
-//              if ( !strncmp(adoWindowPath, "/operations/", strlen("/operations/")) )
-//                selectedNode = tree->FindNode(&(adoWindowPath[strlen("/operations/")-1]));
-//              strcat(adoWindowPath, "/");
-//              strcat(adoWindowPath, ADO_DEVICE_LIST);
-//              if (selectedNode != NULL)
-//                adoWin->LoadFile(adoWindowPath, tree->GenerateNodePathnameWithoutRoot(selectedNode),
-//                                 petPagePPM);
-//              else
-//                adoWin->LoadFile(adoWindowPath, NULL, petPagePPM);
-//              if (adoWin->CreateOK())
-//              {
-//                adoWin->SetPageNode(selectedNode);
-//                adoWin->Show();
-//                LoadPageList(adoWin);
-//                activeAdoWin = adoWin;
-//                SetMessage("Could Not Load Device List");
-//                DisplayError("Problem loading device list.\nRestored to initial page.");
-//                anError = true;
-//              }
-//              else
-//              {
-//                SetMessage("Could Not Load Device List");
-//                DisplayError("Problem restoring original device list.");
-//                anError = true;
-//              }
-//            }
-//            else
-//            {
-//              SetMessage("Could Not Load Device List");
-//              DisplayError("Problem restoring original device list.");
-//              anError = true;
-//            }
-//          }
-//          if (anError)
-//          {
-//            delete [] adoWindowPath;
-//            SetStandardCursor();
-//            return;
-//          }
-//        }
-//        delete [] adoWindowPath;
-//      }
-//      SetStandardCursor();
-//      SetMessage("");
-//    }
-//  }
-//
-//  // user made a selection from the list of device pages
-//  else if(object == pageList && event == UISelect)
-//  {
-//    SetMessage("");
-//    SP_Show();
-//  }
-//  // user is launching a new pet page from within another pet page
-//  else if(event == UIEvent9)
-//  {
-//    PetPage* page = (PetPage*) object;
-//    const char* path = page->LaunchPetPagePath();
-//    int retval = treeTable->SelectNodePath(path);
-//    if (retval != 0) {
-//      // handle error
-//      SetMessage("Unable to load page");
-//    } else {
-//      treeTable->LoadTreeTable();
-//      HandleEvent(treeTable, UITableBtn2Down);  // simulate a select event
-//    }
-//  }
-//  else if(event == UIEvent10) {
-//    PetWindow* win = (PetWindow*) GetWindow(pageList->GetSelection());
-//    MachineTree* mtree = treeTable->GetMachineTree();
-//    StdNode* rootNode = mtree->GetRootNode();
-//    const char* rootPath = mtree->GenerateNodePathname(rootNode); // acop
-//    if (win != NULL) {
-//      const char* selectString = win->GetTreeRootPath(); // "/operations/acop/AGS/Instrumentation/Ipm/Ipm"
-//      if (selectString) {
-//        const char* nodeName = strstr(selectString, rootPath);
-//        if (nodeName) {
-//          StdNode* selectNode = mtree->FindNode(nodeName);
-//          win->SetPageNode(selectNode);
-//          SP_Show();
-//        }
-//      }
-//    }
-//  }
-//  // user canceled creating permanent page in the tree
-//  else if(event == UIEvent6)
-//  {
-//    _creatingPageInTree = false;
-//  }
-//  // user may be creating a permanent page in the tree
-//  else if(event == UIEvent5)
-//  {
-//    if (_creatingPageInTree) {
-//      _creatingPageInTree = false;
-//      string file = editDeviceList->GetPath();
-//      file += editDeviceList->GetDeviceName();
-//      if (!strcmp(editDeviceList->GetDeviceType(), "ado")) {
-//        activeAdoWin->SaveFile(file.c_str());
-//      }
-//    }
-//  }
-//  else if(event == UIEvent2)
-//  {
-//    // event passed up from pet library indicating a window was created or reloaded
-//    LoadPageList( (UIWindow*) object);
-//  }
-//  else if(event == UIEvent1)
-//  {
-//    // event passed up from pet library
-//    if (IsWindowInList((UIWindow*) object)){
-//      PetWindow* adoWin = (PetWindow*) object;
-//      int ppmUser = adoWin->GetPPMUser();
-//      adoWin = new PetWindow(this, "adoWindow");
-//      adoWin->GetPetPage()->AddEventReceiver(this);
-//      adoWin->SetLocalPetWindowCreating(false);
-//      // in this case, we will assume the file loaded is not from the tree
-//      // so don't set the tree - otherwise need to somehow be smart - skip it for now
-//      adoWin->LoadFile(object->GetMessage(), NULL, ppmUser);
-//      if (adoWin->CreateOK())
-//      {
-//        AddListWindow(adoWin);
-//        adoWin->Show();
-//        LoadPageList(adoWin);
-//        activeAdoWin = adoWin;
-//      }
-//      else
-//      {
-//        SetMessage("Received window creation event - problem loading");
-//      }
-//    }
-//  }
-//
+  else if(object == _historyPopup && event == UISelect)
+  {
+    const char* path = _historyPopup->GetSelectedFile();
+    unsigned long time = _historyPopup->GetSelectedTime();
+    if(path == NULL || time == 0)
+      return;
+    long selection = _historyPopup->GetSelection();
+    if(selection == 1)
+      OpenFile(path);
+  }
+  // user made a leaf selection from the machine tree table
+  else if(object == treeTable)
+  {
+    SetMessage("");
+    PetWindow* adoWin = NULL;
+    bool creatAdoWin = false;
+    long numWins = GetNumWindows();
+    int petPagePPM = 0; // in case we are loading an already created page and fail and reload it to its initial list
+    if(event == UISelect || event == UIDoubleClick || event == UIAccept || event == UITableBtn2Down) {
+      // tree table does not automatically select the node on a button 2down
+      if(event == UITableBtn2Down) {
+        const StdNode* node = treeTable->GetLastChanged();
+        treeTable->SelectRow(node);
+      }
+      char s[512];
+      DirTree* tree = (DirTree*)treeTable->GetTree();
+      const StdNode* selectedNode = treeTable->GetNodeSelected();
+      tree->GenerateFullNodePathname(selectedNode, s);
+      strcat(s, "/");
+      PET_WINDOW_TYPE type = WindowType(s);
+
+      // independently look for medm screens (.adl extension) and launch these if found.
+      bool foundmedm = checkForMedmPage(s);
+
+      if (type == PET_UNKNOWN_WINDOW)
+      {
+        if (foundmedm == false) {
+          SetMessage("No ado device list found.");
+          return;
+        }
+      }
+      SetWorkingCursor();
+      // in case we have an error - loading a window - let's remember the window we are replacing!
+      char* adoWindowPath = NULL;
+      if(event == UISelect || event == UIDoubleClick || event == UIAccept) {	// load current window
+        if(type == PET_ADO_WINDOW)
+        {
+          if(numWins > 0 && activeAdoWin && IsWindowInList( (UIWindow*) activeAdoWin)) {
+            adoWin = activeAdoWin;
+            const char* adoPath = adoWin->GetCurrentFileName();
+            petPagePPM = adoWin->GetPPMUser();
+            if (adoPath != NULL)
+            {
+              adoWindowPath = new char[strlen(adoPath)+20]; // need space - because will append ending back later!
+              strcpy(adoWindowPath, adoPath);
+              // now null terminate the /device_list.ado or /device_list ending away
+              AdjustName(adoWindowPath);
+            }
+          }
+          else {
+            creatAdoWin = true;
+            adoWin = CreateAdoWindow();
+          }
+        }
+      }
+      else if(event == UITableBtn2Down) {  // create new window(s)
+        // check to see if a window already exists
+        if(type == PET_ADO_WINDOW)
+          adoWin = (PetWindow*) FindWindow(s, PET_ADO_WINDOW);
+        if(adoWin) {
+          UILabelPopup popup(this, "popup", "One or more windows are already showing this file.\nDo you really want to create a duplicate?", "No", "Yes");
+          int retval = popup.Wait();
+          if(retval == 1) { // No
+            if(adoWin) {
+              adoWin->Show();
+              if(type == PET_ADO_WINDOW)
+                type = PET_UNKNOWN_WINDOW;
+            }
+            if(type == PET_UNKNOWN_WINDOW) { // nothing more to create
+              SetStandardCursor();
+              delete [] adoWindowPath;
+              return;
+            }
+          }
+          else { // Yes - make sure we create new windows
+            adoWin = NULL;
+          }
+        }
+        if(type == PET_ADO_WINDOW)
+        {
+          creatAdoWin = true;
+          adoWin = CreateAdoWindow();
+        }
+      }
+      // now we have one (or two) windows - load the proper device list(s)
+      const char* selectPath = treeTable->GetNodePath();
+      if(selectPath == NULL) {
+        SetMessage("Can't determine path to device list.");
+        SetStandardCursor();
+
+        // if created a window - delete it - remove it from the list!
+        if (creatAdoWin) {
+          if (adoWin)
+            DeleteWindow(adoWin);
+        }
+        delete [] adoWindowPath;
+        return;
+      }
+      SetMessage("Loading device page(s)...");
+      if(adoWin != NULL) {
+        char s[512];
+        DirTree* tree = (DirTree*)treeTable->GetTree();
+        const StdNode* theNode = tree->GetRootNode();
+        if (tree->GenerateFullNodePathname(theNode, s) == 0)
+          adoWin->SetTreeRootPath(s);
+        tree->GenerateFullNodePathname(treeTable->GetNodeSelected(), s);
+        strcat(s, "/");
+        strcat(s, ADO_DEVICE_LIST);
+        adoWin->LoadFile(s, tree->GenerateNodePathnameWithoutRoot( treeTable->GetNodeSelected() ),
+                         get_ppm_user());
+        bool anError = false;
+        if (adoWin->CreateOK())
+        {
+          adoWin->SetPageNode( treeTable->GetNodeSelected() );
+          adoWin->Show();
+          LoadPageList(adoWin);
+          activeAdoWin = adoWin;
+        }
+        else
+        {
+          if (creatAdoWin)
+          {
+            delete [] adoWindowPath;
+            adoWindowPath = NULL;
+            SetStandardCursor();
+            SetMessage("Could Not Load Device List");
+            DeleteWindow(adoWin);
+            anError = true;
+          }
+          else
+          {
+            // we were loading a device page into an existing window
+            // restore to its original path
+            if( adoWindowPath != NULL)
+            {
+              DirTree* tree = (DirTree*)treeTable->GetTree();
+              // the adoWindowPath should not begin with /operations the root of the tree - for this call
+              StdNode* selectedNode = NULL;
+              if ( !strncmp(adoWindowPath, "/operations/", strlen("/operations/")) )
+                selectedNode = tree->FindNode(&(adoWindowPath[strlen("/operations/")-1]));
+              strcat(adoWindowPath, "/");
+              strcat(adoWindowPath, ADO_DEVICE_LIST);
+              if (selectedNode != NULL)
+                adoWin->LoadFile(adoWindowPath, tree->GenerateNodePathnameWithoutRoot(selectedNode),
+                                 petPagePPM);
+              else
+                adoWin->LoadFile(adoWindowPath, NULL, petPagePPM);
+              if (adoWin->CreateOK())
+              {
+                adoWin->SetPageNode(selectedNode);
+                adoWin->Show();
+                LoadPageList(adoWin);
+                activeAdoWin = adoWin;
+                SetMessage("Could Not Load Device List");
+                DisplayError("Problem loading device list.\nRestored to initial page.");
+                anError = true;
+              }
+              else
+              {
+                SetMessage("Could Not Load Device List");
+                DisplayError("Problem restoring original device list.");
+                anError = true;
+              }
+            }
+            else
+            {
+              SetMessage("Could Not Load Device List");
+              DisplayError("Problem restoring original device list.");
+              anError = true;
+            }
+          }
+          if (anError)
+          {
+            delete [] adoWindowPath;
+            SetStandardCursor();
+            return;
+          }
+        }
+        delete [] adoWindowPath;
+      }
+      SetStandardCursor();
+      SetMessage("");
+    }
+  }
+
+  // user made a selection from the list of device pages
+  else if(object == pageList && event == UISelect)
+  {
+    SetMessage("");
+    SP_Show();
+  }
+  // user is launching a new pet page from within another pet page
+  else if(event == UIEvent9)
+  {
+    PetPage* page = (PetPage*) object;
+    const char* path = page->LaunchPetPagePath();
+    int retval = treeTable->SelectNodePath(path);
+    if (retval != 0) {
+      // handle error
+      SetMessage("Unable to load page");
+    } else {
+      treeTable->LoadTreeTable();
+      HandleEvent(treeTable, UITableBtn2Down);  // simulate a select event
+    }
+  }
+  else if(event == UIEvent10) {
+    PetWindow* win = (PetWindow*) GetWindow(pageList->GetSelection());
+    MachineTree* mtree = treeTable->GetMachineTree();
+    StdNode* rootNode = mtree->GetRootNode();
+    const char* rootPath = mtree->GenerateNodePathname(rootNode); // acop
+    if (win != NULL) {
+      const char* selectString = win->GetTreeRootPath(); // "/operations/acop/AGS/Instrumentation/Ipm/Ipm"
+      if (selectString) {
+        const char* nodeName = strstr(selectString, rootPath);
+        if (nodeName) {
+          StdNode* selectNode = mtree->FindNode(nodeName);
+          win->SetPageNode(selectNode);
+          SP_Show();
+        }
+      }
+    }
+  }
+  // user canceled creating permanent page in the tree
+  else if(event == UIEvent6)
+  {
+    _creatingPageInTree = false;
+  }
+  // user may be creating a permanent page in the tree
+  else if(event == UIEvent5)
+  {
+    if (_creatingPageInTree) {
+      _creatingPageInTree = false;
+      string file = editDeviceList->GetPath();
+      file += editDeviceList->GetDeviceName();
+      if (!strcmp(editDeviceList->GetDeviceType(), "ado")) {
+        activeAdoWin->SaveFile(file.c_str());
+      }
+    }
+  }
+  else if(event == UIEvent2)
+  {
+    // event passed up from pet library indicating a window was created or reloaded
+    LoadPageList( (UIWindow*) object);
+  }
+  else if(event == UIEvent1)
+  {
+    // event passed up from pet library
+    if (IsWindowInList((UIWindow*) object)){
+      PetWindow* adoWin = (PetWindow*) object;
+      int ppmUser = adoWin->GetPPMUser();
+      adoWin = new PetWindow(this, "adoWindow");
+      adoWin->GetPetPage()->AddEventReceiver(this);
+      adoWin->SetLocalPetWindowCreating(false);
+      // in this case, we will assume the file loaded is not from the tree
+      // so don't set the tree - otherwise need to somehow be smart - skip it for now
+      adoWin->LoadFile(object->GetMessage(), NULL, ppmUser);
+      if (adoWin->CreateOK())
+      {
+        AddListWindow(adoWin);
+        adoWin->Show();
+        LoadPageList(adoWin);
+        activeAdoWin = adoWin;
+      }
+      else
+      {
+        SetMessage("Received window creation event - problem loading");
+      }
+    }
+  }
+
   // user made a selection from the pulldown menus
   else if(object == pulldownMenu && event == UISelect)
   {
@@ -1017,24 +1012,24 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     SetMessage("");
 
     if(!strcmp(data->namesSelected[0], "File")) {
-//      if(!strcmp(data->namesSelected[1], "New...")) {
-//        SS_New();
-//      }
-//      else if(!strcmp(data->namesSelected[1], "Open...")) {
-//        SS_Open();
-//      }
+      if(!strcmp(data->namesSelected[1], "New...")) {
+        SS_New();
+      }
+      else if(!strcmp(data->namesSelected[1], "Open...")) {
+        SS_Open();
+      }
       if(!strcmp(data->namesSelected[1], "Open Favorite...")) {
         SS_OpenFavorite();
       }
       else if(!strcmp(data->namesSelected[1], "Default PPM User...")) {
         SS_Default_PPM_User();
       }
-//      else if(!strcmp(data->namesSelected[1], "Create Temp ADO Page...")) {
-//        SS_Create_RHIC_Page();
-//      }
-//      else if(!strcmp(data->namesSelected[1], "Create Temp PS ADO Page...")) {
-//        SS_Create_PS_RHIC_Page();
-//      }
+      else if(!strcmp(data->namesSelected[1], "Create Temp ADO Page...")) {
+        SS_Create_RHIC_Page();
+      }
+      else if(!strcmp(data->namesSelected[1], "Create Temp PS ADO Page...")) {
+        SS_Create_PS_RHIC_Page();
+      }
       else if(!strcmp(data->namesSelected[1], "Search pet Tree")) {
         if(!strcmp(data->namesSelected[2], "Find Text in Files...")) {
           SS_FindTextInFiles();
@@ -1050,26 +1045,26 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
         SS_Quit();
       }
     }
-//    else if(!strcmp(data->namesSelected[0], "Page")) {
-//      if(!strcmp(data->namesSelected[1], "Find")) {
-//        SP_Find();
-//      }
-//      else if(!strcmp(data->namesSelected[1], "New")) {
-//        SP_New();
-//      }
-//      else if(!strcmp(data->namesSelected[1], "Show")) {
-//        SP_Show();
-//      }
-//      else if(!strcmp(data->namesSelected[1], "Hide")) {
-//        SP_Hide();
-//      }
-//      else if(!strcmp(data->namesSelected[1], "Close")) {
-//        SP_Close();
-//      }
-//      else if(!strcmp(data->namesSelected[1], "Close All...")) {
-//        SP_Close_All();
-//      }
-//    }
+    else if(!strcmp(data->namesSelected[0], "Page")) {
+      if(!strcmp(data->namesSelected[1], "Find")) {
+        SP_Find();
+      }
+      else if(!strcmp(data->namesSelected[1], "New")) {
+        SP_New();
+      }
+      else if(!strcmp(data->namesSelected[1], "Show")) {
+        SP_Show();
+      }
+      else if(!strcmp(data->namesSelected[1], "Hide")) {
+        SP_Hide();
+      }
+      else if(!strcmp(data->namesSelected[1], "Close")) {
+        SP_Close();
+      }
+      else if(!strcmp(data->namesSelected[1], "Close All...")) {
+        SP_Close_All();
+      }
+    }
     else if(!strcmp(data->namesSelected[0], "Options")) {
       if(!strcmp(data->namesSelected[1], "Pet Page History")) {
         SO_Pet_Page_History();
@@ -1080,57 +1075,57 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       else if(!strcmp(data->namesSelected[1], "PPM User Monitor")) {
         SO_PpmUserMonitor();
       }
-//      else if(!strcmp(data->namesSelected[1], "Flash Pages")) {
-//        if(_totalFlashTimerId > 0L) {
-//          application->DisableTimerEvent(_totalFlashTimerId);
-//        }
-//        // start the timer to flash the windows for four seconds
-//        _totalFlashTimerId = application->EnableTimerEvent(4000);
-//        SO_Flash_Pages();
-//      }
+      else if(!strcmp(data->namesSelected[1], "Flash Pages")) {
+        if(_totalFlashTimerId > 0L) {
+          application->DisableTimerEvent(_totalFlashTimerId);
+        }
+        // start the timer to flash the windows for four seconds
+        _totalFlashTimerId = application->EnableTimerEvent(4000);
+        SO_Flash_Pages();
+      }
     }
   }
-//  else if (event == UIMessage)
-//  {
-//    // we only want to display messages from objects that are not device_list windows!
-//    // they have their own message areas!
-//    // check to see if sent from one of the device pages
-//    const char* className = object->ClassName();
-//    if(strcmp( className, "PetWindow") && strcmp( className, "PetPage"))
-//      SetMessage(object->GetMessage());
-//  }
-//  else if (object == application && event == UITimer)
-//  {
-//    if (application->GetTimerId() == _totalFlashTimerId) {
-//      // stop the flashing of the pages
-//      SO_Flash_Pages(false);
-//      _totalFlashTimerId = 0L;
-//    }
-//  }
+  else if (event == UIMessage)
+  {
+    // we only want to display messages from objects that are not device_list windows!
+    // they have their own message areas!
+    // check to see if sent from one of the device pages
+    const char* className = object->ClassName();
+    if(strcmp( className, "PetWindow") && strcmp( className, "PetPage"))
+      SetMessage(object->GetMessage());
+  }
+  else if (object == application && event == UITimer)
+  {
+    if (application->GetTimerId() == _totalFlashTimerId) {
+      // stop the flashing of the pages
+      SO_Flash_Pages(false);
+      _totalFlashTimerId = 0L;
+    }
+  }
   // otherwise, pass event to base class
   else
     UIMainWindow::HandleEvent(object, event);
 }
 
-//PetWindow* SSMainWindow::CreateAdoWindow()
-//{
-//  PetWindow* adoWin;
-//  DirTree *tree = (DirTree*) treeTable->GetTree();
-//  if(tree) {
-//    char treeRootPathAndNode[512];
-//    const StdNode* theNode = tree->GetRootNode();
-//    if (tree->GenerateFullNodePathname(theNode, treeRootPathAndNode) == 0)
-//      adoWin = new PetWindow(this, "adoWindow", wname, treeRootPathAndNode);
-//    else
-//      adoWin = new PetWindow(this, "adoWindow");
-//  }
-//  else
-//    adoWin = new PetWindow(this, "adoWindow");
-//  adoWin->SetLocalPetWindowCreating(false);
-//  adoWin->GetPetPage()->AddEventReceiver(this);
-//  AddListWindow(adoWin);
-//  return adoWin;
-//}
+PetWindow* SSMainWindow::CreateAdoWindow()
+{
+  PetWindow* adoWin;
+  DirTree *tree = (DirTree*) treeTable->GetTree();
+  if(tree) {
+    char treeRootPathAndNode[512];
+    const StdNode* theNode = tree->GetRootNode();
+    if (tree->GenerateFullNodePathname(theNode, treeRootPathAndNode) == 0)
+      adoWin = new PetWindow(this, "adoWindow", wname, treeRootPathAndNode);
+    else
+      adoWin = new PetWindow(this, "adoWindow");
+  }
+  else
+    adoWin = new PetWindow(this, "adoWindow");
+  adoWin->SetLocalPetWindowCreating(false);
+  adoWin->GetPetPage()->AddEventReceiver(this);
+  AddListWindow(adoWin);
+  return adoWin;
+}
 
 void SSMainWindow::DisplayError(char* errToDisplay)
 {
@@ -1186,58 +1181,58 @@ void SSMainWindow::SetWindowPos(UIWindow* newWin, UIWindow* currWin)
 
 UIWindow* SSMainWindow::FindWindow(const char* file, PET_WINDOW_TYPE wtype)
 {
-//  if (file == NULL)
-//    return NULL;
-//  char fileName[512];
-//  strcpy(fileName, file);
-//  if (!strstr(fileName, "device_list")) {
-//    if(wtype == PET_ADO_WINDOW) {
-//      strcat(fileName, ADO_DEVICE_LIST);
-//    }
-//  } else {
-//    if (wtype == PET_ADO_WINDOW && !strstr(fileName, ".ado"))
-//      strcat(fileName, ".ado");
-//  }
-//
-//  UIWindow* win;
-//  int numWindows = GetNumWindows();
-//  const char* winName;
-//  PET_WINDOW_TYPE type;
-//  for(int i=0; i<numWindows; i++) {
-//    win = GetWindow(i+1);
-//    type = WindowType(win);
-//    winName = NULL;
-//    switch (type)
-//    {
-//      case PET_ADO_WINDOW:
-//        winName = ((PetWindow*)win)->GetCurrentFileName();
-//        break;
-//      default:
-//        break;
-//    }
-//    if(type == wtype && winName && !strcmp(fileName, winName))
-//      return win;
-//  }
+  if (file == NULL)
+    return NULL;
+  char fileName[512];
+  strcpy(fileName, file);
+  if (!strstr(fileName, "device_list")) {
+    if(wtype == PET_ADO_WINDOW) {
+      strcat(fileName, ADO_DEVICE_LIST);
+    }
+  } else {
+    if (wtype == PET_ADO_WINDOW && !strstr(fileName, ".ado"))
+      strcat(fileName, ".ado");
+  }
+
+  UIWindow* win;
+  int numWindows = GetNumWindows();
+  const char* winName;
+  PET_WINDOW_TYPE type;
+  for(int i=0; i<numWindows; i++) {
+    win = GetWindow(i+1);
+    type = WindowType(win);
+    winName = NULL;
+    switch (type)
+    {
+      case PET_ADO_WINDOW:
+        winName = ((PetWindow*)win)->GetCurrentFileName();
+        break;
+      default:
+        break;
+    }
+    if(type == wtype && winName && !strcmp(fileName, winName))
+      return win;
+  }
   return NULL;
 }
 
 void SSMainWindow::ExitAllWindows()
 {
-//  UIWindow* win;
-//  int numWindows = GetNumWindows();
-//  PET_WINDOW_TYPE type;
-//  for(int i=0; i<numWindows; i++) {
-//    win = GetWindow(i+1);
-//    type = WindowType(win);
-//    switch (type)
-//    {
-//      case PET_ADO_WINDOW:
-//        ((PetWindow*)win)->TF_Exit();
-//        break;
-//      default:
-//        break;
-//    }
-//  }
+  UIWindow* win;
+  int numWindows = GetNumWindows();
+  PET_WINDOW_TYPE type;
+  for(int i=0; i<numWindows; i++) {
+    win = GetWindow(i+1);
+    type = WindowType(win);
+    switch (type)
+    {
+      case PET_ADO_WINDOW:
+        ((PetWindow*)win)->TF_Exit();
+        break;
+      default:
+        break;
+    }
+  }
 }
 
 PET_WINDOW_TYPE SSMainWindow::WindowType(UIWindow* window)
@@ -1279,33 +1274,33 @@ PET_WINDOW_TYPE SSMainWindow::WindowType(const char* path)
 
 bool SSMainWindow::checkForMedmPage(const char* path)
 {
-	bool exists = false;
-	string cmd = "medm_cdev -x ";
-	  if (strstr(path, ".adl")) {
-		  exists = true;
-		  cmd += path;
-		  cmd += " &";
-	  } else {
-		  char fname[512];
-		   strcpy(fname, path);
-		   if (!strstr(path, "device_list")) {
-		     strcat(fname, "/");
-		     strcat(fname, "device_list.adl");
-		   } else
-		     strcat(fname, ".adl");
+  bool exists = false;
+  string cmd = "medm_cdev -x ";
+  if (strstr(path, ".adl")) {
+    exists = true;
+    cmd += path;
+    cmd += " &";
+  } else {
+    char fname[512];
+    strcpy(fname, path);
+    if (!strstr(path, "device_list")) {
+      strcat(fname, "/");
+      strcat(fname, "device_list.adl");
+    } else
+      strcat(fname, ".adl");
 
 
-		   exists = UIFileExists(fname);
-		   if (exists) {
-			   cmd += fname;
-			   cmd += " &";
-			   exists = true;
-		   }
-	  }
-    if (exists)
-    	system(cmd.c_str());
+    exists = UIFileExists(fname);
+    if (exists) {
+      cmd += fname;
+      cmd += " &";
+      exists = true;
+    }
+  }
+  if (exists)
+    system(cmd.c_str());
 
-    return exists;
+  return exists;
 }
 
 void SSMainWindow::DeleteListWindow(UIWindow* window)
@@ -1367,23 +1362,23 @@ void SSMainWindow::AddListWindow(UIWindow* window)
 
 void SSMainWindow::LoadTable(const UIWindow* window)
 {
-//  // get the node in the machine tree that was selected
-//  if(window == NULL)
-//    return;
-//
-//  const StdNode* node = NULL;
-//  switch (WindowType((UIWindow*) window))
-//  {
-//    case PET_ADO_WINDOW:
-//      node = ((PetWindow*)window)->GetPageNode();
-//      break;
-//    default:
-//      break;
-//  }
-//  if (node == NULL)
-//    return;
-//
-//  LoadTable(node);
+  // get the node in the machine tree that was selected
+  if(window == NULL)
+    return;
+
+  const StdNode* node = NULL;
+  switch (WindowType((UIWindow*) window))
+  {
+    case PET_ADO_WINDOW:
+      node = ((PetWindow*)window)->GetPageNode();
+      break;
+    default:
+      break;
+  }
+  if (node == NULL)
+    return;
+
+  LoadTable(node);
 }
 
 void SSMainWindow::LoadTable(const StdNode* node)
@@ -1393,7 +1388,7 @@ void SSMainWindow::LoadTable(const StdNode* node)
   treeTable->LoadTreeTable();
   //treeTable->UpdateKeyboardSelector();
 }
-/*
+
 void SSMainWindow::SS_New()
 {
   if (!treeTable->IsLeafNode(treeTable->GetNodeSelected())) {
@@ -1514,7 +1509,7 @@ void SSMainWindow::OpenFile(const char* filePath)
   treeTable->LoadTreeTable();
   HandleEvent(treeTable, UISelect);  // simulate a select event
 }
-*/
+
 void SSMainWindow::SS_OpenFavorite()
 {
   if(_recentPopup == NULL) {
@@ -1545,8 +1540,8 @@ void SSMainWindow::SS_OpenFavorite()
     return;
 
   // attempt to open the file and display its contents
-  //const char* filePath = _recentPopup->GetSelectedFile();
-  //OpenFile(filePath);
+  const char* filePath = _recentPopup->GetSelectedFile();
+  OpenFile(filePath);
 }
 
 void SSMainWindow::AdjustName(char* devicePath)
@@ -1572,35 +1567,35 @@ void SSMainWindow::SS_Default_PPM_User()
   SetPPMLabel();
 }
 
-//void SSMainWindow::SS_Create_RHIC_Page()
-//{
-//  SetWorkingCursor();
-//  PetWindow* petWin = new PetWindow(this, "petWindow");
-//  petWin->SetLocalPetWindowCreating(false);
-//  AddListWindow(petWin);
-//  petWin->GetPetPage()->AddEventReceiver(this);
-//  activeAdoWin = petWin;
-//  petWin->TF_Create_Pet_Page();
-//  petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
-//  petWin->Show();
-//  LoadPageList(petWin);
-//  SetStandardCursor();
-//}
-//
-//void SSMainWindow::SS_Create_PS_RHIC_Page()
-//{
-//  SetWorkingCursor();
-//  PetWindow* petWin = new PetWindow(this, "petWindow");
-//  petWin->GetPetPage()->AddEventReceiver(this);
-//  petWin->SetLocalPetWindowCreating(false);
-//  AddListWindow(petWin);
-//  petWin->TF_Create_PS_Pet_Page();
-//  petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
-//  petWin->Show();
-//  LoadPageList(petWin);
-//  activeAdoWin = petWin;
-//  SetStandardCursor();
-//}
+void SSMainWindow::SS_Create_RHIC_Page()
+{
+  SetWorkingCursor();
+  PetWindow* petWin = new PetWindow(this, "petWindow");
+  petWin->SetLocalPetWindowCreating(false);
+  AddListWindow(petWin);
+  petWin->GetPetPage()->AddEventReceiver(this);
+  activeAdoWin = petWin;
+  petWin->TF_Create_Pet_Page();
+  petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
+  petWin->Show();
+  LoadPageList(petWin);
+  SetStandardCursor();
+}
+
+void SSMainWindow::SS_Create_PS_RHIC_Page()
+{
+  SetWorkingCursor();
+  PetWindow* petWin = new PetWindow(this, "petWindow");
+  petWin->GetPetPage()->AddEventReceiver(this);
+  petWin->SetLocalPetWindowCreating(false);
+  AddListWindow(petWin);
+  petWin->TF_Create_PS_Pet_Page();
+  petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
+  petWin->Show();
+  LoadPageList(petWin);
+  activeAdoWin = petWin;
+  SetStandardCursor();
+}
 
 // only confirm the quit if the user is MCR and if Multiple Instances are running
 // and at least one page is displayed
@@ -1628,7 +1623,7 @@ int SSMainWindow::ConfirmQuit()
    if (nprocesses == 1)
      return 2; // quit with dialog
 
-  //SO_Flash_Pages();
+  SO_Flash_Pages();
 
   // need to get back to the main event loop otherwise there is
   // a possibility that this window will not expose properly
@@ -1639,7 +1634,7 @@ int SSMainWindow::ConfirmQuit()
     // yes
     return 1; // quit without dialog
 
-  //SO_Flash_Pages(false);
+  SO_Flash_Pages(false);
 
   if (_totalFlashTimerId > 0L && application != NULL)
   {
@@ -1713,7 +1708,7 @@ void SSMainWindow::Exit()
     }
   }
 }
-/*
+
 void SSMainWindow::SP_Find()
 {
   // clear selection from the table and reload
@@ -1803,7 +1798,7 @@ void SSMainWindow::SP_Close_All()
   // delete all windows from the list
   DeleteAllWindows();
 }
-*/
+
 void SSMainWindow::SO_Pet_Page_History()
 {
   if(_historyPopup == NULL) {
@@ -1848,35 +1843,35 @@ void SSMainWindow::SO_PpmUserMonitor()
   system("/usr/controls/bin/PpmUserMon &");
 }
 
-//void SSMainWindow::SO_Flash_Pages(bool flash)
-//{
-//  PetWindow* adoWin = NULL;
-//  UIWindow* win = NULL;
-//
-//  int ws = GetWorkspace();
-//
-//  int numWins = GetNumWindows();
-//  for (int i=1; i<=numWins; i++){
-//    win = GetWindow(i);
-//    adoWin = NULL;
-//    if (win != NULL)
-//    {
-//      switch (WindowType(win))
-//      {
-//        case PET_ADO_WINDOW:
-//          adoWin = (PetWindow*) win;
-//          break;
-//        default:
-//          break;
-//      }
-//    }
-//    if (adoWin) {
-//      adoWin->SetWorkspace(ws); // this should not be necessary but it doesn't work properly otherwise
-//      adoWin->Show();
-//      adoWin->Flash(flash);
-//    }
-//  }
-//}
+void SSMainWindow::SO_Flash_Pages(bool flash)
+{
+  PetWindow* adoWin = NULL;
+  UIWindow* win = NULL;
+
+  int ws = GetWorkspace();
+
+  int numWins = GetNumWindows();
+  for (int i=1; i<=numWins; i++){
+    win = GetWindow(i);
+    adoWin = NULL;
+    if (win != NULL)
+    {
+      switch (WindowType(win))
+      {
+        case PET_ADO_WINDOW:
+          adoWin = (PetWindow*) win;
+          break;
+        default:
+          break;
+      }
+    }
+    if (adoWin) {
+      adoWin->SetWorkspace(ws); // this should not be necessary but it doesn't work properly otherwise
+      adoWin->Show();
+      adoWin->Flash(flash);
+    }
+  }
+}
 
 /////////////////// ScrollingPageList Class //////////////////////////////
 PetScrollingEnumList::PetScrollingEnumList(const UIObject* parent, const char* name,
