@@ -62,6 +62,10 @@ class SSMainWindow : public UIMainWindow
   // indicate which window string you want selected
   void LoadPageList(const UIWindow* winSelection = NULL);
 
+  // load a device list with this path in the tree
+  // like treePath = "/FECs/Development/Controls/simple_test
+  void OpenTreePath(const char* treePath);
+
   protected:
 
   UIMenubar*			       menubar;
