@@ -55,7 +55,8 @@ int main(int argc, char *argv[])
   argList.AddString("-db_server");
   argList.AddString("-root");
   argList.AddString("-ddf");
-  argList.AddString("-device_list");
+  argList.AddString("-initial_list");   // like /FECs/xyz, loads tree, then shows pet window
+  argList.AddString("-device_list");    // Ted - not sure what this does
   argList.AddSwitch("-single");         // single window mode
   argList.AddSwitch("-file");		// file to open initially
   argList.AddString("-path");		// default path for file open
@@ -205,6 +206,10 @@ int main(int argc, char *argv[])
              (!argList.IsPresent("-device_list") || !argList.IsPresent("-file") || !argList.IsPresent("-single")))
       cout << "-printToElog option must be used with -single, -file, or -device_list option" << endl;
   }
+
+  const char* initList = argList.String("-initial_list");
+  if(initList && strlen(initList))
+    mainWindow->OpenTreePath(initList);
 
   const char *path = argList.String("-path");
   if(path && strlen(path)) {
@@ -1497,6 +1502,9 @@ void SSMainWindow::SS_Open()
 
 void SSMainWindow::OpenFile(const char* filePath)
 {
+  // filePath should look like:
+  // FECs/Development/Controls/simple_test/device_list
+
   char treePath[1024];
   strcpy(treePath, "/acop/");
   strcat(treePath, filePath);
@@ -1507,7 +1515,35 @@ void SSMainWindow::OpenFile(const char* filePath)
     return;  // not a pet page that can be opened
   treeTable->SelectNodePath(treePath);
   treeTable->LoadTreeTable();
+  treeTable->ShowSelectedNode();
   HandleEvent(treeTable, UISelect);  // simulate a select event
+}
+
+void SSMainWindow::OpenTreePath(const char* treePath)
+{
+  // treePath could be:
+  // 1) /acop/FECs/Development/Controls/simple_test
+  // 2) /FECs/Development/Controls/simple_test
+  // 3) FECs/Development/Controls/simple_test
+
+  if(treePath == NULL) return;
+  int len = strlen(treePath);
+  if(len < 5) return;
+  if( !strncmp(treePath, "/acop", 5)) {
+    treeTable->SelectNodePath(treePath);
+    return;
+  }
+  char* fullPath = new char[len + 8];
+  strcpy(fullPath, "/acop");
+  if(treePath[0] != '/')
+    strcat(fullPath, "/");
+  strcat(fullPath, treePath);
+
+  treeTable->SelectNodePath(fullPath);
+  treeTable->LoadTreeTable();
+  treeTable->ShowSelectedNode();
+  HandleEvent(treeTable, UISelect);  // simulate a select event
+  delete [] fullPath;
 }
 
 void SSMainWindow::SS_OpenFavorite()
@@ -1569,7 +1605,6 @@ void SSMainWindow::SS_Default_PPM_User()
 
 void SSMainWindow::SS_Create_RHIC_Page()
 {
-  SetWorkingCursor();
   PetWindow* petWin = new PetWindow(this, "petWindow");
   petWin->SetLocalPetWindowCreating(false);
   AddListWindow(petWin);
@@ -1579,7 +1614,6 @@ void SSMainWindow::SS_Create_RHIC_Page()
   petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
   petWin->Show();
   LoadPageList(petWin);
-  SetStandardCursor();
 }
 
 void SSMainWindow::SS_Create_PS_RHIC_Page()
