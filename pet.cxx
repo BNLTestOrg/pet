@@ -24,6 +24,7 @@
 #include <setHist/SetStorage.hxx>               // to turn on storage of ADO sets
 #include <MsgLog/MessageLogger.hxx>
 #include <utils/AppContext.hxx>
+#include <dbtools/SelectionHistory.hxx>
 #include "MenuTree.cxx"
 
 using namespace std;
@@ -381,6 +382,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   _historyPopup = NULL;
   _recentPopup = NULL;
   _totalFlashTimerId = 0L;
+  selectionHistory = new SelectionHistory("pet");
 
   // resources
 //  static const char* defaults[] = {
@@ -465,7 +467,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
 
   // put in the list which shows the device pages shown
   pageList = new PetScrollingEnumList(this, "pageList");
-  //pageList->SetMonoFont();
+  pageList->SetMonoFont();
   pageList->SetTitle("ADO/CDEV Pages");
   pageList->AttachTo(NULL, this, messageArea, this);
   pageList->SetItemsVisible(1);
@@ -508,8 +510,9 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
     // the goal here is to get spawned windows to display about at top-center
     int width = 1600, height;
     application->GetScreenSize(&width, &height);
-    int xpos = width/2 - 600;
-    SetPosition(xpos, 0);
+    int xpos = width/2 - 750;
+    int ypos = height/2 - 650;
+    SetPosition(xpos, ypos);
     Show();
   }
 }
@@ -1013,6 +1016,10 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
   // user made a selection from the pulldown menus
   else if(object == pulldownMenu && event == UISelect)
   {
+    // store the selection in the selectionHistory DB table
+    const char* selectStr = pulldownMenu->GetSelectionPath2();
+    selectionHistory->insert(selectStr, "menu");
+
     const UITreeData* data = pulldownMenu->GetTreeData();
     SetMessage("");
 
@@ -1156,10 +1163,10 @@ void SSMainWindow::SetWindowPos(UIWindow* newWin, UIWindow* currWin)
   mainWidth = GetWidth();
 
   // set xpos of new newWin according to main newWin coordinates
-  short xpos = mainX + mainWidth + 13;
+  short xpos = mainX + mainWidth + 20;
 
   // set ypos
-  short ypos = mainY - 30; // need to subtract out the height of the window title bar
+  short ypos = mainY + 30; // need to subtract out the height of the window title bar
   if( !strcmp( newWin->ClassName(), "SSPageWindow") || !strcmp( newWin->ClassName(), "PetWindow") )
   {
     // get the position and height of the current device page
