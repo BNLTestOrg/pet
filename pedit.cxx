@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <UIQt/UIApplication.hxx>
 #include <UIQt/UIArgumentList.hxx>
+#include <UIQt/UIPopups.hxx>
 #include <UIQt/UIEventHandling.hxx>
 #include <pet/PeditWindow.hxx>
 #include <utils/utilities.h>			// for set_default_fault_handler()
@@ -11,10 +12,19 @@ static PeditWindow* peditWin = NULL;
 class MyEventReceiver : public UIEventReceiver
 {
   void HandleEvent(const UIObject* object, UIEvent event) {
-    if(object == peditWin && event == UIWindowMenuClose)
+    if(object == peditWin && event == UIWindowMenuClose) { // user clicked the window close box
+      UILabelPopup exitPopup(peditWin, "exitPopup", NULL, "Yes", "No");
+      exitPopup.SetLabel("Exit pedit?  Are you sure?");
+      if(exitPopup.Wait() == 2)
+        return;
       exit(0);
+    }
+    else if(object == peditWin && event == UIEvent1) { // user selected File->Quit
+      exit(0);
+    }
   }
 };
+
 ////////////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
