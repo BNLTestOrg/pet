@@ -16,6 +16,7 @@ class MenuTree;
 class UICreateDeviceList;
 class PetScrollingEnumList;
 class PetWindow;
+class SelectionHistory;
 
 class SSMainWindow : public UIMainWindow
 {
@@ -89,6 +90,7 @@ class SSMainWindow : public UIMainWindow
   UIHistoryPopup*       _historyPopup;
   UIRecentHistoryPopup* _recentPopup;
   unsigned long         _totalFlashTimerId; // to timeout flashing after 4 seconds.
+  SelectionHistory*     selectionHistory;
 
   // set the window position for a newly created window
   void SetWindowPos(UIWindow* newWin, UIWindow* currWin = NULL);
