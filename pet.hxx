@@ -72,6 +72,7 @@ class SSMainWindow : public UIMainWindow
   UIMenubar*			       menubar;
   UIPulldownMenu*	       pulldownMenu;
   UILabel*			         ppmLabel;
+  UIForm*                mainForm;
   UIMessageArea*	       messageArea;
   UIMachineTreeTable*    treeTable;
   PetScrollingEnumList*	 pageList;
