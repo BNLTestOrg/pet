@@ -435,6 +435,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   EnableEvent(UIWindowMenuClose);
   AddEventReceiver(this);
   SetUserAttachments();
+  SetSpacing(1);
 
   // create a menubar at the top
   menubar = new UIMenubar(this, "mainMenubar");
@@ -461,23 +462,28 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   ppmLabel->AttachTo(menubar, this, NULL, this);
   SetPPMLabel();
 
+  mainForm = new UIForm(this, "mainForm");
+  mainForm->AttachTo(ppmLabel, this, this, this);
+  mainForm->SetMargins(0, 8, 0, 8);
+  mainForm->SetSpacing(0);
+  mainForm->SetUserAttachments();
+
   // put a message area at the bottom of the window
-  messageArea = new UIMessageArea(this, "mainMessage");
-  messageArea->AttachTo(NULL, this, this, this);
+  messageArea = new UIMessageArea(mainForm, "mainMessage");
+  messageArea->AttachTo(NULL, mainForm, mainForm, mainForm);
 
   // put in the list which shows the device pages shown
-  pageList = new PetScrollingEnumList(this, "pageList");
+  pageList = new PetScrollingEnumList(mainForm, "pageList");
   pageList->SetMonoFont();
   pageList->SetTitle("ADO/CDEV Pages");
-  pageList->AttachTo(NULL, this, messageArea, this);
+  pageList->AttachTo(NULL, mainForm, messageArea, mainForm);
   pageList->SetItemsVisible(1);
   pageList->AddEventReceiver(this);
 
   // add the table which displays the machine tree
   // put this in last so that it is the one that grows when the window is resized
-  treeTable = new UIMachineTreeTable(this, "treeTable");
-  //treeTable->GetTable()->ColumnAutoResize(2);
-  treeTable->AttachTo(ppmLabel, this, pageList, this);
+  treeTable = new UIMachineTreeTable(mainForm, "treeTable");
+  treeTable->AttachTo(mainForm, mainForm, pageList, mainForm);
   treeTable->EnableEvent(UITableBtn2Down);
   treeTable->EnableEvent(UIAccept);
   treeTable->EnableEvent(UIDoubleClick);
