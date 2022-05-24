@@ -9,7 +9,7 @@
 #include <petss/UICreateDeviceList.hxx>
 #include <utils/utilities.h>			// for set_default_fault_handler()
 #include <archive/archive_lib.h>		// for init_archive_lib_globals() and ARCHIVE_LOG;
-#include <ddf/DeviceDirectory.hxx>		// for DeviceDirectory global object
+//#include <ddf/DeviceDirectory.hxx>		// for DeviceDirectory global object
 #include <UIGenerics/UIMenubarTools.hxx>	// for mb_init()
 #include <UIAgs/generic_popups_derived.h>	// for gp_set_ppm _program() _user()
 #include <UIAgs/cld_popup.hxx>			// for cld popups
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
   //set up command line arguments
   argList.AddString("-db_server");
   argList.AddString("-root");
-  argList.AddString("-ddf");
+  //  argList.AddString("-ddf");
   argList.AddString("-device_list");
   argList.AddSwitch("-knob");
   argList.AddSwitch("-single");         // single window mode
@@ -184,20 +184,20 @@ int main(int argc, char *argv[])
     set_data_db_name( (char*) argList.String("-db_server") );
 
   // map a ddf
-  if( strlen( argList.String("-ddf") ) )
-    {
-      if( DeviceDirectory.load( argList.String("-ddf") ) <= 0)
-	{
-	  fprintf(stderr, "Could not map ddf %s.\n", argList.String("-ddf") );
-	}
-    }
-  else	// map the current ddf
-    {
-      if( DeviceDirectory.load() <= 0)
-	{
-	  fprintf(stderr, "Could not map current ddf.\n");
-	}
-    }
+//   if( strlen( argList.String("-ddf") ) )
+//     {
+//       if( DeviceDirectory.load( argList.String("-ddf") ) <= 0)
+// 	{
+// 	  fprintf(stderr, "Could not map ddf %s.\n", argList.String("-ddf") );
+// 	}
+//     }
+//   else	// map the current ddf
+//     {
+//       if( DeviceDirectory.load() <= 0)
+// 	{
+// 	  fprintf(stderr, "Could not map current ddf.\n");
+// 	}
+//     }
 
   // check for single window switch
   bool singleWindowMode = false;
@@ -1459,9 +1459,9 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       else if(!strcmp(data->namesSelected[1], "PPM User Monitor")) {
         SO_PpmUserMonitor();
       }
-      else if(!strcmp(data->namesSelected[1], "Reload DDF...")) {
-        SO_Load_DDF();
-      }
+      //      else if(!strcmp(data->namesSelected[1], "Reload DDF...")) {
+      //        SO_Load_DDF();
+      //      }
       else if(!strcmp(data->namesSelected[1], "Flash Pages")) {
         if(_totalFlashTimerId > 0L) {
           application->DisableTimerEvent(_totalFlashTimerId);
