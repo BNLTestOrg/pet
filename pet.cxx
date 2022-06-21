@@ -8,10 +8,6 @@
 #include <petss/UICreateDeviceList.hxx>
 #include <utils/utilities.h>			// for set_default_fault_handler()
 #include <archive/archive_lib.h>		// for init_archive_lib_globals() and ARCHIVE_LOG;
-#include <ddf/DeviceDirectory.hxx>		// for DeviceDirectory global object
-//#include <UIGenerics/UIMenubarTools.hxx>	// for mb_init()
-//#include <UIAgs/generic_popups_derived.h>	// for gp_set_ppm _program() _user()
-//#include <UIGenerics/GenericPopups.hxx>
 #include "pet.hxx"
 #include <sys/stat.h>				// for umask printing permissions
 #include <sys/types.h>
@@ -55,7 +51,6 @@ int main(int argc, char *argv[])
   //set up command line arguments
   argList.AddString("-db_server");
   argList.AddString("-root");
-  argList.AddString("-ddf");
   argList.AddString("-initial_list");   // like /FECs/xyz, loads tree, then shows pet window
   argList.AddString("-device_list");    // Ted - not sure what this does
   argList.AddSwitch("-single");         // single window mode
@@ -477,7 +472,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   pageList->SetMonoFont();
   pageList->SetTitle("ADO/CDEV Pages");
   pageList->AttachTo(NULL, mainForm, messageArea, mainForm);
-  pageList->SetItemsVisible(1);
+  pageList->SetFixedHeight(65);
   pageList->AddEventReceiver(this);
 
   // add the table which displays the machine tree
@@ -501,7 +496,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
     clean_up(0);
   }
   // set the default min sizes
-  treeTable->SetVisibleRows(36);
+  treeTable->SetVisibleRows(30);
   //treeTable->SetNameColumnWidth(45);
   SetMinWidth(300);
 
@@ -644,7 +639,7 @@ void SSMainWindow::LoadPageList(const UIWindow* winSelection)
   }
   else {
     if (pageList->GetDesiredNumVisItems() == 5) // default
-      pageList->SetItemsVisible(1);
+      pageList->SetFixedHeight(65);
   }
   delete [] items;
 }
@@ -1984,7 +1979,7 @@ void PetScrollingEnumList::HandleEvent(const UIObject* object, UIEvent event)
 void PetScrollingEnumList::SetItemsVisible(long num)
 {
 	_desiredNumVisItems = num;
-	UIScrollingEnumList::SetItemsVisible(_desiredNumVisItems);
+	UIScrollingEnumList::SetItemsVisibleFixed(_desiredNumVisItems);
 }
 
 /////// C++ Helper Routines ////////////////////
