@@ -1513,6 +1513,7 @@ void SSMainWindow::OpenFile(const char* filePath)
   // filePath should look like:
   // FECs/Development/Controls/simple_test/device_list
 
+  if(filePath == NULL) return;
   char treePath[1024];
   strcpy(treePath, "/acop/");
   strcat(treePath, filePath);
