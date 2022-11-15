@@ -1399,6 +1399,7 @@ void SSMainWindow::LoadTable(const StdNode* node)
   // make the node the selected one in the table and redisplay
   treeTable->SetNodeSelected(node);
   treeTable->LoadTreeTable();
+  treeTable->ShowNode(node);
   //treeTable->UpdateKeyboardSelector();
 }
 
