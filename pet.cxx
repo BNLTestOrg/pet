@@ -303,50 +303,44 @@ int main(int argc, char *argv[])
     } // if file good
   } // for
 
-//  if ( (argList.IsPresent("-printToElog") || argList.IsPresent("-printTogif")) && (singleWindowMode || singleDeviceListOnly)){
-//    UIPrintTool* pt = GetPrintTool();
-//    if (argList.IsPresent("-printToElog"))
-//    {
-//      const char* elogName = NULL;
-//      if(argList.IsPresent("-elog") )
-//        elogName = argList.String("-elog");
-//      pt->SetPrintOutputType(UIPrintToElog);
-//      if(elogName != NULL && elogName[0] != 0)
-//        pt->SetElogName(elogName);
-//    }
-//    else if (argList.IsPresent("-printTogif"))
-//    {
-//      const char* gifFileName = argList.String("-printTogif");
-//      pt->SetPrintOutputType(UIPrintToFile);
-//      pt->SetPrintFileType(UIgifFile);
-//      pt->SetPrintFileName(gifFileName);
-//    }
-//    // dump snap shot of the AGS page to the elog and exit
-//    if (singleDeviceListOnly)
-//      dumpElogAndExitTimerId = application->EnableTimerEvent(1000);
-//    else
-//      singlePetWin->ElogDumpAndExit();
-//  } else if ((argList.IsPresent("-dumpToElog") || argList.IsPresent("-dumpToDefaultElog")) &&
-//      (singleWindowMode || singleDeviceListOnly)) {
-//    UIPrintTool* printTool = GetPrintTool();
-//    const char* elogName = NULL;
-//    if(argList.IsPresent("-dumpToElog") )
-//      elogName = argList.String("-dumpToElog");
-//
-//    printTool->SetPrintOutputType(UIPrintToElog);
-//    printTool->SetElogAutoEntry();
-//    if(elogName && elogName[0])
-//      printTool->SetElogName(elogName);
-//    if(argList.IsPresent("-elogEntryTitle") )
-//      printTool->SetElogEntryTitle(argList.String("-elogEntryTitle") );
-//    else if(argList.IsPresent("-elogAttachToTitle") )
-//      printTool->SetElogAttachToTitle(argList.String("-elogAttachToTitle") );
-//    // dump snap shot of the page to the elog and exit
-//    if (singleDeviceListOnly)
-//      dumpElogAndExitTimerId = application->EnableTimerEvent(1000);
-//    else
-//      singlePetWin->ElogDumpAndExit();
-//  }
+  if ( (argList.IsPresent("-printToElog") || argList.IsPresent("-printTogif")) && singleWindowMode){
+    UIPrintTool* pt = GetPrintTool();
+    if (argList.IsPresent("-printToElog"))
+    {
+      const char* elogName = NULL;
+      if(argList.IsPresent("-elog") )
+        elogName = argList.String("-elog");
+      pt->SetPrintOutputType(UIPrintToElog);
+      if(elogName != NULL && elogName[0] != 0)
+        pt->SetElogName(elogName);
+    }
+    else if (argList.IsPresent("-printTogif"))
+    {
+      const char* gifFileName = argList.String("-printTogif");
+      pt->SetPrintOutputType(UIPrintToFile);
+      pt->SetPrintFileType(UIgifFile);
+      pt->SetPrintFileName(gifFileName);
+    }
+    // dump snap shot to the elog and exit
+    singlePetWin->ElogDumpAndExit();
+  }
+  else if ((argList.IsPresent("-dumpToElog") || argList.IsPresent("-dumpToDefaultElog")) && singleWindowMode) {
+    UIPrintTool* printTool = GetPrintTool();
+    const char* elogName = NULL;
+    if(argList.IsPresent("-dumpToElog") )
+      elogName = argList.String("-dumpToElog");
+
+    printTool->SetPrintOutputType(UIPrintToElog);
+    printTool->SetElogAutoEntry();
+    if(elogName && elogName[0])
+      printTool->SetElogName(elogName);
+    if(argList.IsPresent("-elogEntryTitle") )
+      printTool->SetElogEntryTitle(argList.String("-elogEntryTitle") );
+    else if(argList.IsPresent("-elogAttachToTitle") )
+      printTool->SetElogAttachToTitle(argList.String("-elogAttachToTitle") );
+    // dump snap shot to the elog and exit
+    singlePetWin->ElogDumpAndExit();
+  }
 
   // loop forever handling user events
   application->HandleEvents();
