@@ -11,6 +11,7 @@
 #include <agsPage/genCldLib.hxx>		// for UICldObjectWindow class
 #include <UI/UIHelp.hxx>                // for UIHelpMenu class
 #include <UIUtils/UIHistoryPopup.hxx>   // for UIHistoryPopup class
+#include <dbtools/SelectionHistory.hxx>
 
 enum PET_WINDOW_TYPE {PET_LD_WINDOW, PET_CLD_WINDOW, PET_ADO_WINDOW, PET_HYBRID_WINDOW, PET_UNKNOWN_WINDOW};
 
@@ -95,6 +96,7 @@ protected:
   UIHistoryPopup*               _historyPopup;
   UIRecentHistoryPopup*         _recentPopup;
   unsigned long                 _totalFlashTimerId; // to timeout flashing after 4 seconds.
+  SelectionHistory*             _selectionHistory;
 
   // set the window position for a newly created window
   void SetWindowPos(UIWindow* newWin, UIWindow* currWin = NULL);
