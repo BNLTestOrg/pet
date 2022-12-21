@@ -535,6 +535,7 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   _historyPopup = NULL;
   _recentPopup = NULL;
   _totalFlashTimerId = 0L;
+  _selectionHistory = new SelectionHistory("pet");
 
   // resources
   static const char* defaults[] = {
@@ -1380,6 +1381,10 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
   // user made a selection from the pulldown menus
   else if(object == pulldownMenu && event == UISelect)
   {
+    // store the selection in the selectionHistory DB table
+    const char* selectStr = pulldownMenu->GetSelectionPath2();
+    _selectionHistory->insert(selectStr, "menu");
+
     const UITreeData* data = pulldownMenu->GetTreeData();
     SetMessage("");
 
