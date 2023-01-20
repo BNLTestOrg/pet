@@ -45,6 +45,7 @@ MenuTree* CreateMenuTree()
 	menuTree->SetNodeType(snode, MenuSeparatorType);
 
 	snode = menuTree->InsertMenuItem("Search pet Tree", "/File", NULL);
+	snode = menuTree->InsertMenuItem("Reload pet Tree", "/File", NULL);
 
 	snode = menuTree->InsertMenuItem("Find Text in Files...", "/File/Search pet Tree", NULL);
 	menuTree->SetNodeHelpText(snode, "Brings up a popup that will let you search for any\nstring within device lists in the pet tree.  You can\npick a starting point in the tree to narrow your search.");
