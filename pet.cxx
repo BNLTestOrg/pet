@@ -1421,7 +1421,38 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
           SS_FindCheckedOutFiles();
         }
       }
-      else if(!strcmp(data->namesSelected[1], "Quit")) {
+       else if(!strcmp(data->namesSelected[1], "Reload pet Tree")) {
+        // clear the treetable and reload it.
+        treeTable->Clear();
+        if (treeTable->Load()) {
+          SetMessage("Could not load machine tree.");
+        } else {
+          treeTable->LoadTreeTable();
+          // re-connect open pet pages with the reloaded nodes
+          MachineTree* mtree = treeTable->GetMachineTree();
+          PetWindow* win = NULL;
+          int i=1;
+          while ((win=(PetWindow*)GetWindow(i)) != NULL) {
+            i++;
+            string page = win->GetCurrentFileName();
+            if (win->GetTreeRootPath() == NULL)
+              continue;
+            string rootPath = win->GetTreeRootPath();
+            if (page.find(rootPath) != string::npos) {
+              page.erase(0, rootPath.size());
+              page = "/acop" + page;
+            }
+            if (page.find("/device_list.ado") != string::npos)
+              page.erase(page.find("/device_list.ado"), strlen("/device_list.ado"));
+            if (page.size() > 0) {
+              StdNode* selectNode = mtree->FindNode(page.c_str()); // For example, "/acop/Booster/Extraction/Bta"
+              win->SetPageNode(selectNode);
+            }
+          }
+          SetMessage("Machine tree reloaded successfully.");
+        }
+      }
+     else if(!strcmp(data->namesSelected[1], "Quit")) {
         SS_Quit();
       }
     }
