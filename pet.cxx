@@ -183,19 +183,13 @@ int main(int argc, char *argv[])
   if( strlen( argList.String("-db_server") ) )
     set_data_db_name( (char*) argList.String("-db_server") );
 
-  // map a ddf
-  if( strlen( argList.String("-ddf") ) )
+  // a ddf (AGS LD Device Directory) is only needed for access to old LD archives
+  // only map a ddf if one is explicitly specified
+  if( argList.IsPresent("-ddf") )
     {
       if( DeviceDirectory.load( argList.String("-ddf") ) <= 0)
 	{
 	  fprintf(stderr, "Could not map ddf %s.\n", argList.String("-ddf") );
-	}
-    }
-  else	// map the current ddf
-    {
-      if( DeviceDirectory.load() <= 0)
-	{
-	  fprintf(stderr, "Could not map current ddf.\n");
 	}
     }
 
