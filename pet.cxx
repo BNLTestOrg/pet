@@ -58,6 +58,12 @@ void errorHandler(int severity, char* text, cdevRequestObject* obj)
 
 int main(int argc, char *argv[])
 {
+  if(strcmp(getenv("CNSHOST"), "csreflect01.pbn.bnl.gov")) {
+    setenv("CNSHOST", "csreflect01.pbn.bnl.gov", 1);
+    printf("Using reflection: %s\n", getenv("CNSHOST"));
+    execv(argv[0], argv);
+  }
+
   //set up command line arguments
   argList.AddString("-db_server");
   argList.AddString("-root");
@@ -1175,6 +1181,8 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
             SetWindowPos(adoWin, ldWin);
           adoWin->SetPageNode( treeTable->GetNodeSelected() );
           adoWin->Show();
+          // Add a marker for Reflection
+          adoWin->TitlePrepend("R - ");
           LoadPageList(adoWin);
           activeAdoWin = adoWin;
         }
@@ -2900,7 +2908,10 @@ void SSPageWindow::CreateWidgets(AGS_PAGE_MODE mode)
 int SSPageWindow::LoadFile(const char* filename, const char* pageTitle, short ppmUser)
 {
   // load the file
-  int retval = AgsPageWindow::LoadFile(filename, pageTitle, ppmUser);
+  std::cout << "Loading file" << std::endl;
+  #define REFLECTIVE_TITLE "R - "
+  std::string title_str = std::string(REFLECTIVE_TITLE) + pageTitle;
+  int retval = AgsPageWindow::LoadFile(filename, title_str.c_str(), ppmUser);
 
   return retval;
 }
