@@ -12,7 +12,6 @@
 //#include <ddf/DeviceDirectory.hxx>		// for DeviceDirectory global object
 #include <UIGenerics/UIMenubarTools.hxx>	// for mb_init()
 #include <UIAgs/generic_popups_derived.h>	// for gp_set_ppm _program() _user()
-#include <UIAgs/cld_popup.hxx>			// for cld popups
 #include <UIGenerics/GenericPopups.hxx>
 #include "pet.hxx"
 #include <sys/stat.h>				// for umask printing permissions
