@@ -1,0 +1,412 @@
+"MTRE",3
+797096602,"Wed Apr  5 11:43:22 1995"
+819994121,"Tue Dec 26 11:08:41 1995"
+48,22,24
+
+"NODE 0"
+"SSpage"
+0,-1,-1,-1,1
+1
+0,""
+0,0
+""
+
+"NODE 1"
+"Page"
+1,0,12,-1,9
+1
+80,""
+0,0
+"This menu holds items that pertain to the
+entire device page."
+
+"NODE 2"
+""
+2,-1,5,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 3"
+""
+3,-1,35,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 4"
+""
+4,-1,2,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 5"
+""
+5,-1,3,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 6"
+""
+6,-1,4,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 7"
+""
+7,-1,6,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 8"
+""
+8,-1,7,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 9"
+"Print All"
+9,1,11,-1,-1
+1
+65,""
+0,0
+"An ASCII print of all devices on this
+device page."
+
+"NODE 10"
+""
+10,-1,8,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 11"
+"Close"
+11,1,-1,9,-1
+1
+67,"Ctrl+C"
+0,0
+"Closes this device page without a confirmation."
+
+"NODE 12"
+"Device"
+12,0,33,1,15
+1
+68,""
+0,0
+"Holds menu items that pertain to the current
+device on the device page."
+
+"NODE 13"
+"Load Global Command..."
+13,26,29,25,-1
+1
+0,""
+0,0
+"Loads a command into one fo the buffer command fields
+for all devices on this device page."
+
+"NODE 14"
+"Send Device"
+14,26,34,32,-1
+1
+68,""
+0,0
+"Sends the contents of the buffer for the current
+device to hardware."
+
+"NODE 15"
+"Description..."
+15,12,-1,-1,-1
+1
+68,"Ctrl+D"
+0,0
+"Allows the user to view and edit database description
+for the current device as well as view the ddf details."
+
+"NODE 16"
+"----"
+16,33,18,17,-1
+6
+0,""
+0,0
+""
+
+"NODE 17"
+"Increment"
+17,33,16,19,-1
+1
+73,"F2"
+0,0
+"Increment the current device setpoint by
+the nudge value.  This is the same as clicking
+on the nudge value using the left mouse button."
+
+"NODE 18"
+"Send (Return or Enter key)"
+18,33,-1,16,-1
+5
+0,""
+0,0
+"Sends the current setpoint to the device
+hardware.  This is the same as clicking on the
+setpoint value with the middle mouse button."
+
+"NODE 19"
+"Decrement"
+19,33,17,-1,-1
+1
+68,"F1"
+0,0
+"Decrements the setpoint for the current device
+by the nudge value.   This is the same as clicking
+on the nudge value with the right mouse button."
+
+"NODE 20"
+"Nudge"
+20,0,26,33,21
+1
+78,""
+0,0
+"Holds menu items related to modifying and
+storing nudge values for devices on this page."
+
+"NODE 21"
+"Edit..."
+21,20,22,-1,-1
+1
+69,""
+0,0
+"Allows the user to edit the nudge value for
+the current device.  This does not permanently
+store this value in the database."
+
+"NODE 22"
+"Edit All..."
+22,20,-1,21,-1
+1
+65,""
+0,0
+"Allows the user to enter a nudge value that
+will be put in the nudge cell for all devices
+on this device page.  This does not permanently
+store these values in the database."
+
+"NODE 23"
+""
+23,-1,28,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 24"
+""
+24,-1,23,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 25"
+"----"
+25,26,13,27,-1
+6
+0,""
+0,0
+""
+
+"NODE 26"
+"Buffer"
+26,0,-1,20,32
+1
+66,""
+0,0
+"Holds menu items that manipulate the buffer
+columns on the device page."
+
+"NODE 27"
+"Load from Current"
+27,26,25,34,-1
+1
+76,""
+0,0
+"Loads the buffer columns from the current
+setpoint and command columns."
+
+"NODE 28"
+""
+28,-1,30,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 29"
+"Load Global Setpoint..."
+29,26,-1,13,-1
+1
+0,""
+0,0
+"Loads a setpoint into the buffer for all devices on
+this device page."
+
+"NODE 30"
+""
+30,-1,31,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 31"
+""
+31,-1,10,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 32"
+"Send..."
+32,26,14,-1,-1
+1
+83,"Ctrl+S"
+0,0
+"Sends the contents of the buffer to the device
+hardware, making these values the current values.
+A confirmation appears before sending the values."
+
+"NODE 33"
+"Setpoint"
+33,0,20,12,19
+1
+83,""
+0,0
+""
+
+"NODE 34"
+"----"
+34,26,27,14,-1
+6
+0,""
+0,0
+""
+
+"NODE 35"
+""
+35,-1,36,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 36"
+""
+36,-1,37,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 37"
+""
+37,-1,38,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 38"
+""
+38,-1,39,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 39"
+""
+39,-1,40,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 40"
+""
+40,-1,41,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 41"
+""
+41,-1,42,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 42"
+""
+42,-1,43,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 43"
+""
+43,-1,44,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 44"
+""
+44,-1,45,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 45"
+""
+45,-1,46,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 46"
+""
+46,-1,47,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 47"
+""
+47,-1,48,-1,-1
+1
+0,""
+0,0
+""
+

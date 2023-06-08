@@ -1,0 +1,55 @@
+#!/bin/csh
+#
+# Note: this script is now under revision control in Clearcase in /vobs/apps/pet
+# 
+# adoPet <ado name> [<ppmuser>] [<pet template>]
+#
+# Example:
+#           adoPet es2-q4-ps 1 defaultPopup.pett
+#
+set ppm = 0
+set template = ""
+#
+# get the ado name
+if ($#argv < 1) then
+	echo -n "ado name? "
+	set ado=($<)
+else
+	set ado="$argv[1]"
+
+	# look for optional ppm user
+	if ($#argv > 1) then
+	  set ppm="$argv[2]"
+	endif
+
+	# and optional pet template 
+	if ($#argv > 2) then
+	  set template=";template:$argv[3]"
+	endif
+	
+endif
+
+#
+# is it in cns?
+set cnsline = `cnslookup $ado | grep ADO`
+if ( $status != 0 ) then
+    echo "$ado is not an ADO that is listed in cns"
+    exit 1
+endif
+#
+# remove any old tmp device list
+\rm /tmp/${ado}.ado >& /dev/null
+# 
+# put some info at top of the page
+touch /tmp/${ado}.ado
+echo -n ' "system name","' >> /tmp/${ado}.ado ; echo -n $cnsline[7] >> /tmp/${ado}.ado ; echo '"' >> /tmp/${ado}.ado
+echo -n ' "generic name","' >> /tmp/${ado}.ado ; echo -n $cnsline[3] >> /tmp/${ado}.ado ; echo '"' >> /tmp/${ado}.ado
+echo -n ' "server name","' >> /tmp/${ado}.ado ; echo -n $cnsline[4] >> /tmp/${ado}.ado ; echo '"' >> /tmp/${ado}.ado
+echo -n ' "ado class","' >> /tmp/${ado}.ado ; echo -n $cnsline[2] >> /tmp/${ado}.ado ; echo '"' >> /tmp/${ado}.ado
+echo ' ' >> /tmp/${ado}.ado
+#
+# show the page
+echo ${ado}$template >> /tmp/${ado}.ado
+
+pet -s /tmp/${ado}.ado -ppm ${ppm}
+

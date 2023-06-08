@@ -1,0 +1,581 @@
+"MTRE",3
+797096602,"Wed Apr  5 11:43:22 1995"
+1058559770,"Fri Jul 18 16:22:50 2003"
+64,62,62
+
+"NODE 0"
+"SSpage"
+0,-1,-1,-1,1
+1
+0,""
+0,0
+""
+
+"NODE 1"
+"Page"
+1,0,12,-1,2
+1
+80,""
+0,0
+"This menu holds items that pertain to the
+entire device page."
+
+"NODE 2"
+"Operational Mode"
+2,1,3,-1,-1
+4
+79,"Ctrl+O"
+0,1
+"Selecting this items causes the program to
+display only those columns that are usefule
+for operations."
+
+"NODE 3"
+"Engineering Mode"
+3,1,4,2,-1
+4
+69,"Ctrl+E"
+0,0
+"Selecting this items causes the program to display
+all columns, including those that are pertinent to
+operations, engineering and diagnostic users."
+
+"NODE 4"
+"----"
+4,1,56,3,-1
+6
+0,""
+0,0
+""
+
+"NODE 5"
+"Set PPM User..."
+5,1,38,59,-1
+1
+80,"Ctrl+P"
+0,0
+"Allows the user to set the PPM user displayed
+on this device page only."
+
+"NODE 6"
+"Duplicate..."
+6,1,10,38,-1
+1
+68,""
+0,0
+"Creates a duplicate of this device page.
+The user is first prompted for the PPM user
+to display on the duplicate page."
+
+"NODE 7"
+"View Send Buffer Results..."
+7,26,-1,9,-1
+1
+0,""
+0,0
+""
+
+"NODE 8"
+"----"
+8,26,9,37,-1
+6
+0,""
+0,0
+""
+
+"NODE 9"
+"View Load Buffer Results..."
+9,26,7,8,-1
+1
+0,""
+0,0
+""
+
+"NODE 10"
+"----"
+10,1,43,6,-1
+6
+0,""
+0,0
+""
+
+"NODE 11"
+"Close"
+11,1,-1,43,-1
+1
+67,"Ctrl+C"
+0,0
+"Closes this device page without a confirmation."
+
+"NODE 12"
+"Device"
+12,0,33,1,15
+1
+68,""
+0,0
+"Holds menu items that pertain to the current
+device on the device page."
+
+"NODE 13"
+"Show All PPM Users"
+13,12,44,15,-1
+1
+65,"Ctrl+A"
+0,0
+"Brings up a separate window displaying the
+current device for all PPM users."
+
+"NODE 14"
+"Send Device"
+14,26,34,32,-1
+1
+68,""
+0,0
+"Sends the contents of the buffer for the current
+device to hardware."
+
+"NODE 15"
+"Description..."
+15,12,13,-1,-1
+1
+68,"Ctrl+D"
+0,0
+"Allows the user to view and edit database description
+for the current device as well as view the ddf details."
+
+"NODE 16"
+"----"
+16,33,18,17,-1
+6
+0,""
+0,0
+""
+
+"NODE 17"
+"Increment"
+17,33,16,19,-1
+1
+73,"F2"
+0,0
+"Increment the current device setpoint by
+the nudge value.  This is the same as clicking
+on the nudge value using the left mouse button."
+
+"NODE 18"
+"Send (Return or Enter key)"
+18,33,-1,16,-1
+5
+0,""
+0,0
+"Sends the current setpoint to the device
+hardware.  This is the same as clicking on the
+setpoint value with the middle mouse button."
+
+"NODE 19"
+"Decrement"
+19,33,17,-1,-1
+1
+68,"F1"
+0,0
+"Decrements the setpoint for the current device
+by the nudge value.   This is the same as clicking
+on the nudge value with the right mouse button."
+
+"NODE 20"
+"Nudge"
+20,0,26,33,21
+1
+78,""
+0,0
+"Holds menu items related to modifying and
+storing nudge values for devices on this page."
+
+"NODE 21"
+"Edit..."
+21,20,22,-1,-1
+1
+69,""
+0,0
+"Allows the user to edit the nudge value for
+the current device.  This does not permanently
+store this value in the database."
+
+"NODE 22"
+"Edit All..."
+22,20,23,21,-1
+1
+65,""
+0,0
+"Allows the user to enter a nudge value that
+will be put in the nudge cell for all devices
+on this device page.  This does not permanently
+store these values in the database."
+
+"NODE 23"
+"----"
+23,20,24,22,-1
+6
+0,""
+0,0
+""
+
+"NODE 24"
+"Save"
+24,20,25,23,-1
+1
+83,""
+0,0
+"Permanently stores the nudge value for the
+current device into a file.  No confirmation."
+
+"NODE 25"
+"Save All..."
+25,20,60,24,-1
+1
+108,""
+0,0
+"Permanently stores the nudge values for all
+devices on the device page into a file
+after a confirmation."
+
+"NODE 26"
+"Buffer"
+26,0,45,20,32
+1
+66,""
+0,0
+"Holds menu items that manipulate the buffer
+columns on the device page."
+
+"NODE 27"
+"Load from Current"
+27,26,28,30,-1
+1
+76,""
+0,0
+"Loads the buffer columns from the current
+setpoint and command columns."
+
+"NODE 28"
+"Load from Temp. File"
+28,26,29,27,-1
+1
+84,""
+0,0
+"Loads the buffer columns from setpoint and
+command data stored in the temp. file.  There
+is one temp. file in the system for each device list."
+
+"NODE 29"
+"Load from Archive..."
+29,26,35,28,-1
+1
+65,""
+0,0
+"Loads the buffer columns from data stored
+in a user selected archive file."
+
+"NODE 30"
+"----"
+30,26,27,31,-1
+6
+0,""
+0,0
+""
+
+"NODE 31"
+"Save Temp. File"
+31,26,30,54,-1
+1
+84,"Ctrl+T"
+0,0
+"Saves the current data into a temporary file.
+This data can later be retrieved using the
+Load from Temp menu option.  There is one
+temp. file in the system for each device list."
+
+"NODE 32"
+"Send..."
+32,26,14,-1,-1
+1
+83,"Ctrl+S"
+0,0
+"Sends the contents of the buffer to the device
+hardware, making these values the current values.
+A confirmation appears before sending the values."
+
+"NODE 33"
+"Setpoint"
+33,0,20,12,19
+1
+83,""
+0,0
+""
+
+"NODE 34"
+"----"
+34,26,54,14,-1
+6
+0,""
+0,0
+""
+
+"NODE 35"
+"----"
+35,26,36,29,-1
+6
+0,""
+0,0
+""
+
+"NODE 36"
+"Load Global Command..."
+36,26,37,35,-1
+1
+0,""
+0,0
+"Loads a command into one of the buffer command fields
+for all devices on this device page."
+
+"NODE 37"
+"Load Global Setpoint..."
+37,26,8,36,-1
+1
+0,""
+0,0
+"Loads a setpoint into the buffer for all
+devices on this device page."
+
+"NODE 38"
+"Reload"
+38,1,6,5,-1
+1
+82,""
+0,0
+"Reloads the devices for the current
+device page."
+
+"NODE 39"
+"View/Edit Metadevice"
+39,12,55,44,-1
+1
+77,""
+0,0
+"Brings up the metadevice editor for the currently
+selected metadevice.  If no metadevice is selected,
+a blank metadevice editor is displayed."
+
+"NODE 40"
+"Diagnostics"
+40,0,-1,45,42
+1
+68,""
+1,0
+""
+
+"NODE 41"
+"Show Engineering Units"
+41,40,-1,42,-1
+4
+69,""
+0,0
+"When selected, the special columns shown when
+in engineering mode, show engineering units like
+mA, V, instead of device units (counts)."
+
+"NODE 42"
+"Show Device Units"
+42,40,41,-1,-1
+4
+68,""
+0,1
+"When selected, the extra columns displayed in
+engineering mode show values in devices units
+(CNTS = counts) rather than engineering units."
+
+"NODE 43"
+"Hide"
+43,1,11,10,-1
+1
+72,"Ctrl+H"
+0,0
+"Makes the window invisible, but still leaves it in
+the Page List on the main SpeadSheet window."
+
+"NODE 44"
+"Show CLD Editor"
+44,12,39,13,-1
+1
+67,""
+0,0
+"Brings up a new window which let the user view
+and/or edit CLD setpoints, measurements, commands
+and statuses.  CLD reports are updated continuously."
+
+"NODE 45"
+"Graph"
+45,0,40,26,46
+1
+71,""
+1,0
+"Graphics display options"
+
+"NODE 46"
+"New StripChart"
+46,45,47,-1,-1
+1
+78,""
+0,0
+"Create a StripChart in a popup window
+to display measurement and setpoint
+for this SLD."
+
+"NODE 47"
+"Add to StripChart"
+47,45,48,46,-1
+1
+65,""
+0,0
+"Add currently selected SLD to
+existing StripChart
+"
+
+"NODE 48"
+"----"
+48,45,49,47,-1
+6
+0,""
+0,0
+""
+
+"NODE 49"
+"New Correlation Graph"
+49,45,50,48,-1
+1
+0,""
+0,0
+"Create a CorrelationGraph in a popup window
+to display measurement and setpoint
+for this SLD.
+"
+
+"NODE 50"
+"Add to Correlation Graph"
+50,45,51,49,-1
+1
+0,""
+0,0
+"Add currently selected SLD to
+existing Correlation Graph
+"
+
+"NODE 51"
+"----"
+51,45,52,50,-1
+6
+0,""
+0,0
+""
+
+"NODE 52"
+"New Snapshot Graph"
+52,45,53,51,-1
+1
+0,""
+0,0
+"Create a Snapshot Graph in a popup window
+to display measurement and setpoint
+for this device (SLD or CLD).
+
+"
+
+"NODE 53"
+"Add to Snapshot Graph"
+53,45,-1,52,-1
+1
+0,""
+0,0
+"Add selected device (SLD or CLD)
+to existing snapshot graph"
+
+"NODE 54"
+"Save Archive File"
+54,26,31,34,-1
+1
+0,""
+0,0
+"Makes an archive of current page.  Acts like Save Temp.
+with a name."
+
+"NODE 55"
+"Delay Channel Editor"
+55,12,-1,39,-1
+1
+68,""
+0,0
+"Bring up the delay channel editor for the selected delay module"
+
+"NODE 56"
+"View Source"
+56,1,57,4,-1
+1
+0,""
+0,0
+"View the contents of the file that creates this page"
+
+"NODE 57"
+"Save As..."
+57,1,58,56,-1
+1
+0,""
+0,0
+""
+
+"NODE 58"
+"Create AGS Page..."
+58,1,59,57,-1
+1
+0,""
+0,0
+""
+
+"NODE 59"
+"----"
+59,1,5,58,-1
+6
+0,""
+0,0
+""
+
+"NODE 60"
+"Nudge Down"
+60,20,61,25,-1
+1
+0,"F1"
+0,0
+"Nudge value down"
+
+"NODE 61"
+"Nudge Up"
+61,20,-1,60,-1
+1
+0,"F2"
+0,0
+"Nudge value up"
+
+"NODE 62"
+""
+62,-1,63,-1,-1
+1
+0,""
+0,0
+""
+
+"NODE 63"
+""
+63,-1,64,-1,-1
+1
+0,""
+0,0
+""
+

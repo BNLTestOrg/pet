@@ -1,0 +1,6 @@
+# Ignore executables and object files
+X86/*
+SUN/*
+TimeStamp.c
+*.o
+!.keep
