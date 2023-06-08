@@ -1,6 +1,11 @@
 # Makefile for pet application
+# Define BASEDIR/MAKEDIR environment variables if not already set
+ifndef BASEDIR
+	BASEDIR := $(PWD)
+	MAKEDIR := $(BASEDIR)/libs/makefiles
+endif
 
-include /vobs/libs/makefiles/MakeStd.inc
+include ${BASEDIR}/libs/makefiles/MakeStd.inc
 
 USESOLIBS = true
 
