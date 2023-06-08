@@ -1,0 +1,356 @@
+[submodule "libs/Acme"]
+	path = libs/Acme
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/Acme.git
+	branch = 64bit
+[submodule "libs/Alarm"]
+	path = libs/Alarm
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/Alarm.git
+	branch = 64bit
+[submodule "libs/Async"]
+	path = libs/Async
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/Async.git
+	branch = 64bit
+[submodule "libs/DataServerClient"]
+	path = libs/DataServerClient
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/DataServerClient.git
+	branch = 64bit
+[submodule "libs/Display"]
+	path = libs/Display
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/Display.git
+	branch = 64bit
+[submodule "libs/EventLinks"]
+	path = libs/EventLinks
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/EventLinks.git
+	branch = 64bit
+[submodule "libs/FilterData"]
+	path = libs/FilterData
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/FilterData.git
+	branch = 64bit
+[submodule "libs/GenData"]
+	path = libs/GenData
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/GenData.git
+	branch = 64bit
+[submodule "libs/HttpClient"]
+	path = libs/HttpClient
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/HttpClient.git
+	branch = 64bit
+[submodule "libs/IO"]
+	path = libs/IO
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/IO.git
+	branch = 64bit
+[submodule "libs/MsgLog"]
+	path = libs/MsgLog
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/MsgLog.git
+	branch = 64bit
+[submodule "libs/Page"]
+	path = libs/Page
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/Page.git
+	branch = 64bit
+[submodule "libs/QG"]
+	path = libs/QG
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/QG.git
+	branch = 64bit
+[submodule "libs/RhicFileInfo"]
+	path = libs/RhicFileInfo
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/RhicFileInfo.git
+	branch = 64bit
+[submodule "libs/SDDS"]
+	path = libs/SDDS
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/SDDS.git
+	branch = 64bit
+[submodule "libs/SddsIO"]
+	path = libs/SddsIO
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/SddsIO.git
+	branch = 64bit
+[submodule "libs/UI"]
+	path = libs/UI
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UI.git
+	branch = 64bit
+[submodule "libs/UIAgs"]
+	path = libs/UIAgs
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIAgs.git
+	branch = 64bit
+[submodule "libs/UIDelay"]
+	path = libs/UIDelay
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIDelay.git
+	branch = 64bit
+[submodule "libs/UIDevice"]
+	path = libs/UIDevice
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIDevice.git
+	branch = 64bit
+[submodule "libs/UIDummy"]
+	path = libs/UIDummy
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIDummy.git
+	branch = 64bit
+[submodule "libs/UIGenerics"]
+	path = libs/UIGenerics
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIGenerics.git
+	branch = 64bit
+[submodule "libs/UIKnvas"]
+	path = libs/UIKnvas
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIKnvas.git
+	branch = 64bit
+[submodule "libs/UIPS"]
+	path = libs/UIPS
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIPS.git
+	branch = 64bit
+[submodule "libs/UIPlot"]
+	path = libs/UIPlot
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIPlot.git
+	branch = 64bit
+[submodule "libs/UIQt"]
+	path = libs/UIQt
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIQt.git
+	branch = 64bit
+[submodule "libs/UIQtPlot"]
+	path = libs/UIQtPlot
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIQtPlot.git
+	branch = 64bit
+[submodule "libs/UIRhicFileInfo"]
+	path = libs/UIRhicFileInfo
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIRhicFileInfo.git
+	branch = 64bit
+[submodule "libs/UISaveRestore"]
+	path = libs/UISaveRestore
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UISaveRestore.git
+	branch = 64bit
+[submodule "libs/UISetHist"]
+	path = libs/UISetHist
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UISetHist.git
+	branch = 64bit
+[submodule "libs/UITable"]
+	path = libs/UITable
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UITable.git
+	branch = 64bit
+[submodule "libs/UIUtils"]
+	path = libs/UIUtils
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIUtils.git
+	branch = 64bit
+[submodule "libs/UIV124"]
+	path = libs/UIV124
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIV124.git
+	branch = 64bit
+[submodule "libs/UIXrt3d"]
+	path = libs/UIXrt3d
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIXrt3d.git
+	branch = 64bit
+[submodule "libs/XmlDom"]
+	path = libs/XmlDom
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/XmlDom.git
+	branch = 64bit
+[submodule "libs/XrtGraph"]
+	path = libs/XrtGraph
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/XrtGraph.git
+	branch = 64bit
+[submodule "libs/ado"]
+	path = libs/ado
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/ado.git
+	branch = 64bit
+[submodule "libs/adoIf"]
+	path = libs/adoIf
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/adoIf.git
+	branch = 64bit
+[submodule "libs/agsDevices"]
+	path = libs/agsDevices
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/agsDevices.git
+	branch = 64bit
+[submodule "libs/agsPage"]
+	path = libs/agsPage
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/agsPage.git
+	branch = 64bit
+[submodule "libs/archive"]
+	path = libs/archive
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/archive.git
+	branch = 64bit
+[submodule "libs/baseEvent"]
+	path = libs/baseEvent
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/baseEvent.git
+	branch = 64bit
+[submodule "libs/basics"]
+	path = libs/basics
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/basics.git
+	branch = 64bit
+[submodule "libs/cdev"]
+	path = libs/cdev
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/cdev.git
+	branch = 64bit
+[submodule "libs/cdevAdoService"]
+	path = libs/cdevAdoService
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/cdevAdoService.git
+	branch = 64bit
+[submodule "libs/cdevCns"]
+	path = libs/cdevCns
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/cdevCns.git
+	branch = 64bit
+[submodule "libs/cdevData"]
+	path = libs/cdevData
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/cdevData.git
+	branch = 64bit
+[submodule "libs/cns"]
+	path = libs/cns
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/cns.git
+	branch = 64bit
+[submodule "libs/commLogServ"]
+	path = libs/commLogServ
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/commLogServ.git
+	branch = 64bit
+[submodule "libs/commToolsLib"]
+	path = libs/commToolsLib
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/commToolsLib.git
+	branch = 64bit
+[submodule "libs/dataBase"]
+	path = libs/dataBase
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/dataBase.git
+	branch = 64bit
+[submodule "libs/dataConvert"]
+	path = libs/dataConvert
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/dataConvert.git
+	branch = 64bit
+[submodule "libs/dataGraph"]
+	path = libs/dataGraph
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/dataGraph.git
+	branch = 64bit
+[submodule "libs/db++2"]
+	path = libs/db++2
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/db-2.git
+	branch = 64bit
+[submodule "libs/dbUtil"]
+	path = libs/dbUtil
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/dbUtil.git
+	branch = 64bit
+[submodule "libs/dbtools"]
+	path = libs/dbtools
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/dbtools.git
+	branch = 64bit
+[submodule "libs/ddf"]
+	path = libs/ddf
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/ddf.git
+	branch = 64bit
+[submodule "libs/fftw"]
+	path = libs/fftw
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/fftw.git
+	branch = 64bit
+[submodule "libs/funcTools"]
+	path = libs/funcTools
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/funcTools.git
+	branch = 64bit
+[submodule "libs/gpm"]
+	path = libs/gpm
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/gpm.git
+	branch = 64bit
+[submodule "libs/gpmlow"]
+	path = libs/gpmlow
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/gpmlow.git
+	branch = 64bit
+[submodule "libs/gpmlowUI"]
+	path = libs/gpmlowUI
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/gpmlowUI.git
+	branch = 64bit
+[submodule "libs/ifHandlerLib"]
+	path = libs/ifHandlerLib
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/ifHandlerLib.git
+	branch = 64bit
+[submodule "libs/includeAdo"]
+	path = libs/includeAdo
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/includeAdo.git
+	branch = 64bit
+[submodule "libs/includeCdev"]
+	path = libs/includeCdev
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/includeCdev.git
+	branch = 64bit
+[submodule "libs/includeCom"]
+	path = libs/includeCom
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/includeCom.git
+	branch = 64bit
+[submodule "libs/ipc"]
+	path = libs/ipc
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/ipc.git
+	branch = 64bit
+[submodule "libs/ipcLogger"]
+	path = libs/ipcLogger
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/ipcLogger.git
+	branch = 64bit
+[submodule "libs/logger"]
+	path = libs/logger
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/logger.git
+	branch = 64bit
+[submodule "libs/math"]
+	path = libs/math
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/math.git
+	branch = 64bit
+[submodule "libs/messenger"]
+	path = libs/messenger
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/messenger.git
+	branch = 64bit
+[submodule "libs/name"]
+	path = libs/name
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/name.git
+	branch = 64bit
+[submodule "libs/notifLib"]
+	path = libs/notifLib
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/notifLib.git
+	branch = 64bit
+[submodule "libs/pet"]
+	path = libs/pet
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/pet.git
+	branch = 64bit
+[submodule "libs/petss"]
+	path = libs/petss
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/petss.git
+	branch = 64bit
+[submodule "libs/rhicError"]
+	path = libs/rhicError
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/rhicError.git
+	branch = 64bit
+[submodule "libs/rhicPS"]
+	path = libs/rhicPS
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/rhicPS.git
+	branch = 64bit
+[submodule "libs/save_restore"]
+	path = libs/save_restore
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/save_restore.git
+	branch = 64bit
+[submodule "libs/setHist"]
+	path = libs/setHist
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/setHist.git
+	branch = 64bit
+[submodule "libs/smtp"]
+	path = libs/smtp
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/smtp.git
+	branch = 64bit
+[submodule "libs/stationClComm"]
+	path = libs/stationClComm
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/stationClComm.git
+	branch = 64bit
+[submodule "libs/stationComm"]
+	path = libs/stationComm
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/stationComm.git
+	branch = 64bit
+[submodule "libs/svcHandlerLib"]
+	path = libs/svcHandlerLib
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/svcHandlerLib.git
+	branch = 64bit
+[submodule "libs/timeLine"]
+	path = libs/timeLine
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/timeLine.git
+	branch = 64bit
+[submodule "libs/udpNet"]
+	path = libs/udpNet
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/udpNet.git
+	branch = 64bit
+[submodule "libs/utils"]
+	path = libs/utils
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/utils.git
+	branch = 64bit
+[submodule "libs/utilsIO"]
+	path = libs/utilsIO
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/utilsIO.git
+	branch = 64bit
+[submodule "libs/video"]
+	path = libs/video
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/video.git
+	branch = 64bit
+[submodule "libs/makefiles"]
+	path = libs/makefiles
+	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/makefiles.git
+	branch = 64bit
