@@ -1,32 +1,3 @@
-# When a push for this project is complete, it will trigger a synchronization to ClearCase.
-stages:
-  - check_changes
-  - update_clearcase
-
-before_script:
-  - export PATH=/usr/atria/bin/:$PATH
-
-check_changes:
-  stage: check_changes
-  script:
-    - echo ?Checking changed files...?
-    - git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep -v "^\." > changed_files.txt
-    - git log --format=%B -n 1 $CI_COMMIT_SHA > commit_message.txt
-  artifacts:
-    paths:
-      - changed_files.txt
-      - commit_message.txt
-
-update_clearcase:
-  stage: update_clearcase
-  script:
-    - echo ?Updating ClearCase with changed files...?
-    - echo "Changed Files"
-    - cat changed_files.txt
-    - echo "Commit message"
-    - cat commit_message.txt
-    - echo "Running on $HOST under user $USER"
-    - echo "Run some clearcase commands here"
-    - env FILES="$(paste -s -d ' ' ./changed_files.txt)" COMMIT="$(cat ./commit_message.txt)" VOB=$(paste -s -d ' ' ./.clearcase-vob) /usr/atria/bin/cleartool setview -exec '/ride/release/X86/scripts/gitlab_to_ccase_synchro.sh' vobadm
-  dependencies:
-    - check_changes
+include:
+  - project: 'cplusplus/common'
+    file: '/gitlab-ci-template.yml'
