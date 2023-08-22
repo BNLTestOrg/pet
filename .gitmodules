@@ -1,356 +1,356 @@
 [submodule "libs/Acme"]
 	path = libs/Acme
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/Acme.git
-	branch = master
+	branch = .
 [submodule "libs/Alarm"]
 	path = libs/Alarm
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/Alarm.git
-	branch = master
+	branch = .
 [submodule "libs/Async"]
 	path = libs/Async
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/Async.git
-	branch = master
+	branch = .
 [submodule "libs/DataServerClient"]
 	path = libs/DataServerClient
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/DataServerClient.git
-	branch = master
+	branch = .
 [submodule "libs/Display"]
 	path = libs/Display
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/Display.git
-	branch = master
+	branch = .
 [submodule "libs/EventLinks"]
 	path = libs/EventLinks
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/EventLinks.git
-	branch = master
+	branch = .
 [submodule "libs/FilterData"]
 	path = libs/FilterData
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/FilterData.git
-	branch = master
+	branch = .
 [submodule "libs/GenData"]
 	path = libs/GenData
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/GenData.git
-	branch = master
+	branch = .
 [submodule "libs/HttpClient"]
 	path = libs/HttpClient
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/HttpClient.git
-	branch = master
+	branch = .
 [submodule "libs/IO"]
 	path = libs/IO
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/IO.git
-	branch = master
+	branch = .
 [submodule "libs/MsgLog"]
 	path = libs/MsgLog
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/MsgLog.git
-	branch = master
+	branch = .
 [submodule "libs/Page"]
 	path = libs/Page
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/Page.git
-	branch = master
+	branch = .
 [submodule "libs/QG"]
 	path = libs/QG
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/QG.git
-	branch = master
+	branch = .
 [submodule "libs/RhicFileInfo"]
 	path = libs/RhicFileInfo
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/RhicFileInfo.git
-	branch = master
+	branch = .
 [submodule "libs/SDDS"]
 	path = libs/SDDS
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/SDDS.git
-	branch = master
+	branch = .
 [submodule "libs/SddsIO"]
 	path = libs/SddsIO
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/SddsIO.git
-	branch = master
+	branch = .
 [submodule "libs/UI"]
 	path = libs/UI
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UI.git
-	branch = master
+	branch = .
 [submodule "libs/UIAgs"]
 	path = libs/UIAgs
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIAgs.git
-	branch = master
+	branch = .
 [submodule "libs/UIDelay"]
 	path = libs/UIDelay
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIDelay.git
-	branch = master
+	branch = .
 [submodule "libs/UIDevice"]
 	path = libs/UIDevice
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIDevice.git
-	branch = master
+	branch = .
 [submodule "libs/UIDummy"]
 	path = libs/UIDummy
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIDummy.git
-	branch = master
+	branch = .
 [submodule "libs/UIGenerics"]
 	path = libs/UIGenerics
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIGenerics.git
-	branch = master
+	branch = .
 [submodule "libs/UIKnvas"]
 	path = libs/UIKnvas
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIKnvas.git
-	branch = master
+	branch = .
 [submodule "libs/UIPS"]
 	path = libs/UIPS
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIPS.git
-	branch = master
+	branch = .
 [submodule "libs/UIPlot"]
 	path = libs/UIPlot
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIPlot.git
-	branch = master
+	branch = .
 [submodule "libs/UIQt"]
 	path = libs/UIQt
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIQt.git
-	branch = master
+	branch = .
 [submodule "libs/UIQtPlot"]
 	path = libs/UIQtPlot
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIQtPlot.git
-	branch = master
+	branch = .
 [submodule "libs/UIRhicFileInfo"]
 	path = libs/UIRhicFileInfo
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIRhicFileInfo.git
-	branch = master
+	branch = .
 [submodule "libs/UISaveRestore"]
 	path = libs/UISaveRestore
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UISaveRestore.git
-	branch = master
+	branch = .
 [submodule "libs/UISetHist"]
 	path = libs/UISetHist
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UISetHist.git
-	branch = master
+	branch = .
 [submodule "libs/UITable"]
 	path = libs/UITable
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UITable.git
-	branch = master
+	branch = .
 [submodule "libs/UIUtils"]
 	path = libs/UIUtils
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIUtils.git
-	branch = master
+	branch = .
 [submodule "libs/UIV124"]
 	path = libs/UIV124
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIV124.git
-	branch = master
+	branch = .
 [submodule "libs/UIXrt3d"]
 	path = libs/UIXrt3d
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/UIXrt3d.git
-	branch = master
+	branch = .
 [submodule "libs/XmlDom"]
 	path = libs/XmlDom
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/XmlDom.git
-	branch = master
+	branch = .
 [submodule "libs/XrtGraph"]
 	path = libs/XrtGraph
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/XrtGraph.git
-	branch = master
+	branch = .
 [submodule "libs/ado"]
 	path = libs/ado
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/ado.git
-	branch = master
+	branch = .
 [submodule "libs/adoIf"]
 	path = libs/adoIf
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/adoIf.git
-	branch = master
+	branch = .
 [submodule "libs/agsDevices"]
 	path = libs/agsDevices
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/agsDevices.git
-	branch = master
+	branch = .
 [submodule "libs/agsPage"]
 	path = libs/agsPage
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/agsPage.git
-	branch = master
+	branch = .
 [submodule "libs/archive"]
 	path = libs/archive
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/archive.git
-	branch = master
+	branch = .
 [submodule "libs/baseEvent"]
 	path = libs/baseEvent
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/baseEvent.git
-	branch = master
+	branch = .
 [submodule "libs/basics"]
 	path = libs/basics
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/basics.git
-	branch = master
+	branch = .
 [submodule "libs/cdev"]
 	path = libs/cdev
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/cdev.git
-	branch = master
+	branch = .
 [submodule "libs/cdevAdoService"]
 	path = libs/cdevAdoService
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/cdevAdoService.git
-	branch = master
+	branch = .
 [submodule "libs/cdevCns"]
 	path = libs/cdevCns
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/cdevCns.git
-	branch = master
+	branch = .
 [submodule "libs/cdevData"]
 	path = libs/cdevData
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/cdevData.git
-	branch = master
+	branch = .
 [submodule "libs/cns"]
 	path = libs/cns
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/cns.git
-	branch = master
+	branch = .
 [submodule "libs/commLogServ"]
 	path = libs/commLogServ
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/commLogServ.git
-	branch = master
+	branch = .
 [submodule "libs/commToolsLib"]
 	path = libs/commToolsLib
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/commToolsLib.git
-	branch = master
+	branch = .
 [submodule "libs/dataBase"]
 	path = libs/dataBase
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/dataBase.git
-	branch = master
+	branch = .
 [submodule "libs/dataConvert"]
 	path = libs/dataConvert
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/dataConvert.git
-	branch = master
+	branch = .
 [submodule "libs/dataGraph"]
 	path = libs/dataGraph
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/dataGraph.git
-	branch = master
+	branch = .
 [submodule "libs/db++2"]
 	path = libs/db++2
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/db-2.git
-	branch = master
+	branch = .
 [submodule "libs/dbUtil"]
 	path = libs/dbUtil
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/dbUtil.git
-	branch = master
+	branch = .
 [submodule "libs/dbtools"]
 	path = libs/dbtools
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/dbtools.git
-	branch = master
+	branch = .
 [submodule "libs/ddf"]
 	path = libs/ddf
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/ddf.git
-	branch = master
+	branch = .
 [submodule "libs/fftw"]
 	path = libs/fftw
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/fftw.git
-	branch = master
+	branch = .
 [submodule "libs/funcTools"]
 	path = libs/funcTools
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/funcTools.git
-	branch = master
+	branch = .
 [submodule "libs/gpm"]
 	path = libs/gpm
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/gpm.git
-	branch = master
+	branch = .
 [submodule "libs/gpmlow"]
 	path = libs/gpmlow
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/gpmlow.git
-	branch = master
+	branch = .
 [submodule "libs/gpmlowUI"]
 	path = libs/gpmlowUI
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/gpmlowUI.git
-	branch = master
+	branch = .
 [submodule "libs/ifHandlerLib"]
 	path = libs/ifHandlerLib
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/ifHandlerLib.git
-	branch = master
+	branch = .
 [submodule "libs/includeAdo"]
 	path = libs/includeAdo
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/includeAdo.git
-	branch = master
+	branch = .
 [submodule "libs/includeCdev"]
 	path = libs/includeCdev
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/includeCdev.git
-	branch = master
+	branch = .
 [submodule "libs/includeCom"]
 	path = libs/includeCom
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/includeCom.git
-	branch = master
+	branch = .
 [submodule "libs/ipc"]
 	path = libs/ipc
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/ipc.git
-	branch = master
+	branch = .
 [submodule "libs/ipcLogger"]
 	path = libs/ipcLogger
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/ipcLogger.git
-	branch = master
+	branch = .
 [submodule "libs/logger"]
 	path = libs/logger
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/logger.git
-	branch = master
+	branch = .
 [submodule "libs/math"]
 	path = libs/math
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/math.git
-	branch = master
+	branch = .
 [submodule "libs/messenger"]
 	path = libs/messenger
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/messenger.git
-	branch = master
+	branch = .
 [submodule "libs/name"]
 	path = libs/name
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/name.git
-	branch = master
+	branch = .
 [submodule "libs/notifLib"]
 	path = libs/notifLib
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/notifLib.git
-	branch = master
+	branch = .
 [submodule "libs/pet"]
 	path = libs/pet
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/pet.git
-	branch = master
+	branch = .
 [submodule "libs/petss"]
 	path = libs/petss
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/petss.git
-	branch = master
+	branch = .
 [submodule "libs/rhicError"]
 	path = libs/rhicError
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/rhicError.git
-	branch = master
+	branch = .
 [submodule "libs/rhicPS"]
 	path = libs/rhicPS
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/rhicPS.git
-	branch = master
+	branch = .
 [submodule "libs/save_restore"]
 	path = libs/save_restore
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/save_restore.git
-	branch = master
+	branch = .
 [submodule "libs/setHist"]
 	path = libs/setHist
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/setHist.git
-	branch = master
+	branch = .
 [submodule "libs/smtp"]
 	path = libs/smtp
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/smtp.git
-	branch = master
+	branch = .
 [submodule "libs/stationClComm"]
 	path = libs/stationClComm
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/stationClComm.git
-	branch = master
+	branch = .
 [submodule "libs/stationComm"]
 	path = libs/stationComm
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/stationComm.git
-	branch = master
+	branch = .
 [submodule "libs/svcHandlerLib"]
 	path = libs/svcHandlerLib
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/svcHandlerLib.git
-	branch = master
+	branch = .
 [submodule "libs/timeLine"]
 	path = libs/timeLine
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/timeLine.git
-	branch = master
+	branch = .
 [submodule "libs/udpNet"]
 	path = libs/udpNet
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/udpNet.git
-	branch = master
+	branch = .
 [submodule "libs/utils"]
 	path = libs/utils
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/utils.git
-	branch = master
+	branch = .
 [submodule "libs/utilsIO"]
 	path = libs/utilsIO
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/utilsIO.git
-	branch = master
+	branch = .
 [submodule "libs/video"]
 	path = libs/video
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/video.git
-	branch = master
+	branch = .
 [submodule "libs/makefiles"]
 	path = libs/makefiles
 	url = git@gitlab.pbn.bnl.gov:cplusplus/libs/makefiles.git
-	branch = master
+	branch = .
