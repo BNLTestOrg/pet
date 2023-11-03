@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
   argList.AddString("-dumpToDefaultElog", "dump window image to the current default elog - must use with -single or -file");
   argList.AddString("-elogEntryTitle", "", "", "a title to attach to this elog entry - use with -dumpToElog");
   argList.AddString("-elogAttachToTitle", "", "", "attach image to the entry with this title - use with -dumpToElog");
+  argList.AddSwitch("-readOnly", "open pet in read-only mode.");
 
   // initialize the application
   application  = new UIApplication(argc, argv, &argList);
@@ -108,10 +109,14 @@ int main(int argc, char *argv[])
   if( argList.IsPresent("-knob") ) wname = "KnobPanel";
   else wname = "pet";
 
+  if (argList.IsPresent("-readOnly")) {
+      IORequest ioreq;
+      ioreq.setGlobalReadOnlyAccess();
+  }
+
   if (argList.IsPresent("-ppm")) {
       IORequest* ioreq = new IORequest();
-      
-      char* system = "injSpec.super"; 
+      char* system = "injSpec.super";
       int ppmValue =0;
       if(!strcmp(argList.String("-ppm"), "BOOSTER_USER_FOR_NSRL")) {
           int id = ioreq->addEntry(system, "boosterPpmUserForNsrlM");
@@ -176,6 +181,8 @@ int main(int argc, char *argv[])
     application->AddEventReceiver(mainWindow);
     // set up the archive lib tools
     mainWindow->InitArchiveLib();
+    if (argList.IsPresent("-readOnly"))
+        mainWindow->SetTitle("pet (Read Only)");
   }
 
   // check values of some command line arguments
@@ -438,6 +445,14 @@ int main(int argc, char *argv[])
       singlePetWin->ElogDumpAndExit();
   }
 
+  if (singlePetWin) {
+      if (singleWindowMode)
+          singlePetWin->toggleReadOnlyMenu(argList.IsPresent("-readOnly"));
+      else
+          // this will enable/disable menu options accordingly in the Petwindow
+          singlePetWin->SetLocalPetWindowCreating(singleWindowMode);
+  }
+
   // loop forever handling user events
   application->HandleEvents();
 }
@@ -593,6 +608,10 @@ SSMainWindow::SSMainWindow(const UIObject* parent, const char* name, const char*
   // put a pulldown menu in the menubar
   pulldownMenuTree = CreateMenuTree();
 
+  if (argList.IsPresent("-readOnly")) {
+      StdNode* node = pulldownMenuTree->FindMenuItem("/Options/Read Only Mode");
+      pulldownMenuTree->SetNodeSelected(node, 1);
+  }
   // the name of the tree file is in the resource file
   pulldownMenu = new UIPulldownMenu(menubar, "mainPulldown", pulldownMenuTree);
   if(pulldownMenu->IsTreeLoaded() == UIFalse)
@@ -1174,6 +1193,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
           if (type == PET_HYBRID_WINDOW && !adoWin->IsManaged() )
             SetWindowPos(adoWin, ldWin);
           adoWin->SetPageNode( treeTable->GetNodeSelected() );
+          adoWin->toggleReadOnlyMenu(pulldownMenu->IsMenuItemSelected("/Options", "Read Only Mode"));
           adoWin->Show();
           LoadPageList(adoWin);
           activeAdoWin = adoWin;
@@ -1360,6 +1380,7 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
       if (adoWin->CreateOK())
       {
         AddListWindow(adoWin);
+        adoWin->toggleReadOnlyMenu(pulldownMenu->IsMenuItemSelected("/Options", "Read Only Mode"));
         adoWin->Show();
         LoadPageList(adoWin);
         activeAdoWin = adoWin;
@@ -1472,6 +1493,26 @@ void SSMainWindow::HandleEvent(const UIObject* object, UIEvent event)
     else if(!strcmp(data->namesSelected[0], "Options")) {
       if(!strcmp(data->namesSelected[1], "Pet Page History")) {
         SO_Pet_Page_History();
+      }
+      else if(!strcmp(data->namesSelected[1], "Read Only Mode")) {
+          bool readOnlyMode;
+          IORequest ioreq;
+          if (pulldownMenu->IsMenuItemSelected("/Options", "Read Only Mode")) {
+              ioreq.setGlobalReadOnlyAccess();
+              mainWindow->SetTitle("pet (Read Only)");
+              readOnlyMode = true;
+          } else {
+              ioreq.setGlobalReadWriteAccess();
+              mainWindow->SetTitle("pet");
+              readOnlyMode = false;
+          }
+          int numWins = GetNumWindows();
+          PetWindow* win;
+          for (int i=1; i<=numWins; i++) {
+              win = (PetWindow *) GetWindow(i);
+              win->GetPetPage()->ReloadFile();
+              win->toggleReadOnlyMenu(readOnlyMode);
+          }
       }
       else if(!strcmp(data->namesSelected[1], "Read Archive Log")) {
         SO_Read_Archive_Log();
@@ -2065,6 +2106,7 @@ void SSMainWindow::SS_New()
 	petWin->EditBuiltInEditor(editDeviceList->GetPath());
 	string name = editDeviceList->GetPath();
 	petWin->SetTreeRootPath(name.c_str());
+    petWin->toggleReadOnlyMenu(pulldownMenu->IsMenuItemSelected("/Options", "Read Only Mode"));
 	LoadPageList(petWin);
       } else {
 	// editing existing file
@@ -2218,6 +2260,7 @@ void SSMainWindow::SS_Create_RHIC_Page()
   activeAdoWin = petWin;
   petWin->TF_Create_Pet_Page();
   petWin->RemoveAllGpms(); // there are none but this will take care of the attachments
+  petWin->toggleReadOnlyMenu(pulldownMenu->IsMenuItemSelected("/Options", "Read Only Mode"));
   petWin->Show();
   LoadPageList(petWin);
   SetStandardCursor();

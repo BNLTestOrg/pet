@@ -4,3 +4,5 @@ SUN/*
 TimeStamp.c
 *.o
 !.keep
+.idea/*
+cmake-build-*
