@@ -102,6 +102,10 @@ MenuTree* CreateMenuTree()
 	menuTree->SetNodeHelpText(snode, "This menu provides miscellaneous options\navailable to the program as a whole.");
 	menuTree->SetNodeMnemonic(snode, 'O');
 
+    snode = menuTree->InsertMenuItem("Read Only Mode", "/Options", NULL);
+    menuTree->SetNodeHelpText(snode, "Disables settings for all pet pages associated with this instance of pet.");
+    menuTree->SetNodeType(snode, MenuToggleType);
+
 	snode = menuTree->InsertMenuItem("Pet Page History", "/Options", NULL);
 	menuTree->SetNodeHelpText(snode, "Brings up a new window allowing you to look at the history\nof when pet pages were loaded by this program or any\nother one.  Searches for particular pages are possible.");
 
